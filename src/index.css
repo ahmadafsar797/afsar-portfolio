@@ -1,0 +1,226 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: 'Pogonia';
+  src: url('/fonts/pogonia-regular.ttf') format('truetype'),
+       url('/fonts/pogonia-regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Pogonia';
+  src: url('/fonts/pogonia-medium.ttf') format('truetype'),
+       url('/fonts/pogonia-medium.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Pogonia';
+  src: url('/fonts/pogonia-semibold.ttf') format('truetype'),
+       url('/fonts/pogonia-semibold.otf') format('opentype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Pogonia';
+  src: url('/fonts/pogonia-bold.ttf') format('truetype'),
+       url('/fonts/pogonia-bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Pogonia';
+  src: url('/fonts/pogonia-extrabold.ttf') format('truetype'),
+       url('/fonts/pogonia-extrabold.otf') format('opentype');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Pogonia';
+  src: url('/fonts/pogonia-black.ttf') format('truetype'),
+       url('/fonts/pogonia-black.otf') format('opentype');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@theme {
+  --font-pogonia: 'Pogonia', 'Montserrat', system-ui, -apple-system, sans-serif;
+  --font-serif: 'Pogonia', 'Montserrat', serif;
+  --font-montserrat: 'Montserrat', system-ui, -apple-system, sans-serif;
+  --font-sans: 'Montserrat', system-ui, -apple-system, sans-serif;
+
+  /* Regular font family scale (Montserrat) - slightly larger across UI */
+  --text-xs: 0.84375rem; /* ~13.5px, was 12px */
+  --text-xs--line-height: 1.25rem;
+
+  --text-sm: 0.96875rem; /* ~15.5px, was 14px */
+  --text-sm--line-height: 1.5rem;
+
+  --text-base: 1.09375rem; /* ~17.5px, was 16px */
+  --text-base--line-height: 1.7rem;
+
+  --text-lg: 1.21875rem; /* ~19.5px, was 18px */
+  --text-lg--line-height: 1.85rem;
+
+  --text-xl: 1.34375rem; /* ~21.5px, was 20px */
+  --text-xl--line-height: 1.95rem;
+
+  /* Screenshot Exact Palette */
+  --color-chocolate: #2B170F;
+  --color-chocolate-hover: #3E2217;
+  --color-golden: #C65D45;
+  --color-golden-hover: #a84d38;
+  --color-cream: #F8F1E7;
+  --color-dark-brown: #2B170F;
+  --color-warm-gray: #756A62;
+  --color-warm-white: #FFF9F2;
+
+  --color-canvas: #F8F1E7;
+  --color-surface: #FFF9F2;
+  --color-dark: #2B170F;
+  --color-border-subtle: rgba(43, 23, 15, 0.08);
+  --color-border-medium: rgba(43, 23, 15, 0.16);
+}
+
+/* Base resets & typography */
+html {
+  scroll-behavior: smooth;
+  color-scheme: light;
+}
+
+body {
+  background-color: #F8F1E7;
+  color: #756A62;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  overflow-x: hidden;
+  letter-spacing: -0.01em;
+  font-size: 1.05rem;
+}
+
+.text-\[10px\] {
+  font-size: 11.5px !important;
+}
+
+.text-\[11px\] {
+  font-size: 12.5px !important;
+}
+
+
+/* Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Typography assignments: strictly Montserrat (Medium by default) and Pogonia */
+.font-editorial, .font-pogonia, .font-serif {
+  font-family: 'Pogonia', 'Montserrat', serif;
+}
+
+.font-ui, .font-sans, .font-montserrat {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+}
+
+/* Medium thickness (500) for regular text, paragraphs, and descriptions */
+p, blockquote {
+  font-weight: 500;
+}
+
+.font-normal {
+  font-weight: 500 !important;
+}
+
+.font-badge {
+  font-family: 'Montserrat', sans-serif;
+  letter-spacing: 0.06em;
+}
+
+/* Custom scrollbar in warm tones */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F8F1E7;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #e2d7c9;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #C65D45;
+}
+
+/* Aspect ratio helpers */
+.aspect-9-16 {
+  aspect-ratio: 9 / 16;
+}
+
+.aspect-16-9 {
+  aspect-ratio: 16 / 9;
+}
+
+.aspect-4-5 {
+  aspect-ratio: 4 / 5;
+}
+
+/* Animations for reference hero */
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 14s linear infinite;
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 28s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+/* Golden & chocolate shadows */
+.gold-glow {
+  box-shadow: 0 0 35px -5px rgba(249, 169, 22, 0.35);
+}
+
+.subtle-card-shadow {
+  box-shadow: 0 10px 30px -10px rgba(43, 23, 15, 0.06);
+}
