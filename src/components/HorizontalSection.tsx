@@ -150,7 +150,7 @@ const HorizontalVideoCard: React.FC<HorizontalVideoCardProps> = ({ video, index,
           <button
             onClick={() => onOpenLightbox(video.video_url, video.title, video.client, video.category)}
             data-cursor="play"
-            className="group/watchbtn relative inline-flex items-center gap-3 px-7 py-3.5 rounded-full overflow-hidden font-sans font-black text-sm uppercase tracking-widest text-[#FFF9F2] bg-gradient-to-r from-[#C65D45] via-[#D8684F] to-[#E2725B] shadow-[0_6px_24px_rgba(198,93,69,0.55),inset_0_1px_1px_rgba(255,255,255,0.35)] hover:shadow-[0_8px_32px_rgba(198,93,69,0.75),inset_0_1px_1px_rgba(255,255,255,0.4)] hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer border border-[#E2725B]/50"
+            className="group/watchbtn relative inline-flex items-center gap-3 px-7 py-3.5 rounded-full overflow-hidden font-sans font-semibold text-sm uppercase text-[#FFF9F2] bg-gradient-to-r from-[#C65D45] via-[#D8684F] to-[#E2725B] shadow-[0_6px_24px_rgba(198,93,69,0.55),inset_0_1px_1px_rgba(255,255,255,0.35)] hover:shadow-[0_8px_32px_rgba(198,93,69,0.75),inset_0_1px_1px_rgba(255,255,255,0.4)] hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer border border-[#E2725B]/50"
           >
             {/* shimmer sweep on hover */}
             <span className="absolute inset-0 -translate-x-full group-hover/watchbtn:translate-x-full group-active/watchbtn:translate-x-full transition-transform duration-500 bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none" />
