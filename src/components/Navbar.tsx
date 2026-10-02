@@ -196,10 +196,9 @@ export const Navbar: React.FC<NavbarProps> = ({ settings, onOpenAdmin, isAdminLo
               href="#contact"
               onClick={() => handleNavClick('contact')}
               data-cursor="open"
-              className="group/navbtn relative px-5 sm:px-6 md:px-7 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-sans font-bold text-[#FFF9F2] bg-gradient-to-r from-[#C65D45] via-[#D8684F] to-[#E2725B] hover:shadow-[0_0_20px_rgba(198,93,69,0.5)] hover:scale-105 active:scale-95 transition-all duration-300 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),0_4px_12px_rgba(0,0,0,0.3)] border border-white/25 flex items-center gap-2 cursor-pointer"
+              className="group/navbtn relative px-5 sm:px-6 md:px-7 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-sans font-bold text-[#FFF9F2] bg-gradient-to-r from-[#C65D45] via-[#D8684F] to-[#E2725B] hover:shadow-[0_0_20px_rgba(198,93,69,0.5)] hover:scale-105 active:scale-95 transition-all duration-300 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),0_4px_12px_rgba(0,0,0,0.3)] border border-white/25 cursor-pointer"
             >
-              <span>Contact Me</span>
-              <span className="w-2 h-2 rounded-full bg-[#FFA07A] shadow-[0_0_6px_#FFA07A,0_0_10px_#C65D45] animate-pulse" />
+              Contact Me
             </a>
           </div>
 
@@ -208,10 +207,9 @@ export const Navbar: React.FC<NavbarProps> = ({ settings, onOpenAdmin, isAdminLo
             <a
               href="#contact"
               onClick={() => handleNavClick('contact')}
-              className="px-3 py-1.5 rounded-full text-[11px] font-sans font-bold text-[#FFF9F2] bg-gradient-to-r from-[#C65D45] to-[#D8684F] shadow-sm hover:brightness-105 active:scale-95 transition-all whitespace-nowrap flex items-center gap-1.5 border border-white/20"
+              className="px-3 py-1.5 rounded-full text-[11px] font-sans font-bold text-[#FFF9F2] bg-gradient-to-r from-[#C65D45] to-[#D8684F] shadow-sm hover:brightness-105 active:scale-95 transition-all whitespace-nowrap border border-white/20"
             >
-              <span>Contact</span>
-              <span className="w-1.5 h-1.5 rounded-full bg-[#FFA07A] shadow-[0_0_4px_#FFA07A]" />
+              Contact
             </a>
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}

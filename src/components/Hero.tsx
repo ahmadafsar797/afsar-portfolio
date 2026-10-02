@@ -263,8 +263,6 @@ export const Hero: React.FC<HeroProps> = ({ settings, onWatchShowreel }) => {
                   aria-label="Watch Master Showreel"
                 >
                   <Play className="w-3.5 h-3.5 fill-current text-white/95 ml-0.5" />
-                  {/* Glowing Tactile LED Indicator Dot from Reference */}
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#FFA07A] shadow-[0_0_8px_#C65D45,0_0_14px_#FFA07A] animate-pulse" />
                 </button>
               </div>
 
@@ -272,10 +270,9 @@ export const Hero: React.FC<HeroProps> = ({ settings, onWatchShowreel }) => {
               <a
                 href="#contact"
                 data-cursor="open"
-                className="group/hire relative px-6 sm:px-7 py-3.5 sm:py-4 rounded-full bg-gradient-to-b from-[#28150D] via-[#1E0F09] to-[#140A06] text-[#FFF9F2] font-sans font-bold text-xs uppercase tracking-wider border border-[#2B170F]/50 shadow-[0_4px_14px_rgba(0,0,0,0.25),inset_0_1px_1px_rgba(255,255,255,0.15)] hover:border-[#C65D45] hover:shadow-[0_4px_22px_rgba(198,93,69,0.35)] hover:scale-105 active:scale-95 transition-all duration-300 flex items-center gap-2.5"
+                className="group/hire relative px-6 sm:px-7 py-3.5 sm:py-4 rounded-full bg-gradient-to-b from-[#28150D] via-[#1E0F09] to-[#140A06] text-[#FFF9F2] font-sans font-bold text-xs uppercase tracking-wider border border-[#2B170F]/50 shadow-[0_4px_14px_rgba(0,0,0,0.25),inset_0_1px_1px_rgba(255,255,255,0.15)] hover:border-[#C65D45] hover:shadow-[0_4px_22px_rgba(198,93,69,0.35)] hover:scale-105 active:scale-95 transition-all duration-300"
               >
-                <span>Hire Me</span>
-                <span className="w-2 h-2 rounded-full bg-[#FFA07A] opacity-80 group-hover/hire:opacity-100 shadow-[0_0_8px_#C65D45] transition-opacity" />
+                Hire Me
               </a>
             </div>
           </div>
