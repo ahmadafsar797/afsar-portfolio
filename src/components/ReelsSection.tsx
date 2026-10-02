@@ -275,7 +275,7 @@ const ReelCard: React.FC<ReelCardProps> = ({
 
         {/* Bottom Details */}
         <div className="absolute bottom-0 left-0 right-0 p-2.5 sm:p-5 z-10 flex flex-col gap-0.5 sm:gap-1 translate-y-1 group-hover:translate-y-0 transition-transform duration-300">
-          <div className="text-[8.5px] sm:text-[11px] font-sans uppercase tracking-wider text-[#C65D45] font-semibold truncate">
+          <div className="text-[10px] sm:text-[13px] font-sans uppercase tracking-wider text-[#C65D45] font-medium truncate">
             {reel.client || 'Client Project'}
           </div>
           <h3 className="font-pogonia text-xs sm:text-xl lg:text-2xl font-bold text-white group-hover:text-[#C65D45] transition-colors line-clamp-2 leading-snug">
