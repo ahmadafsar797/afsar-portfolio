@@ -227,7 +227,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ settings, presel
                     }}
                     className="group/again relative mt-6 px-6 py-2.5 rounded-full overflow-hidden text-xs font-black uppercase tracking-widest text-[#FFF9F2] bg-gradient-to-r from-[#C65D45] via-[#D8684F] to-[#E2725B] shadow-[0_4px_18px_rgba(198,93,69,0.45)] hover:shadow-[0_6px_24px_rgba(198,93,69,0.6)] hover:scale-105 active:scale-95 transition-all duration-300 border border-[#E2725B]/40"
                   >
-                    <span className="absolute inset-0 -translate-x-full group-hover/again:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none" />
+                    <span className="absolute inset-0 -translate-x-full group-hover/again:translate-x-full group-active/again:translate-x-full transition-transform duration-500 bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none" />
                     <span className="relative">Send Another Message</span>
                   </button>
                 </div>
@@ -339,7 +339,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ settings, presel
                     disabled={loading}
                     className="group/submit relative w-full py-4 rounded-full overflow-hidden text-sm font-black uppercase tracking-widest text-[#FFF9F2] bg-gradient-to-r from-[#C65D45] via-[#D8684F] to-[#E2725B] shadow-[0_6px_28px_rgba(198,93,69,0.5),inset_0_1px_1px_rgba(255,255,255,0.35)] hover:shadow-[0_8px_36px_rgba(198,93,69,0.7)] hover:scale-[1.02] active:scale-95 transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-2 border border-[#E2725B]/40"
                   >
-                    <span className="absolute inset-0 -translate-x-full group-hover/submit:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none" />
+                    <span className="absolute inset-0 -translate-x-full group-hover/submit:translate-x-full group-active/submit:translate-x-full transition-transform duration-500 bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none" />
                     {loading ? (
                       <span className="relative">Submitting Inquiry...</span>
                     ) : (

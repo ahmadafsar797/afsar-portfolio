@@ -386,7 +386,7 @@ const HorizontalTestimonialCard: React.FC<HorizontalTestimonialCardProps> = ({
           data-cursor="play"
           className="group/story relative w-full py-3 rounded-full overflow-hidden text-xs font-sans uppercase font-black tracking-widest text-[#FFF9F2] bg-gradient-to-r from-[#C65D45] via-[#D8684F] to-[#E2725B] shadow-[0_4px_18px_rgba(198,93,69,0.45),inset_0_1px_1px_rgba(255,255,255,0.35)] hover:shadow-[0_6px_28px_rgba(198,93,69,0.65)] hover:scale-[1.02] active:scale-95 transition-all duration-300 flex items-center justify-center gap-2 border border-[#E2725B]/40 cursor-pointer"
         >
-          <span className="absolute inset-0 -translate-x-full group-hover/story:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none" />
+          <span className="absolute inset-0 -translate-x-full group-hover/story:translate-x-full group-active/story:translate-x-full transition-transform duration-500 bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none" />
           <Play className="relative w-3.5 h-3.5 fill-current" />
           <span className="relative">Watch Client Story</span>
         </button>

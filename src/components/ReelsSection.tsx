@@ -79,7 +79,7 @@ export const ReelsSection: React.FC<ReelsSectionProps> = ({ reels, onOpenLightbo
                   }`}
                 >
                   {active && (
-                    <span className="absolute inset-0 -translate-x-full group-hover/filter:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/25 to-transparent pointer-events-none" />
+                    <span className="absolute inset-0 -translate-x-full group-hover/filter:translate-x-full group-active/filter:translate-x-full transition-transform duration-500 bg-gradient-to-r from-transparent via-white/25 to-transparent pointer-events-none" />
                   )}
                   <span className="relative">{cat}</span>
                 </button>

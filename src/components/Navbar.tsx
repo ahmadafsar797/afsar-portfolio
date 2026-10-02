@@ -198,7 +198,7 @@ export const Navbar: React.FC<NavbarProps> = ({ settings, onOpenAdmin, isAdminLo
               data-cursor="open"
               className="group/navbtn relative px-5 sm:px-6 md:px-7 py-2 sm:py-2.5 rounded-full overflow-hidden text-xs sm:text-sm font-sans font-black text-[#FFF9F2] bg-gradient-to-r from-[#C65D45] via-[#D8684F] to-[#E2725B] uppercase tracking-widest hover:shadow-[0_0_28px_rgba(198,93,69,0.65)] hover:scale-105 active:scale-95 transition-all duration-300 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),0_4px_12px_rgba(0,0,0,0.3)] border border-white/25 cursor-pointer"
             >
-              <span className="absolute inset-0 -translate-x-full group-hover/navbtn:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/25 to-transparent pointer-events-none" />
+              <span className="absolute inset-0 -translate-x-full group-hover/navbtn:translate-x-full group-active/navbtn:translate-x-full transition-transform duration-500 bg-gradient-to-r from-transparent via-white/25 to-transparent pointer-events-none" />
               <span className="relative">Contact Me</span>
             </a>
           </div>
@@ -210,7 +210,7 @@ export const Navbar: React.FC<NavbarProps> = ({ settings, onOpenAdmin, isAdminLo
               onClick={() => handleNavClick('contact')}
               className="group/mobilebtn relative px-3 py-1.5 rounded-full overflow-hidden text-[11px] font-sans font-black text-[#FFF9F2] bg-gradient-to-r from-[#C65D45] to-[#D8684F] uppercase tracking-widest hover:shadow-[0_0_16px_rgba(198,93,69,0.5)] active:scale-95 transition-all whitespace-nowrap border border-white/20"
             >
-              <span className="absolute inset-0 -translate-x-full group-hover/mobilebtn:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none" />
+              <span className="absolute inset-0 -translate-x-full group-hover/mobilebtn:translate-x-full group-active/mobilebtn:translate-x-full transition-transform duration-500 bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none" />
               <span className="relative">Contact</span>
             </a>
             <button
