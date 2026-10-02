@@ -243,11 +243,8 @@ const ReelCard: React.FC<ReelCardProps> = ({
         {/* Vignette */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/25 to-black/40 pointer-events-none transition-opacity duration-300 group-hover:opacity-90" />
 
-        {/* Top Chips */}
-        <div className="absolute top-2 sm:top-4 left-2 sm:left-4 right-2 sm:right-4 flex items-center justify-between z-10">
-          <span className="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full bg-black/75 backdrop-blur-md border border-white/10 text-[8.5px] sm:text-[10px] font-sans uppercase font-bold tracking-wider text-[#C65D45] truncate max-w-[68%]">
-            {reel.category}
-          </span>
+        {/* Top Controls */}
+        <div className="absolute top-2 sm:top-4 left-2 sm:left-4 right-2 sm:right-4 flex items-center justify-end z-10">
           <div className="flex items-center gap-1.5 sm:gap-2">
             {reel.duration && (
               <span className="px-1.5 py-0.5 sm:px-2 sm:py-0.5 rounded-full bg-black/75 backdrop-blur-md text-[8.5px] sm:text-[10px] font-sans text-white/80 shrink-0">
