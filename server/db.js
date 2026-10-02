@@ -101,12 +101,11 @@ async function initDb() {
   if (!fs.existsSync(dataDir))    fs.mkdirSync(dataDir,    { recursive: true });
   if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
 
-  // Load sql.js with its WASM binary
+  // Load sql.js — tell it exactly where to find the WASM binary
   const initSqlJs = require('sql.js');
-  const wasmPath  = path.join(require.resolve('sql.js'), '..', 'dist', 'sql-wasm.wasm');
-  const wasmBinary = fs.existsSync(wasmPath) ? fs.readFileSync(wasmPath) : undefined;
-
-  const SQL = await initSqlJs({ wasmBinary });
+  const SQL = await initSqlJs({
+    locateFile: (file) => path.join(__dirname, '..', 'node_modules', 'sql.js', 'dist', file)
+  });
 
   // Load existing database file or create a new one
   let sqlJsDb;
