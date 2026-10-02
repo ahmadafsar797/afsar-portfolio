@@ -16,14 +16,8 @@ export const PageLoader: React.FC<PageLoaderProps> = ({ onComplete }) => {
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    // Safety: always complete within 2.5s even if GSAP fails
-    const safetyTimer = setTimeout(() => {
-      onComplete();
-    }, 2500);
-
     // Respect reduced motion
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      clearTimeout(safetyTimer);
       onComplete();
       return;
     }
@@ -76,13 +70,11 @@ export const PageLoader: React.FC<PageLoaderProps> = ({ onComplete }) => {
       }, 0.55)
       // Complete callback right as curtains open
       .call(() => {
-        clearTimeout(safetyTimer);
         onComplete();
       }, undefined, 0.7);
 
     return () => {
       tl.kill();
-      clearTimeout(safetyTimer);
     };
   }, [onComplete]);
 
