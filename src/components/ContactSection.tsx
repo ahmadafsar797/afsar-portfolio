@@ -225,9 +225,10 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ settings, presel
                         brief_url: '',
                       });
                     }}
-                    className="mt-6 px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider text-[#2B170F] bg-[#FFF9F2] hover:bg-[#FFF9F2]/80 border border-[#2B170F]/20 transition-all shadow-sm"
+                    className="group/again relative mt-6 px-6 py-2.5 rounded-full overflow-hidden text-xs font-black uppercase tracking-widest text-[#FFF9F2] bg-gradient-to-r from-[#C65D45] via-[#D8684F] to-[#E2725B] shadow-[0_4px_18px_rgba(198,93,69,0.45)] hover:shadow-[0_6px_24px_rgba(198,93,69,0.6)] hover:scale-105 active:scale-95 transition-all duration-300 border border-[#E2725B]/40"
                   >
-                    Send Another Message
+                    <span className="absolute inset-0 -translate-x-full group-hover/again:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none" />
+                    <span className="relative">Send Another Message</span>
                   </button>
                 </div>
               ) : (
@@ -336,14 +337,15 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ settings, presel
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full py-4 rounded-full text-xs font-bold uppercase tracking-widest text-[#2B170F] bg-[#C65D45] hover:bg-[#a84d38] transition-all duration-300 shadow-lg shadow-[#C65D45]/25 active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
+                    className="group/submit relative w-full py-4 rounded-full overflow-hidden text-sm font-black uppercase tracking-widest text-[#FFF9F2] bg-gradient-to-r from-[#C65D45] via-[#D8684F] to-[#E2725B] shadow-[0_6px_28px_rgba(198,93,69,0.5),inset_0_1px_1px_rgba(255,255,255,0.35)] hover:shadow-[0_8px_36px_rgba(198,93,69,0.7)] hover:scale-[1.02] active:scale-95 transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-2 border border-[#E2725B]/40"
                   >
+                    <span className="absolute inset-0 -translate-x-full group-hover/submit:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none" />
                     {loading ? (
-                      <span>Submitting Inquiry...</span>
+                      <span className="relative">Submitting Inquiry...</span>
                     ) : (
                       <>
-                        <span>Submit Project Inquiry</span>
-                        <Send className="w-4 h-4" />
+                        <span className="relative">Submit Project Inquiry</span>
+                        <Send className="relative w-4 h-4" />
                       </>
                     )}
                   </button>
