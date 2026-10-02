@@ -1,5 +1,5 @@
 import React from 'react';
-import { Film, ArrowUp, ShieldCheck } from 'lucide-react';
+import { Film, ArrowUp } from 'lucide-react';
 import { SettingsData } from '../types';
 
 interface FooterProps {
@@ -54,20 +54,10 @@ export const Footer: React.FC<FooterProps> = ({ settings, onOpenAdmin, isAdminLo
           </button>
         </div>
 
-        {/* Bottom credits & admin entry */}
+        {/* Bottom credits */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-8 text-xs text-[#FFF9F2]/50 font-montserrat">
           <div>
             © {new Date().getFullYear()} Afsar Ahmad. All Rights Reserved. Crafted for high-retention cinematic storytelling.
-          </div>
-
-          <div className="flex items-center gap-4">
-            <button
-              onClick={onOpenAdmin}
-              className="hover:text-[#C65D45] transition-colors flex items-center gap-1.5 cursor-pointer text-[#FFF9F2]/70"
-            >
-              <ShieldCheck className="w-3.5 h-3.5 text-[#C65D45]" />
-              <span>{isAdminLoggedIn ? 'Admin Dashboard' : 'Editor Admin Login'}</span>
-            </button>
           </div>
         </div>
       </div>
