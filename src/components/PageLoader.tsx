@@ -153,7 +153,7 @@ export const PageLoader: React.FC<PageLoaderProps> = ({ onComplete }) => {
             color: 'rgba(255, 249, 242, 0.55)',
           }}
         >
-          Video Editor & Colorist
+          Video Editor & Motion Designer
         </div>
 
         <div

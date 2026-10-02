@@ -299,7 +299,7 @@ function seedDefaultData() {
     `).run(
       1,
       'Story first. Pacing second. Effects serve the narrative.',
-      "I'm Afsar Ahmad, a freelance video editor and colorist with over 2 years of dedicated post-production experience. I partner with ambitious creators, modern brands, and growing channels worldwide to craft videos that capture attention within the first 1.5 seconds and retain it through emotional rhythm, dynamic soundscapes, and flawless pacing.",
+      "I'm Afsar Ahmad, a freelance video editor and motion designer with over 2 years of dedicated post-production experience. I partner with ambitious creators, modern brands, and growing channels worldwide to craft videos that capture attention within the first 1.5 seconds and retain it through emotional rhythm, dynamic soundscapes, and flawless pacing.",
       'In a feed saturated with derivative templates, true engagement comes from intentional narrative tension, hyper-calibrated audio design, and color grading that elevates raw footage into a cinematic world.',
       '2+', '65M+', '180+', '99.4%',
       'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80',

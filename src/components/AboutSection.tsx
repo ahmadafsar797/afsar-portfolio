@@ -139,7 +139,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ about, onOpenShowree
 
             <p className="text-base sm:text-lg font-medium text-[#756A62] leading-relaxed mb-6">
               {about?.bio ||
-                "I'm Afsar Ahmad, a freelance video editor and colorist with over 2 years of dedicated post-production experience. I partner with ambitious creators, modern brands, and growing channels worldwide to craft videos that capture attention within the first 1.5 seconds and retain it through emotional rhythm, dynamic soundscapes, and flawless pacing."}
+                "I'm Afsar Ahmad, a freelance video editor and motion designer with over 2 years of dedicated post-production experience. I partner with ambitious creators, modern brands, and growing channels worldwide to craft videos that capture attention within the first 1.5 seconds and retain it through emotional rhythm, dynamic soundscapes, and flawless pacing."}
             </p>
 
             <p className="text-sm sm:text-base font-medium text-[#756A62]/80 leading-relaxed mb-8">

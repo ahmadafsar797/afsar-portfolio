@@ -134,7 +134,7 @@ export const App: React.FC = () => {
           AFSAR AHMAD
         </div>
         <div className="text-[10px] font-sans uppercase tracking-[0.25em] text-[#FFF9F2]/50 mt-2">
-          Video Editor & Colorist
+          Video Editor & Motion Designer
         </div>
       </div>
     );

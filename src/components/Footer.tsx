@@ -27,7 +27,7 @@ export const Footer: React.FC<FooterProps> = ({ settings, onOpenAdmin, isAdminLo
                 AFSAR AHMAD
               </span>
               <span className="text-[10px] font-montserrat uppercase tracking-widest text-[#FFF9F2]/50">
-                Video Editor & Narrative Colorist
+                Video Editor & Motion Designer
               </span>
             </div>
           </div>
