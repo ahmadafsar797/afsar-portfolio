@@ -1,0 +1,3 @@
+# This file keeps the data/ folder in Git.
+# The actual portfolio.db file is excluded by .gitignore.
+# Render.com will create a fresh database on first boot automatically.

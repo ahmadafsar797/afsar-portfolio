@@ -1,0 +1,3 @@
+# This file keeps the uploads/ folder in Git.
+# Actual uploaded files are excluded by .gitignore.
+# Render.com will write new uploads to this folder at runtime.

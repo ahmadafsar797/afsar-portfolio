@@ -16,3 +16,17 @@ Thumbs.db
 # Logs
 logs/
 *.log
+
+# Build output (Render will build it fresh)
+dist/
+
+# Local uploaded files (large videos / images uploaded through admin panel)
+# On Render, uploads are stored on the server's ephemeral disk
+uploads/*
+!uploads/.gitkeep
+
+# Local SQLite database (Render will auto-create a fresh one on first run)
+data/portfolio.db
+
+# Scratch/temp files
+scratch/
