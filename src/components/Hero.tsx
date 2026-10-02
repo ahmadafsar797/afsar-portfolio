@@ -239,37 +239,43 @@ export const Hero: React.FC<HeroProps> = ({ settings, onWatchShowreel }) => {
             </p>
 
             {/* CTAs */}
-            <div ref={ctaRef} className="flex flex-wrap items-center gap-3 sm:gap-4">
-              <div className="inline-flex items-stretch rounded-full shadow-lg shadow-[#2B170F]/20 overflow-hidden group">
+            <div ref={ctaRef} className="flex flex-wrap items-center gap-3 sm:gap-5">
+              {/* Luxury Tactile Switch Pill Button (from reference design) */}
+              <div className="relative inline-flex items-center rounded-full p-1 sm:p-1.5 bg-[#180E09] border border-[#2B170F]/40 shadow-[inset_0_3px_8px_rgba(0,0,0,0.7),inset_0_-1px_2px_rgba(255,255,255,0.08),0_8px_24px_rgba(43,23,15,0.28)] group select-none transition-all duration-300 hover:shadow-[inset_0_3px_8px_rgba(0,0,0,0.7),0_8px_28px_rgba(198,93,69,0.35)]">
+                {/* Active Colored Track (Left Side) */}
                 <a
                   href="#reels"
                   data-cursor="open"
-                  className="bg-[#2B170F] hover:bg-[#3E2217] text-[#FFF9F2] px-5 sm:px-7 py-3.5 font-sans font-semibold text-xs uppercase tracking-wider transition-colors duration-300 flex items-center gap-2 whitespace-nowrap"
+                  className="relative z-10 px-5 sm:px-6 py-2.5 sm:py-3 rounded-l-full bg-gradient-to-r from-[#C65D45] via-[#D8684F] to-[#E2725B] text-[#FFF9F2] font-sans font-bold text-xs uppercase tracking-wider shadow-[inset_0_1px_2px_rgba(255,255,255,0.45),0_0_16px_rgba(198,93,69,0.35)] hover:brightness-105 active:scale-98 transition-all duration-200 flex items-center gap-2"
                 >
                   <span>Explore Portfolio</span>
                 </a>
-                {/* Divider line */}
-                <div className="w-px bg-[#FFF9F2]/15 shrink-0" />
+
+                {/* Tactile 3D Slider Knob with Glowing LED Indicator (Right Side) */}
                 <button
                   ref={playBtnRef}
                   onClick={onWatchShowreel}
                   onMouseMove={handlePlayMagnetic}
                   onMouseLeave={handlePlayLeave}
                   data-cursor="play"
-                  className="bg-[#C65D45] hover:bg-[#a84d38] text-[#FFF9F2] px-4 flex items-center justify-center transition-colors duration-300 active:scale-95 cursor-pointer"
+                  className="relative z-10 ml-1 px-4 sm:px-5 py-2.5 sm:py-3 rounded-full bg-gradient-to-b from-[#341C13] via-[#24130C] to-[#160B06] border border-white/20 text-[#FFF9F2] flex items-center gap-3 shadow-[-4px_0_12px_rgba(0,0,0,0.55),0_4px_10px_rgba(0,0,0,0.6),inset_0_1px_1px_rgba(255,255,255,0.25)] group-hover:shadow-[-6px_0_16px_rgba(0,0,0,0.65),0_6px_14px_rgba(0,0,0,0.7),0_0_20px_rgba(198,93,69,0.3)] group-hover:border-[#C65D45]/60 transition-all duration-300 cursor-pointer active:scale-95"
                   title="Watch Master Showreel"
                   aria-label="Watch Master Showreel"
                 >
-                  <Play className="w-4 h-4 fill-current ml-0.5" />
+                  <Play className="w-3.5 h-3.5 fill-current text-white/95 ml-0.5" />
+                  {/* Glowing Tactile LED Indicator Dot from Reference */}
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#FFA07A] shadow-[0_0_8px_#C65D45,0_0_14px_#FFA07A] animate-pulse" />
                 </button>
               </div>
 
+              {/* Hire Me Secondary Tactile Pill Button */}
               <a
                 href="#contact"
                 data-cursor="open"
-                className="px-6 py-3 rounded-full border-2 border-[#2B170F] text-[#2B170F] hover:bg-[#2B170F] hover:text-[#FFF9F2] font-sans font-semibold text-xs uppercase tracking-wider transition-all duration-300 shadow-sm hover:scale-105 active:scale-95"
+                className="group/hire relative px-6 sm:px-7 py-3.5 sm:py-4 rounded-full bg-gradient-to-b from-[#28150D] via-[#1E0F09] to-[#140A06] text-[#FFF9F2] font-sans font-bold text-xs uppercase tracking-wider border border-[#2B170F]/50 shadow-[0_4px_14px_rgba(0,0,0,0.25),inset_0_1px_1px_rgba(255,255,255,0.15)] hover:border-[#C65D45] hover:shadow-[0_4px_22px_rgba(198,93,69,0.35)] hover:scale-105 active:scale-95 transition-all duration-300 flex items-center gap-2.5"
               >
-                Hire Me
+                <span>Hire Me</span>
+                <span className="w-2 h-2 rounded-full bg-[#FFA07A] opacity-80 group-hover/hire:opacity-100 shadow-[0_0_8px_#C65D45] transition-opacity" />
               </a>
             </div>
           </div>

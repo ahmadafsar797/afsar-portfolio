@@ -66,19 +66,25 @@ export const ReelsSection: React.FC<ReelsSectionProps> = ({ reels, onOpenLightbo
         {/* Category Filters */}
         <div ref={filtersRef} className="flex items-center gap-2 overflow-x-auto pb-4 mb-10 scrollbar-none">
           <div className="flex items-center gap-2 pr-4">
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setSelectedCategory(cat)}
-                className={`text-xs font-sans uppercase font-medium tracking-wider px-4 py-2 rounded-full whitespace-nowrap transition-all duration-300 cursor-pointer ${
-                  selectedCategory === cat
-                    ? 'bg-[#C65D45] text-[#2B170F] font-bold shadow-md shadow-[#C65D45]/25 scale-105'
-                    : 'bg-[#FFF9F2] text-[#756A62] hover:text-[#2B170F] hover:bg-[#fffcf8] border border-[#2B170F]/10'
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
+            {categories.map((cat) => {
+              const active = selectedCategory === cat;
+              return (
+                <button
+                  key={cat}
+                  onClick={() => setSelectedCategory(cat)}
+                  className={`text-xs font-sans uppercase tracking-wider px-4 py-2 rounded-full whitespace-nowrap transition-all duration-300 cursor-pointer flex items-center gap-2 ${
+                    active
+                      ? 'bg-gradient-to-r from-[#C65D45] via-[#D8684F] to-[#E2725B] text-[#FFF9F2] font-bold shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),0_4px_14px_rgba(198,93,69,0.35)] scale-105 border border-white/20'
+                      : 'bg-[#180E09]/5 hover:bg-[#180E09]/10 text-[#756A62] hover:text-[#2B170F] border border-[#2B170F]/15 font-medium'
+                  }`}
+                >
+                  {active && (
+                    <span className="w-2 h-2 rounded-full bg-[#FFA07A] shadow-[0_0_6px_#FFA07A,0_0_10px_#C65D45] animate-pulse" />
+                  )}
+                  <span>{cat}</span>
+                </button>
+              );
+            })}
           </div>
         </div>
 

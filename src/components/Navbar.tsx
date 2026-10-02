@@ -196,20 +196,22 @@ export const Navbar: React.FC<NavbarProps> = ({ settings, onOpenAdmin, isAdminLo
               href="#contact"
               onClick={() => handleNavClick('contact')}
               data-cursor="open"
-              className="px-6 sm:px-7 md:px-8 py-2.5 sm:py-3 rounded-full text-xs sm:text-sm md:text-base font-sans font-bold text-[#2B170F] bg-[#FFF9F2] hover:bg-white hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-300 shadow-lg cursor-pointer"
+              className="group/navbtn relative px-5 sm:px-6 md:px-7 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-sans font-bold text-[#FFF9F2] bg-gradient-to-r from-[#C65D45] via-[#D8684F] to-[#E2725B] hover:shadow-[0_0_20px_rgba(198,93,69,0.5)] hover:scale-105 active:scale-95 transition-all duration-300 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),0_4px_12px_rgba(0,0,0,0.3)] border border-white/25 flex items-center gap-2 cursor-pointer"
             >
-              Contact Me
+              <span>Contact Me</span>
+              <span className="w-2 h-2 rounded-full bg-[#FFA07A] shadow-[0_0_6px_#FFA07A,0_0_10px_#C65D45] animate-pulse" />
             </a>
           </div>
 
           {/* Mobile Hamburger & Contact */}
-          <div className="flex sm:hidden items-center gap-1.5 shrink-0">
+          <div className="flex sm:hidden items-center gap-2 shrink-0">
             <a
               href="#contact"
               onClick={() => handleNavClick('contact')}
-              className="px-3 py-1.5 rounded-full text-xs font-sans font-bold text-[#2B170F] bg-[#FFF9F2] shadow-sm hover:bg-white active:scale-95 transition-all whitespace-nowrap"
+              className="px-3 py-1.5 rounded-full text-[11px] font-sans font-bold text-[#FFF9F2] bg-gradient-to-r from-[#C65D45] to-[#D8684F] shadow-sm hover:brightness-105 active:scale-95 transition-all whitespace-nowrap flex items-center gap-1.5 border border-white/20"
             >
-              Contact
+              <span>Contact</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-[#FFA07A] shadow-[0_0_4px_#FFA07A]" />
             </a>
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
