@@ -629,19 +629,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
 
                         <div>
                           <label className="block text-xs font-montserrat uppercase text-white/60 mb-1">
-                            Client / Brand
-                          </label>
-                          <input
-                            type="text"
-                            value={editingReel.client || ''}
-                            onChange={(e) => setEditingReel({ ...editingReel, client: e.target.value })}
-                            className="w-full px-3 py-2 rounded-lg bg-black border border-white/15 text-sm text-white"
-                            placeholder="e.g. Arc Athletics"
-                          />
-                        </div>
-
-                        <div>
-                          <label className="block text-xs font-montserrat uppercase text-white/60 mb-1">
                             Views Count Metric
                           </label>
                           <input
@@ -766,7 +753,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                           <th className="p-3">Preview</th>
                           <th className="p-3">Title</th>
                           <th className="p-3">Category</th>
-                          <th className="p-3">Client</th>
                           <th className="p-3">Views</th>
                           <th className="p-3 text-right">Actions</th>
                         </tr>
@@ -783,7 +769,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                             </td>
                             <td className="p-3 font-medium text-white max-w-[200px] truncate">{r.title}</td>
                             <td className="p-3 text-[#C65D45]">{r.category}</td>
-                            <td className="p-3 text-white/70">{r.client}</td>
                             <td className="p-3 text-white/50">{r.views_count}</td>
                             <td className="p-3 text-right">
                               <div className="flex items-center justify-end gap-2">

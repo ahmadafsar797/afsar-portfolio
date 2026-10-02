@@ -109,7 +109,7 @@ export const ReelsSection: React.FC<ReelsSectionProps> = ({ reels, onOpenLightbo
                   e.stopPropagation();
                   setUnmutedReelId(unmutedReelId === reel.id ? null : reel.id);
                 }}
-                onClick={() => onOpenLightbox(reel.video_url, reel.title, reel.client, reel.category)}
+                onClick={() => onOpenLightbox(reel.video_url, reel.title, undefined, reel.category)}
               />
             </div>
           ))}
@@ -275,9 +275,6 @@ const ReelCard: React.FC<ReelCardProps> = ({
 
         {/* Bottom Details */}
         <div className="absolute bottom-0 left-0 right-0 p-2.5 sm:p-5 z-10 flex flex-col gap-0.5 sm:gap-1 translate-y-1 group-hover:translate-y-0 transition-transform duration-300">
-          <div className="text-[10px] sm:text-[13px] font-sans uppercase tracking-wider text-[#C65D45] font-medium truncate">
-            {reel.client || 'Client Project'}
-          </div>
           <h3 className="font-pogonia text-xs sm:text-xl lg:text-2xl font-bold text-white group-hover:text-[#C65D45] transition-colors line-clamp-2 leading-snug">
             {reel.title}
           </h3>
