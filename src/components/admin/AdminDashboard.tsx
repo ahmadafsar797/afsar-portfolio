@@ -21,6 +21,7 @@ import {
   Shield,
   Eye,
   RefreshCw,
+  Lock,
 } from 'lucide-react';
 import { api } from '../../services/api';
 import {
@@ -78,6 +79,43 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
   // Profile picture
   const [profilePicUploading, setProfilePicUploading] = useState(false);
   const [profilePicPreview, setProfilePicPreview] = useState<string | null>(null);
+
+  // Password change state
+  const [passwordForm, setPasswordForm] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: '',
+  });
+  const [passwordLoading, setPasswordLoading] = useState(false);
+
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!passwordForm.currentPassword || !passwordForm.newPassword) {
+      showNotice('Please enter current and new password', 'error');
+      return;
+    }
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      showNotice('New passwords do not match', 'error');
+      return;
+    }
+    if (passwordForm.newPassword.length < 6) {
+      showNotice('New password must be at least 6 characters', 'error');
+      return;
+    }
+    try {
+      setPasswordLoading(true);
+      await api.changePassword({
+        currentPassword: passwordForm.currentPassword,
+        newPassword: passwordForm.newPassword,
+      });
+      showNotice('Admin password changed successfully!');
+      setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
+    } catch (err: any) {
+      showNotice(err.message || 'Failed to change password. Check current password.', 'error');
+    } finally {
+      setPasswordLoading(false);
+    }
+  };
 
   // Check auth on open
   useEffect(() => {
@@ -2109,6 +2147,70 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                       </div>
                     </div>
                   </div>
+                  {/* ─────────────────────────────────────────────────────── */}
+
+                  {/* ── CHANGE ADMIN PASSWORD ─────────────────────────── */}
+                  <form onSubmit={handleChangePassword} className="p-6 rounded-2xl bg-[#101018] border border-white/10 space-y-4">
+                    <div className="flex items-center gap-2">
+                      <Lock className="w-4 h-4 text-[#C65D45]" />
+                      <h4 className="text-sm font-bold text-white uppercase tracking-wider">Change Admin Password</h4>
+                    </div>
+                    <p className="text-xs text-white/50">
+                      Update the password you use to log into this admin dashboard.
+                    </p>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div>
+                        <label className="block text-xs font-montserrat uppercase text-white/60 mb-1">
+                          Current Password
+                        </label>
+                        <input
+                          type="password"
+                          placeholder="Current password"
+                          value={passwordForm.currentPassword}
+                          onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
+                          className="w-full px-3 py-2 rounded-lg bg-black border border-white/15 text-sm text-white focus:border-[#C65D45] outline-none"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-montserrat uppercase text-white/60 mb-1">
+                          New Password
+                        </label>
+                        <input
+                          type="password"
+                          placeholder="At least 6 characters"
+                          value={passwordForm.newPassword}
+                          onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
+                          className="w-full px-3 py-2 rounded-lg bg-black border border-white/15 text-sm text-white focus:border-[#C65D45] outline-none"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-montserrat uppercase text-white/60 mb-1">
+                          Confirm New Password
+                        </label>
+                        <input
+                          type="password"
+                          placeholder="Re-enter new password"
+                          value={passwordForm.confirmPassword}
+                          onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
+                          className="w-full px-3 py-2 rounded-lg bg-black border border-white/15 text-sm text-white focus:border-[#C65D45] outline-none"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="pt-2">
+                      <button
+                        type="submit"
+                        disabled={passwordLoading}
+                        className="px-5 py-2 rounded-full text-xs font-montserrat uppercase tracking-wider text-white bg-[#C65D45] hover:bg-[#D76E56] font-semibold disabled:opacity-50 transition-all flex items-center gap-2 cursor-pointer"
+                      >
+                        <Lock className="w-3.5 h-3.5" />
+                        <span>{passwordLoading ? 'Updating Password...' : 'Update Password'}</span>
+                      </button>
+                    </div>
+                  </form>
                   {/* ─────────────────────────────────────────────────────── */}
 
                   <div className="space-y-4 p-6 rounded-2xl bg-[#101018] border border-white/10">
