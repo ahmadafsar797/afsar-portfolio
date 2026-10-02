@@ -150,10 +150,12 @@ const HorizontalVideoCard: React.FC<HorizontalVideoCardProps> = ({ video, index,
           <button
             onClick={() => onOpenLightbox(video.video_url, video.title, video.client, video.category)}
             data-cursor="play"
-            className="inline-flex items-center gap-2.5 px-6 py-3 rounded-full text-xs font-sans uppercase tracking-wider text-[#2B170F] bg-[#C65D45] hover:bg-[#a84d38] hover:scale-105 active:scale-95 transition-all duration-300 font-bold shadow-md shadow-[#C65D45]/25 cursor-pointer"
+            className="group/watchbtn relative inline-flex items-center gap-3 px-7 py-3.5 rounded-full overflow-hidden font-sans font-black text-sm uppercase tracking-widest text-[#FFF9F2] bg-gradient-to-r from-[#C65D45] via-[#D8684F] to-[#E2725B] shadow-[0_6px_24px_rgba(198,93,69,0.55),inset_0_1px_1px_rgba(255,255,255,0.35)] hover:shadow-[0_8px_32px_rgba(198,93,69,0.75),inset_0_1px_1px_rgba(255,255,255,0.4)] hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer border border-[#E2725B]/50"
           >
-            <Play className="w-3.5 h-3.5 fill-current" />
-            <span>Watch Full Film</span>
+            {/* shimmer sweep on hover */}
+            <span className="absolute inset-0 -translate-x-full group-hover/watchbtn:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none" />
+            <Play className="relative w-4 h-4 fill-current drop-shadow" />
+            <span className="relative">Watch Full Film</span>
           </button>
 
           <a
