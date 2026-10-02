@@ -20,9 +20,8 @@ logs/
 # Build output (Render will build it fresh)
 dist/
 
-# Local uploaded files (large videos / images uploaded through admin panel)
-# On Render, uploads are stored on the server's ephemeral disk
-uploads/*
+# Local uploaded files (videos committed to git for permanent hosting on Render)
+!uploads/*.mp4
 !uploads/.gitkeep
 
 # Local SQLite database (Render will auto-create a fresh one on first run)

@@ -312,12 +312,12 @@ function seedDefaultData() {
   if (reelsCount.count === 0) {
     const insertReel = _db.prepare(`INSERT INTO reels (title, category, client, video_url, thumbnail_url, views_count, duration, is_featured, order_index) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`);
     const sampleReels = [
-      ['HYPER-PACE: Cyberpunk Sneaker Drop','Social Media Ads','KINETIX Athletics','https://assets.mixkit.co/videos/preview/mixkit-urban-dancer-performing-in-a-neon-tunnel-42997-large.mp4','https://images.unsplash.com/photo-1552346154-21d32810aba3?auto=format&fit=crop&w=800&q=80','2.4M Views','0:28',1,1],
-      ['The AI Revolution in 45 Seconds','Talking Head Edits','Devin K. (Tech Founder)','https://assets.mixkit.co/videos/preview/mixkit-man-working-on-his-laptop-at-home-43282-large.mp4','https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=800&q=80','890K Views','0:45',1,2],
-      ['Chrono Lux: Kinetic Watch Macro','Product Reels','AURA Timepieces','https://assets.mixkit.co/videos/preview/mixkit-hands-of-a-man-wearing-a-watch-41846-large.mp4','https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80','1.7M Views','0:22',1,3],
-      ['Tokyo Midnight Drift: Street Culture','Cinematic Social Content','Drift & Grain Studio','https://assets.mixkit.co/videos/preview/mixkit-car-driving-through-the-city-at-night-42864-large.mp4','https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=800&q=80','3.1M Views','0:35',1,4],
-      ['3 Editing Secrets That Broke The Algorithm','YouTube Shorts','Creator Velocity','https://assets.mixkit.co/videos/preview/mixkit-young-man-recording-himself-with-his-phone-42982-large.mp4','https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80','1.2M Views','0:58',0,5],
-      ['Nordic Roast: Coffee Sensory Journey','Instagram Reels','Fjord Coffee Labs','https://assets.mixkit.co/videos/preview/mixkit-barista-pouring-coffee-into-a-cup-41785-large.mp4','https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=800&q=80','640K Views','0:30',0,6],
+      ['Sunglasses Video with Model', 'Social Media Ads', 'KINETIX Athletics', '/uploads/Sunglasses_Reel-1790973581902-303130025.mp4', '', '2.4M Views', '0:28', 1, 1],
+      ['Nescafe Coffee matchcut video', 'Product Reels', 'Devin K. (Tech Founder)', '/uploads/Imported_Coffee_Video-1790973678658-120191219.mp4', '', '890K Views', '0:45', 1, 2],
+      ['SadakChaap Restaurant Reel', 'Instagram Reels', 'SadakChaap', '/uploads/Sadakchaap_Video-1790973809368-368620759.mp4', '', '1.7M Views', '0:22', 1, 3],
+      ['Ek__agga Sandal Ads Video', 'Product Reels', 'Ek__agga', '/uploads/Sandle_Product_3-1790973901599-518600078.mp4', '', '3.1M Views', '0:35', 1, 4],
+      ['Trending Reel', 'Instagram Reels', 'Creator Velocity', '/uploads/Priyanka_Video-1790974050192-460800610.mp4', '', '1.2M Views', '0:58', 0, 5],
+      ['Reyan Sunglasses Ai Cgi Video', 'Product Reels', 'Fjord Coffee Labs', '/uploads/Sunglasses_Video-1790974206869-652475516.mp4', '', '640K Views', '0:30', 0, 6],
     ];
     for (const r of sampleReels) insertReel.run(...r);
   }
