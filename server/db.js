@@ -1,4 +1,4 @@
-const { DatabaseSync } = require('node:sqlite');
+const Database = require('better-sqlite3');
 const path = require('path');
 const fs = require('fs');
 const bcrypt = require('bcryptjs');
@@ -14,7 +14,7 @@ if (!fs.existsSync(uploadsDir)) {
 }
 
 const dbPath = path.join(dataDir, 'portfolio.db');
-const db = new DatabaseSync(dbPath);
+const db = new Database(dbPath);
 
 // Enable WAL mode for high performance
 db.exec('PRAGMA journal_mode = WAL;');
