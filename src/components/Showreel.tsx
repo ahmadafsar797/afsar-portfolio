@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { Play, Pause, Volume2, VolumeX, Maximize2, Sparkles, Layers, Sliders, Disc } from 'lucide-react';
 import { SettingsData } from '../types';
 import { gsap } from 'gsap';
@@ -17,6 +17,7 @@ export const Showreel: React.FC<ShowreelProps> = ({ settings, onOpenLightbox }) 
   const [currentTime, setCurrentTime] = useState('0:00');
   const [duration, setDuration] = useState('0:00');
   const [showControls, setShowControls] = useState(true);
+  const [autoThumbnail, setAutoThumbnail] = useState<string | null>(null);
 
   const headerRef = useFadeUpOnScroll<HTMLDivElement>(0);
   const playerRef = useRevealOnScroll<HTMLDivElement>('up', 0.1);
@@ -26,9 +27,46 @@ export const Showreel: React.FC<ShowreelProps> = ({ settings, onOpenLightbox }) 
   const videoUrl =
     settings?.featured_showreel_url ||
     'https://assets.mixkit.co/videos/preview/mixkit-cinematographer-filming-with-a-professional-camera-42861-large.mp4';
-  const posterUrl =
-    settings?.featured_showreel_poster ||
-    'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?auto=format&fit=crop&w=1920&q=80';
+  const posterUrl = settings?.featured_showreel_poster || null;
+
+  // Auto-capture a random frame from the video when no poster is set
+  useEffect(() => {
+    if (posterUrl) {
+      setAutoThumbnail(null); // has a real poster, no need
+      return;
+    }
+    const video = document.createElement('video');
+    video.src = videoUrl;
+    video.muted = true;
+    video.playsInline = true;
+    video.crossOrigin = 'anonymous';
+    video.preload = 'metadata';
+
+    video.addEventListener('loadedmetadata', () => {
+      const dur = video.duration;
+      if (!dur || !isFinite(dur)) return;
+      // Seek to a random frame between 10% and 80% of the video
+      video.currentTime = dur * (0.1 + Math.random() * 0.7);
+    });
+
+    video.addEventListener('seeked', () => {
+      try {
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth || 1280;
+        canvas.height = video.videoHeight || 720;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+        // Only use if it's not a blank/empty frame
+        if (dataUrl && dataUrl !== 'data:,') {
+          setAutoThumbnail(dataUrl);
+        }
+      } catch {
+        // CORS or other error — silently ignore, video will show normally
+      }
+    });
+  }, [videoUrl, posterUrl]);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -130,7 +168,7 @@ export const Showreel: React.FC<ShowreelProps> = ({ settings, onOpenLightbox }) 
           <video
             ref={videoRef}
             src={videoUrl}
-            poster={posterUrl}
+            poster={posterUrl || autoThumbnail || undefined}
             playsInline
             muted={isMuted}
             loop
