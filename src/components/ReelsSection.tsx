@@ -5,6 +5,7 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useStaggerOnScroll, useFadeUpOnScroll } from '../hooks/useAnimations';
 import { VideoAutoThumbnail } from './VideoAutoThumbnail';
+import { isYouTubeUrl } from '../utils/videoUtils';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -139,9 +140,10 @@ const ReelCard: React.FC<ReelCardProps> = ({
   const videoRef = useRef<HTMLVideoElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const playBtnRef = useRef<HTMLDivElement>(null);
+  const isYt = isYouTubeUrl(reel.video_url);
 
   useEffect(() => {
-    if (videoRef.current) {
+    if (!isYt && videoRef.current) {
       if (isHovered) {
         videoRef.current.currentTime = 0;
         videoRef.current.play().catch(() => {});
@@ -149,7 +151,7 @@ const ReelCard: React.FC<ReelCardProps> = ({
         videoRef.current.pause();
       }
     }
-  }, [isHovered]);
+  }, [isHovered, isYt]);
 
   // Magnetic play button
   const handleMagnetic = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -211,21 +213,23 @@ const ReelCard: React.FC<ReelCardProps> = ({
           thumbnailUrl={reel.thumbnail_url}
           alt={reel.title}
           className={`w-full h-full object-cover transition-all duration-700 ease-out group-hover:scale-105 ${
-            isHovered ? 'opacity-0' : 'opacity-100'
+            isHovered && !isYt ? 'opacity-0' : 'opacity-100'
           }`}
         />
 
-        {/* Video Preview */}
-        <video
-          ref={videoRef}
-          src={reel.video_url}
-          muted={!isUnmuted}
-          loop
-          playsInline
-          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${
-            isHovered ? 'opacity-100' : 'opacity-0'
-          }`}
-        />
+        {/* Video Preview (for HTML5 MP4s) */}
+        {!isYt && (
+          <video
+            ref={videoRef}
+            src={reel.video_url}
+            muted={!isUnmuted}
+            loop
+            playsInline
+            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${
+              isHovered ? 'opacity-100' : 'opacity-0'
+            }`}
+          />
+        )}
 
         {/* Vignette */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/25 to-black/40 pointer-events-none transition-opacity duration-300 group-hover:opacity-90" />

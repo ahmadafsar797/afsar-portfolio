@@ -3,6 +3,7 @@ import { Play, Pause, Volume2, VolumeX, Maximize2, Sparkles, Layers, Sliders, Di
 import { SettingsData } from '../types';
 import { gsap } from 'gsap';
 import { useRevealOnScroll, useFadeUpOnScroll } from '../hooks/useAnimations';
+import { isYouTubeUrl, getYouTubeThumbnail } from '../utils/videoUtils';
 
 interface ShowreelProps {
   settings?: SettingsData;
@@ -28,11 +29,13 @@ export const Showreel: React.FC<ShowreelProps> = ({ settings, onOpenLightbox }) 
     settings?.featured_showreel_url ||
     'https://assets.mixkit.co/videos/preview/mixkit-cinematographer-filming-with-a-professional-camera-42861-large.mp4';
   const posterUrl = settings?.featured_showreel_poster || null;
+  const isYt = isYouTubeUrl(videoUrl);
+  const effectivePoster = posterUrl || (isYt ? getYouTubeThumbnail(videoUrl) : autoThumbnail);
 
-  // Auto-capture a random frame from the video when no poster is set
+  // Auto-capture a random frame from native video when no poster is set
   useEffect(() => {
-    if (posterUrl) {
-      setAutoThumbnail(null); // has a real poster, no need
+    if (posterUrl || isYt) {
+      setAutoThumbnail(null); // has a real poster or YouTube thumbnail, no need
       return;
     }
     const video = document.createElement('video');
@@ -165,23 +168,32 @@ export const Showreel: React.FC<ShowreelProps> = ({ settings, onOpenLightbox }) 
           className="group relative w-full aspect-16-9 rounded-2xl overflow-hidden bg-black border border-[#2B170F]/15 shadow-xl transition-shadow duration-500 hover:shadow-2xl hover:shadow-[#C65D45]/10 hover:border-[#C65D45]/50"
           onMouseEnter={() => setShowControls(true)}
         >
-          <video
-            ref={videoRef}
-            src={videoUrl}
-            poster={posterUrl || autoThumbnail || undefined}
-            playsInline
-            muted={isMuted}
-            loop
-            onTimeUpdate={handleTimeUpdate}
-            onLoadedMetadata={handleLoadedMetadata}
-            className="w-full h-full object-cover cursor-pointer"
-            onClick={() => onOpenLightbox(videoUrl, 'Featured Master Showreel', 'Afsar Ahmad Films')}
-          />
+          {isYt ? (
+            <img
+              src={effectivePoster || ''}
+              alt="Featured Master Showreel"
+              className="w-full h-full object-cover cursor-pointer group-hover:scale-105 transition-transform duration-700 ease-out"
+              onClick={() => onOpenLightbox(videoUrl, 'Featured Master Showreel', 'Afsar Ahmad Films')}
+            />
+          ) : (
+            <video
+              ref={videoRef}
+              src={videoUrl}
+              poster={effectivePoster || undefined}
+              playsInline
+              muted={isMuted}
+              loop
+              onTimeUpdate={handleTimeUpdate}
+              onLoadedMetadata={handleLoadedMetadata}
+              className="w-full h-full object-cover cursor-pointer"
+              onClick={() => onOpenLightbox(videoUrl, 'Featured Master Showreel', 'Afsar Ahmad Films')}
+            />
+          )}
 
           {/* Central Play/Pause */}
           <div
             className={`absolute inset-0 flex items-center justify-center pointer-events-none transition-opacity duration-300 ${
-              isPlaying ? 'opacity-0 group-hover:opacity-100' : 'opacity-100 bg-black/40'
+              isPlaying && !isYt ? 'opacity-0 group-hover:opacity-100' : 'opacity-100 bg-black/40'
             }`}
           >
             <button
@@ -203,43 +215,52 @@ export const Showreel: React.FC<ShowreelProps> = ({ settings, onOpenLightbox }) 
           {/* Cinema Controls Bar */}
           <div
             className={`absolute bottom-0 left-0 right-0 p-4 sm:p-6 bg-gradient-to-t from-black/95 via-black/60 to-transparent transition-opacity duration-300 ${
-              showControls || !isPlaying ? 'opacity-100' : 'opacity-0'
+              showControls || !isPlaying || isYt ? 'opacity-100' : 'opacity-0'
             }`}
           >
-            {/* Scrubber */}
-            <div
-              className="relative w-full h-1.5 bg-white/30 rounded-full cursor-pointer overflow-hidden group/bar mb-3 hover:h-2.5 transition-all duration-200"
-              onClick={handleSeek}
-              onTouchStart={handleTouchSeek}
-            >
+            {/* Scrubber (only for HTML5 videos) */}
+            {!isYt && (
               <div
-                className="h-full bg-gradient-to-r from-[#C65D45] to-[#ffba3b] rounded-full transition-all duration-75 relative"
-                style={{ width: `${progress}%` }}
-              />
-            </div>
+                className="relative w-full h-1.5 bg-white/30 rounded-full cursor-pointer overflow-hidden group/bar mb-3 hover:h-2.5 transition-all duration-200"
+                onClick={handleSeek}
+                onTouchStart={handleTouchSeek}
+              >
+                <div
+                  className="h-full bg-gradient-to-r from-[#C65D45] to-[#ffba3b] rounded-full transition-all duration-75 relative"
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
+            )}
 
             <div className="flex items-center justify-between text-xs text-white">
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => onOpenLightbox(videoUrl, 'Featured Master Showreel', 'Afsar Ahmad Films')}
-                  className="p-1 hover:text-[#C65D45] transition-colors cursor-pointer"
+                  className="p-1 hover:text-[#C65D45] transition-colors cursor-pointer flex items-center gap-2"
                   aria-label="Play Fullscreen"
                 >
-                  <Play className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={toggleMute}
-                  className="p-1 hover:text-[#C65D45] transition-colors flex items-center gap-1 cursor-pointer"
-                  aria-label={isMuted ? 'Unmute' : 'Mute'}
-                >
-                  {isMuted ? <VolumeX className="w-4 h-4 text-white/60" /> : <Volume2 className="w-4 h-4 text-[#C65D45]" />}
-                  <span className="text-[10px] font-sans uppercase hidden sm:inline">
-                    {isMuted ? 'Muted' : 'Sound On'}
+                  <Play className="w-4 h-4 text-[#C65D45] fill-current" />
+                  <span className="text-xs font-bold font-sans uppercase tracking-wider">
+                    {isYt ? 'Watch Showreel' : 'Play'}
                   </span>
                 </button>
-                <div className="text-[11px] font-sans text-white/70">
-                  <span>{currentTime}</span> / <span>{duration}</span>
-                </div>
+                {!isYt && (
+                  <>
+                    <button
+                      onClick={toggleMute}
+                      className="p-1 hover:text-[#C65D45] transition-colors flex items-center gap-1 cursor-pointer"
+                      aria-label={isMuted ? 'Unmute' : 'Mute'}
+                    >
+                      {isMuted ? <VolumeX className="w-4 h-4 text-white/60" /> : <Volume2 className="w-4 h-4 text-[#C65D45]" />}
+                      <span className="text-[10px] font-sans uppercase hidden sm:inline">
+                        {isMuted ? 'Muted' : 'Sound On'}
+                      </span>
+                    </button>
+                    <div className="text-[11px] font-sans text-white/70">
+                      <span>{currentTime}</span> / <span>{duration}</span>
+                    </div>
+                  </>
+                )}
               </div>
 
               <div className="flex items-center gap-3">

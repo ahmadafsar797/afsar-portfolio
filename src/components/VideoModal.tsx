@@ -12,6 +12,7 @@ import {
   Minimize,
   Sliders,
 } from 'lucide-react';
+import { isYouTubeUrl, getYouTubeEmbedUrl, getYouTubeThumbnail } from '../utils/videoUtils';
 
 interface VideoModalProps {
   isOpen: boolean;
@@ -50,9 +51,14 @@ export const VideoModal: React.FC<VideoModalProps> = ({
   const [playbackSpeed, setPlaybackSpeed] = useState(1);
   const [showSpeedMenu, setShowSpeedMenu] = useState(false);
   const [hoverTime, setHoverTime] = useState<string | null>(null);
-  const [hoverPosition, setHoverPosition] = useState<number>(0);
   const [feedback, setFeedback] = useState<{ text: string; id: number } | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+
+  const isYt = isYouTubeUrl(videoUrl);
+  const isShortOrVertical =
+    isVertical ||
+    (videoUrl && videoUrl.includes('/shorts/')) ||
+    Boolean(category && /reel|short|9:16|vertical/i.test(category));
 
   // Trigger brief visual feedback (e.g. "+10s", "-10s", "Paused")
   const triggerFeedback = useCallback((text: string) => {
@@ -236,7 +242,7 @@ export const VideoModal: React.FC<VideoModalProps> = ({
 
   // Reset video state when modal opens with a new URL
   useEffect(() => {
-    if (isOpen && videoRef.current) {
+    if (isOpen && !isYt && videoRef.current) {
       videoRef.current.currentTime = 0;
       videoRef.current.playbackRate = playbackSpeed;
       videoRef.current
@@ -363,19 +369,26 @@ export const VideoModal: React.FC<VideoModalProps> = ({
     >
       {/* Ambient background glow matching the video */}
       <div className="absolute inset-0 pointer-events-none opacity-20 overflow-hidden blur-3xl scale-125">
-        <video
-          src={videoUrl}
-          muted
-          loop
-          playsInline
-          className="w-full h-full object-cover"
-        />
+        {isYt ? (
+          <div
+            className="w-full h-full bg-cover bg-center"
+            style={{ backgroundImage: `url(${getYouTubeThumbnail(videoUrl) || ''})` }}
+          />
+        ) : (
+          <video
+            src={videoUrl}
+            muted
+            loop
+            playsInline
+            className="w-full h-full object-cover"
+          />
+        )}
       </div>
 
       {/* ── TOP HEADER BAR: TITLE, METADATA & CUT / CLOSE BUTTON ────────────── */}
       <header
         className={`relative z-50 w-full px-5 sm:px-8 py-4 sm:py-6 flex items-center justify-between bg-gradient-to-b from-black/95 via-black/70 to-transparent transition-opacity duration-300 ${
-          showControls ? 'opacity-100' : 'opacity-0 pointer-events-none'
+          showControls || isYt ? 'opacity-100' : 'opacity-0 pointer-events-none'
         }`}
       >
         {/* Left: Video Details */}
@@ -397,9 +410,9 @@ export const VideoModal: React.FC<VideoModalProps> = ({
               </h2>
             </div>
             <div className="flex items-center gap-2 text-[11px] text-white/50 mt-0.5">
-              <span>{isVertical ? '9:16 Vertical Reel' : '16:9 Cinema 4K'}</span>
+              <span>{isShortOrVertical ? '9:16 Vertical Reel' : '16:9 Cinema 4K'}</span>
               <span>•</span>
-              <span>{duration}</span>
+              <span>{isYt ? 'YouTube Player' : duration}</span>
             </div>
           </div>
         </div>
@@ -421,253 +434,273 @@ export const VideoModal: React.FC<VideoModalProps> = ({
       </header>
 
       {/* ── CENTRAL FULLSCREEN VIDEO STAGE ─────────────────────────────────── */}
-      <main className="relative flex-1 w-full h-full flex items-center justify-center overflow-hidden">
-        {/* True Fullscreen Video Canvas */}
-        <video
-          ref={videoRef}
-          src={videoUrl}
-          playsInline
-          loop
-          muted={isMuted}
-          onTimeUpdate={handleTimeUpdate}
-          onLoadedMetadata={handleLoadedMetadata}
-          onClick={togglePlay}
-          className={`cursor-pointer transition-all duration-300 ${
-            isVertical
-              ? 'h-full max-h-screen w-auto aspect-9-16 shadow-2xl rounded-lg sm:rounded-2xl border border-white/10'
-              : 'w-full h-full max-w-full max-h-full object-contain'
-          }`}
-        />
-
-        {/* Transient Central Ripple Feedback (+10s, -10s, Play, Paused) */}
-        {feedback && (
+      <main className="relative flex-1 w-full h-full flex items-center justify-center overflow-hidden p-2 sm:p-6">
+        {isYt ? (
           <div
-            key={feedback.id}
-            className="absolute z-40 pointer-events-none px-6 py-3 rounded-2xl bg-black/80 backdrop-blur-xl border border-white/20 text-[#FFF9F2] text-sm sm:text-base font-bold shadow-2xl animate-in zoom-in-75 fade-in duration-150 flex items-center gap-2"
+            className={`relative flex items-center justify-center w-full h-full ${
+              isShortOrVertical ? 'max-w-[420px]' : 'max-w-5xl'
+            }`}
           >
-            {feedback.text.includes('+') ? (
-              <RotateCw className="w-5 h-5 text-[#C65D45]" />
-            ) : feedback.text.includes('-') ? (
-              <RotateCcw className="w-5 h-5 text-[#C65D45]" />
-            ) : null}
-            <span>{feedback.text}</span>
+            <iframe
+              src={getYouTubeEmbedUrl(videoUrl, true) || ''}
+              title={title || 'YouTube Video'}
+              className={`w-full ${
+                isShortOrVertical ? 'aspect-9-16 max-h-[85vh]' : 'aspect-16-9 max-h-[85vh]'
+              } rounded-xl sm:rounded-2xl shadow-2xl border border-white/15 bg-black`}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+            />
           </div>
-        )}
-
-        {/* Center Hover Action Controls: -10s, Play/Pause, +10s */}
-        <div
-          className={`absolute inset-0 flex items-center justify-center pointer-events-none transition-opacity duration-300 ${
-            showControls || !isPlaying
-              ? 'opacity-100'
-              : 'opacity-0'
-          }`}
-        >
-          <div className="flex items-center gap-6 sm:gap-10 pointer-events-auto">
-            {/* Center Backward -10s Button */}
-            <button
-              onClick={handleBackward}
-              className="group/back flex flex-col items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-black/60 hover:bg-[#C65D45] border border-white/20 hover:border-[#C65D45] text-white hover:text-[#2B170F] backdrop-blur-xl transition-all duration-200 active:scale-90 shadow-xl cursor-pointer"
-              title="Duration Backward 10s (← Left Arrow)"
-              aria-label="Backward 10 seconds"
-            >
-              <RotateCcw className="w-5 h-5 sm:w-6 sm:h-6 stroke-[2.2] group-hover/back:-rotate-45 transition-transform duration-300" />
-              <span className="text-[10px] font-bold mt-0.5 tracking-tight">-10s</span>
-            </button>
-
-            {/* Big Central Play / Pause Button */}
-            <button
+        ) : (
+          <>
+            {/* True Fullscreen Video Canvas */}
+            <video
+              ref={videoRef}
+              src={videoUrl}
+              playsInline
+              loop
+              muted={isMuted}
+              onTimeUpdate={handleTimeUpdate}
+              onLoadedMetadata={handleLoadedMetadata}
               onClick={togglePlay}
-              className="flex items-center justify-center w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-[#C65D45] hover:bg-[#a84d38] text-[#2B170F] transition-all duration-300 transform hover:scale-110 active:scale-95 shadow-2xl cursor-pointer"
-              title={isPlaying ? 'Pause (Space)' : 'Play (Space)'}
-              aria-label={isPlaying ? 'Pause' : 'Play'}
-            >
-              {isPlaying ? (
-                <Pause className="w-9 h-9 sm:w-10 sm:h-10 fill-current" />
-              ) : (
-                <Play className="w-9 h-9 sm:w-10 sm:h-10 fill-current ml-1" />
-              )}
-            </button>
+              className={`cursor-pointer transition-all duration-300 ${
+                isVertical
+                  ? 'h-full max-h-screen w-auto aspect-9-16 shadow-2xl rounded-lg sm:rounded-2xl border border-white/10'
+                  : 'w-full h-full max-w-full max-h-full object-contain'
+              }`}
+            />
 
-            {/* Center Forward +10s Button */}
-            <button
-              onClick={handleForward}
-              className="group/fwd flex flex-col items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-black/60 hover:bg-[#C65D45] border border-white/20 hover:border-[#C65D45] text-white hover:text-[#2B170F] backdrop-blur-xl transition-all duration-200 active:scale-90 shadow-xl cursor-pointer"
-              title="Duration Forward 10s (→ Right Arrow)"
-              aria-label="Forward 10 seconds"
-            >
-              <RotateCw className="w-5 h-5 sm:w-6 sm:h-6 stroke-[2.2] group-hover/fwd:rotate-45 transition-transform duration-300" />
-              <span className="text-[10px] font-bold mt-0.5 tracking-tight">+10s</span>
-            </button>
-          </div>
-        </div>
-      </main>
-
-      {/* ── BOTTOM DURATION & CONTROL DECK ──────────────────────────────────── */}
-      <footer
-        className={`relative z-50 w-full px-4 sm:px-8 pb-5 pt-10 sm:pb-6 bg-gradient-to-t from-black via-black/85 to-transparent transition-opacity duration-300 ${
-          showControls || !isPlaying
-            ? 'opacity-100'
-            : 'opacity-0 pointer-events-none'
-        }`}
-      >
-        <div className="max-w-6xl mx-auto space-y-3">
-          {/* Interactive Duration Timeline / Scrubber */}
-          <div
-            ref={progressBarRef}
-            onMouseDown={handleSeekMouseDown}
-            onTouchStart={handleSeekTouchStart}
-            onMouseMove={handleProgressMouseMove}
-            onMouseLeave={handleProgressMouseLeave}
-            className="group/bar relative w-full h-2.5 hover:h-4 bg-white/20 hover:bg-white/30 rounded-full cursor-pointer transition-all duration-150 py-1 touch-none"
-          >
-            {/* Timestamp hover tooltip */}
-            {hoverTime && (
+            {/* Transient Central Ripple Feedback (+10s, -10s, Play, Paused) */}
+            {feedback && (
               <div
-                className="absolute -top-8 px-2.5 py-1 rounded-md bg-[#2B170F] text-[#FFF9F2] text-[11px] font-bold border border-white/20 shadow-xl pointer-events-none transform -translate-x-1/2 whitespace-nowrap"
-                style={{ left: `${hoverPosition}px` }}
+                key={feedback.id}
+                className="absolute z-40 pointer-events-none px-6 py-3 rounded-2xl bg-black/80 backdrop-blur-xl border border-white/20 text-[#FFF9F2] text-sm sm:text-base font-bold shadow-2xl animate-in zoom-in-75 fade-in duration-150 flex items-center gap-2"
               >
-                {hoverTime}
+                {feedback.text.includes('+') ? (
+                  <RotateCw className="w-5 h-5 text-[#C65D45]" />
+                ) : feedback.text.includes('-') ? (
+                  <RotateCcw className="w-5 h-5 text-[#C65D45]" />
+                ) : null}
+                <span>{feedback.text}</span>
               </div>
             )}
 
-            {/* Filled Progress Bar */}
+            {/* Center Hover Action Controls: -10s, Play/Pause, +10s */}
             <div
-              className="h-full bg-gradient-to-r from-[#C65D45] to-[#ffba3b] rounded-full relative transition-[width] duration-75 shadow-lg shadow-[#C65D45]/40"
-              style={{ width: `${progress}%` }}
+              className={`absolute inset-0 flex items-center justify-center pointer-events-none transition-opacity duration-300 ${
+                showControls || !isPlaying ? 'opacity-100' : 'opacity-0'
+              }`}
             >
-              {/* Seeker Thumb */}
-              <div className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-white border-2 border-[#C65D45] shadow-md scale-100 sm:scale-0 sm:group-hover/bar:scale-100 transition-transform duration-150" />
-            </div>
-          </div>
-
-          {/* Lower Control Bar: Forward/Backward, Play/Pause, Duration, Volume, Speed, Fullscreen */}
-          <div className="flex items-center justify-between text-white text-xs pt-1">
-            {/* Left Cluster: Transport Controls */}
-            <div className="flex items-center gap-2 sm:gap-4">
-              {/* Play / Pause Toggle */}
-              <button
-                onClick={togglePlay}
-                className="p-2 rounded-full hover:bg-white/10 text-white hover:text-[#C65D45] transition-colors cursor-pointer"
-                title={isPlaying ? 'Pause (Space)' : 'Play (Space)'}
-              >
-                {isPlaying ? <Pause className="w-5 h-5 fill-current" /> : <Play className="w-5 h-5 fill-current ml-0.5" />}
-              </button>
-
-              {/* DURATION BACKWARD BUTTON */}
-              <button
-                onClick={handleBackward}
-                className="hidden sm:flex items-center gap-1 px-3 py-1.5 rounded-full bg-white/10 hover:bg-[#C65D45] hover:text-[#2B170F] transition-all text-xs font-bold cursor-pointer group"
-                title="Duration Backward 10s (← Arrow)"
-              >
-                <RotateCcw className="w-3.5 h-3.5 group-hover:-rotate-45 transition-transform" />
-                <span>-10s</span>
-              </button>
-
-              {/* DURATION FORWARD BUTTON */}
-              <button
-                onClick={handleForward}
-                className="hidden sm:flex items-center gap-1 px-3 py-1.5 rounded-full bg-white/10 hover:bg-[#C65D45] hover:text-[#2B170F] transition-all text-xs font-bold cursor-pointer group"
-                title="Duration Forward 10s (→ Arrow)"
-              >
-                <span>+10s</span>
-                <RotateCw className="w-3.5 h-3.5 group-hover:rotate-45 transition-transform" />
-              </button>
-
-              {/* Duration Display */}
-              <div className="flex items-center gap-1.5 text-xs text-white/80 font-mono pl-1">
-                <span className="font-bold text-white">{currentTime}</span>
-                <span className="text-white/40">/</span>
-                <span>{duration}</span>
-                <span className="hidden md:inline text-white/40 text-[11px] ml-1">
-                  ({remainingTime})
-                </span>
-              </div>
-            </div>
-
-            {/* Right Cluster: Volume, Speed, Fullscreen, Cut */}
-            <div className="flex items-center gap-2 sm:gap-4">
-              {/* Volume & Slider */}
-              <div className="group/vol flex items-center gap-2">
+              <div className="flex items-center gap-6 sm:gap-10 pointer-events-auto">
+                {/* Center Backward -10s Button */}
                 <button
-                  onClick={toggleMute}
-                  className="p-1.5 rounded-full hover:bg-white/10 hover:text-[#C65D45] transition-colors cursor-pointer"
-                  title={isMuted ? 'Unmute (M)' : 'Mute (M)'}
+                  onClick={handleBackward}
+                  className="group/back flex flex-col items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-black/60 hover:bg-[#C65D45] border border-white/20 hover:border-[#C65D45] text-white hover:text-[#2B170F] backdrop-blur-xl transition-all duration-200 active:scale-90 shadow-xl cursor-pointer"
+                  title="Duration Backward 10s (← Left Arrow)"
+                  aria-label="Backward 10 seconds"
                 >
-                  {isMuted || volume === 0 ? (
-                    <VolumeX className="w-4 h-4 text-white/50" />
-                  ) : volume < 0.5 ? (
-                    <Volume1 className="w-4 h-4 text-[#C65D45]" />
+                  <RotateCcw className="w-5 h-5 sm:w-6 sm:h-6 stroke-[2.2] group-hover/back:-rotate-45 transition-transform duration-300" />
+                  <span className="text-[10px] font-bold mt-0.5 tracking-tight">-10s</span>
+                </button>
+
+                {/* Big Central Play / Pause Button */}
+                <button
+                  onClick={togglePlay}
+                  className="flex items-center justify-center w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-[#C65D45] hover:bg-[#a84d38] text-[#2B170F] transition-all duration-300 transform hover:scale-110 active:scale-95 shadow-2xl cursor-pointer"
+                  title={isPlaying ? 'Pause (Space)' : 'Play (Space)'}
+                  aria-label={isPlaying ? 'Pause' : 'Play'}
+                >
+                  {isPlaying ? (
+                    <Pause className="w-9 h-9 sm:w-10 sm:h-10 fill-current" />
                   ) : (
-                    <Volume2 className="w-4 h-4 text-[#C65D45]" />
+                    <Play className="w-9 h-9 sm:w-10 sm:h-10 fill-current ml-1" />
                   )}
                 </button>
-                <input
-                  type="range"
-                  min="0"
-                  max="1"
-                  step="0.05"
-                  value={isMuted ? 0 : volume}
-                  onChange={handleVolumeChange}
-                  className="w-16 sm:w-20 h-1 accent-[#C65D45] cursor-pointer hidden sm:inline-block"
-                  title={`Volume: ${Math.round((isMuted ? 0 : volume) * 100)}%`}
-                />
-              </div>
 
-              {/* Playback Speed Picker */}
-              <div className="relative">
+                {/* Center Forward +10s Button */}
                 <button
-                  onClick={() => setShowSpeedMenu(!showSpeedMenu)}
-                  className="px-2.5 py-1 rounded-full bg-white/10 hover:bg-white/20 text-[11px] font-bold transition-colors cursor-pointer"
-                  title="Playback Speed"
+                  onClick={handleForward}
+                  className="group/fwd flex flex-col items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-black/60 hover:bg-[#C65D45] border border-white/20 hover:border-[#C65D45] text-white hover:text-[#2B170F] backdrop-blur-xl transition-all duration-200 active:scale-90 shadow-xl cursor-pointer"
+                  title="Duration Forward 10s (→ Right Arrow)"
+                  aria-label="Forward 10 seconds"
                 >
-                  {playbackSpeed}x
+                  <RotateCw className="w-5 h-5 sm:w-6 sm:h-6 stroke-[2.2] group-hover/fwd:rotate-45 transition-transform duration-300" />
+                  <span className="text-[10px] font-bold mt-0.5 tracking-tight">+10s</span>
+                </button>
+              </div>
+            </div>
+          </>
+        )}
+      </main>
+
+      {/* ── BOTTOM DURATION & CONTROL DECK (HTML5 Videos only) ──────────────────────────────────── */}
+      {!isYt && (
+        <footer
+          className={`relative z-50 w-full px-4 sm:px-8 pb-5 pt-10 sm:pb-6 bg-gradient-to-t from-black via-black/85 to-transparent transition-opacity duration-300 ${
+            showControls || !isPlaying
+              ? 'opacity-100'
+              : 'opacity-0 pointer-events-none'
+          }`}
+        >
+          <div className="max-w-6xl mx-auto space-y-3">
+            {/* Interactive Duration Timeline / Scrubber */}
+            <div
+              ref={progressBarRef}
+              onMouseDown={handleSeekMouseDown}
+              onTouchStart={handleSeekTouchStart}
+              onMouseMove={handleProgressMouseMove}
+              onMouseLeave={handleProgressMouseLeave}
+              className="group/bar relative w-full h-2.5 hover:h-4 bg-white/20 hover:bg-white/30 rounded-full cursor-pointer transition-all duration-150 py-1 touch-none"
+            >
+              {/* Timestamp hover tooltip */}
+              {hoverTime && (
+                <div
+                  className="absolute -top-8 px-2.5 py-1 rounded-md bg-[#2B170F] text-[#FFF9F2] text-[11px] font-bold border border-white/20 shadow-xl pointer-events-none transform -translate-x-1/2 whitespace-nowrap"
+                  style={{ left: `${hoverPosition}px` }}
+                >
+                  {hoverTime}
+                </div>
+              )}
+
+              {/* Filled Progress Bar */}
+              <div
+                className="h-full bg-gradient-to-r from-[#C65D45] to-[#ffba3b] rounded-full relative transition-[width] duration-75 shadow-lg shadow-[#C65D45]/40"
+                style={{ width: `${progress}%` }}
+              >
+                {/* Seeker Thumb */}
+                <div className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-white border-2 border-[#C65D45] shadow-md scale-100 sm:scale-0 sm:group-hover/bar:scale-100 transition-transform duration-150" />
+              </div>
+            </div>
+
+            {/* Lower Control Bar: Forward/Backward, Play/Pause, Duration, Volume, Speed, Fullscreen */}
+            <div className="flex items-center justify-between text-white text-xs pt-1">
+              {/* Left Cluster: Transport Controls */}
+              <div className="flex items-center gap-2 sm:gap-4">
+                {/* Play / Pause Toggle */}
+                <button
+                  onClick={togglePlay}
+                  className="p-2 rounded-full hover:bg-white/10 text-white hover:text-[#C65D45] transition-colors cursor-pointer"
+                  title={isPlaying ? 'Pause (Space)' : 'Play (Space)'}
+                >
+                  {isPlaying ? <Pause className="w-5 h-5 fill-current" /> : <Play className="w-5 h-5 fill-current ml-0.5" />}
                 </button>
 
-                {showSpeedMenu && (
-                  <div className="absolute bottom-full right-0 mb-2 py-1 w-24 bg-[#2B170F] border border-white/20 rounded-xl shadow-2xl text-xs overflow-hidden z-50">
-                    {[0.5, 0.75, 1, 1.25, 1.5, 2].map((s) => (
-                      <button
-                        key={s}
-                        onClick={() => handleSpeedChange(s)}
-                        className={`w-full text-left px-3 py-1.5 transition-colors cursor-pointer ${
-                          playbackSpeed === s
-                            ? 'bg-[#C65D45] text-[#2B170F] font-bold'
-                            : 'text-white/80 hover:bg-white/10'
-                        }`}
-                      >
-                        {s}x
-                      </button>
-                    ))}
-                  </div>
-                )}
+                {/* DURATION BACKWARD BUTTON */}
+                <button
+                  onClick={handleBackward}
+                  className="hidden sm:flex items-center gap-1 px-3 py-1.5 rounded-full bg-white/10 hover:bg-[#C65D45] hover:text-[#2B170F] transition-all text-xs font-bold cursor-pointer group"
+                  title="Duration Backward 10s (← Arrow)"
+                >
+                  <RotateCcw className="w-3.5 h-3.5 group-hover:-rotate-45 transition-transform" />
+                  <span>-10s</span>
+                </button>
+
+                {/* DURATION FORWARD BUTTON */}
+                <button
+                  onClick={handleForward}
+                  className="hidden sm:flex items-center gap-1 px-3 py-1.5 rounded-full bg-white/10 hover:bg-[#C65D45] hover:text-[#2B170F] transition-all text-xs font-bold cursor-pointer group"
+                  title="Duration Forward 10s (→ Arrow)"
+                >
+                  <span>+10s</span>
+                  <RotateCw className="w-3.5 h-3.5 group-hover:rotate-45 transition-transform" />
+                </button>
+
+                {/* Duration Display */}
+                <div className="flex items-center gap-1.5 text-xs text-white/80 font-mono pl-1">
+                  <span className="font-bold text-white">{currentTime}</span>
+                  <span className="text-white/40">/</span>
+                  <span>{duration}</span>
+                  <span className="hidden md:inline text-white/40 text-[11px] ml-1">
+                    ({remainingTime})
+                  </span>
+                </div>
               </div>
 
-              {/* Toggle Native Fullscreen Button */}
-              <button
-                onClick={toggleNativeFullscreen}
-                className="p-2 rounded-full hover:bg-white/10 text-white hover:text-[#C65D45] transition-colors cursor-pointer"
-                title={isNativeFullscreen ? 'Exit Fullscreen (F)' : 'Full Screen (F)'}
-              >
-                {isNativeFullscreen ? (
-                  <Minimize className="w-4 h-4" />
-                ) : (
-                  <Maximize className="w-4 h-4" />
-                )}
-              </button>
+              {/* Right Cluster: Volume, Speed, Fullscreen, Cut */}
+              <div className="flex items-center gap-2 sm:gap-4">
+                {/* Volume & Slider */}
+                <div className="group/vol flex items-center gap-2">
+                  <button
+                    onClick={toggleMute}
+                    className="p-1.5 rounded-full hover:bg-white/10 hover:text-[#C65D45] transition-colors cursor-pointer"
+                    title={isMuted ? 'Unmute (M)' : 'Mute (M)'}
+                  >
+                    {isMuted || volume === 0 ? (
+                      <VolumeX className="w-4 h-4 text-white/50" />
+                    ) : volume < 0.5 ? (
+                      <Volume1 className="w-4 h-4 text-[#C65D45]" />
+                    ) : (
+                      <Volume2 className="w-4 h-4 text-[#C65D45]" />
+                    )}
+                  </button>
+                  <input
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.05"
+                    value={isMuted ? 0 : volume}
+                    onChange={handleVolumeChange}
+                    className="w-16 sm:w-20 h-1 accent-[#C65D45] cursor-pointer hidden sm:inline-block"
+                    title={`Volume: ${Math.round((isMuted ? 0 : volume) * 100)}%`}
+                  />
+                </div>
 
-              {/* Bottom Back Button for Quick Access */}
-              <button
-                onClick={onClose}
-                className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-500/20 hover:bg-red-500 text-red-200 hover:text-white transition-all text-xs font-bold cursor-pointer border border-red-500/30"
-                title="Back / Exit Video (Esc)"
-              >
-                <X className="w-3.5 h-3.5" />
-                <span>Back</span>
-              </button>
+                {/* Playback Speed Picker */}
+                <div className="relative">
+                  <button
+                    onClick={() => setShowSpeedMenu(!showSpeedMenu)}
+                    className="px-2.5 py-1 rounded-full bg-white/10 hover:bg-white/20 text-[11px] font-bold transition-colors cursor-pointer"
+                    title="Playback Speed"
+                  >
+                    {playbackSpeed}x
+                  </button>
+
+                  {showSpeedMenu && (
+                    <div className="absolute bottom-full right-0 mb-2 py-1 w-24 bg-[#2B170F] border border-white/20 rounded-xl shadow-2xl text-xs overflow-hidden z-50">
+                      {[0.5, 0.75, 1, 1.25, 1.5, 2].map((s) => (
+                        <button
+                          key={s}
+                          onClick={() => handleSpeedChange(s)}
+                          className={`w-full text-left px-3 py-1.5 transition-colors cursor-pointer ${
+                            playbackSpeed === s
+                              ? 'bg-[#C65D45] text-[#2B170F] font-bold'
+                              : 'text-white/80 hover:bg-white/10'
+                          }`}
+                        >
+                          {s}x
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Toggle Native Fullscreen Button */}
+                <button
+                  onClick={toggleNativeFullscreen}
+                  className="p-2 rounded-full hover:bg-white/10 text-white hover:text-[#C65D45] transition-colors cursor-pointer"
+                  title={isNativeFullscreen ? 'Exit Fullscreen (F)' : 'Full Screen (F)'}
+                >
+                  {isNativeFullscreen ? (
+                    <Minimize className="w-4 h-4" />
+                  ) : (
+                    <Maximize className="w-4 h-4" />
+                  )}
+                </button>
+
+                {/* Bottom Back Button for Quick Access */}
+                <button
+                  onClick={onClose}
+                  className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-500/20 hover:bg-red-500 text-red-200 hover:text-white transition-all text-xs font-bold cursor-pointer border border-red-500/30"
+                  title="Back / Exit Video (Esc)"
+                >
+                  <X className="w-3.5 h-3.5" />
+                  <span>Back</span>
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      </footer>
+        </footer>
+      )}
     </div>
   );
 };

@@ -2,6 +2,7 @@ import React from 'react';
 import { Play, Sparkles, CheckCircle2, Cpu, FileText, Target, ArrowUpRight } from 'lucide-react';
 import { Project } from '../types';
 import { BeforeAfterSlider } from './BeforeAfterSlider';
+import { VideoAutoThumbnail } from './VideoAutoThumbnail';
 
 interface SelectedProjectsProps {
   projects: Project[];
@@ -142,8 +143,9 @@ export const SelectedProjects: React.FC<SelectedProjectsProps> = ({ projects, on
                       onClick={() => onOpenLightbox(project.video_url, project.title, project.client, project.category)}
                       className="relative w-full aspect-16-9 rounded-2xl overflow-hidden cursor-pointer bg-black border border-[#2B170F]/10 group/img shadow-xl"
                     >
-                      <img
-                        src={project.thumbnail_url || 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80'}
+                      <VideoAutoThumbnail
+                        videoUrl={project.video_url}
+                        thumbnailUrl={project.thumbnail_url}
                         alt={project.title}
                         className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-700"
                       />

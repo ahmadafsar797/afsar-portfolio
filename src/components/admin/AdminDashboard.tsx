@@ -34,6 +34,7 @@ import {
   SettingsData,
   ContactMessage,
 } from '../../types';
+import { isYouTubeUrl, getYouTubeThumbnail } from '../../utils/videoUtils';
 
 interface AdminDashboardProps {
   isOpen: boolean;
@@ -655,15 +656,21 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                         {/* Video URL & File Upload */}
                         <div>
                           <label className="block text-xs font-montserrat uppercase text-white/60 mb-1">
-                            Video URL (MP4 / Direct Stream) *
+                            Video URL (YouTube link, Shorts, or MP4) *
                           </label>
                           <input
                             type="text"
                             value={editingReel.video_url || ''}
                             onChange={(e) => setEditingReel({ ...editingReel, video_url: e.target.value })}
                             className="w-full px-3 py-2 rounded-lg bg-black border border-white/15 text-sm text-white mb-2"
-                            placeholder="https://... or upload below"
+                            placeholder="https://youtube.com/watch?v=... or https://youtu.be/... or .mp4"
                           />
+                          {isYouTubeUrl(editingReel.video_url) && (
+                            <div className="flex items-center gap-2 mb-2 p-2 rounded-lg bg-[#C65D45]/15 border border-[#C65D45]/30 text-xs text-[#C65D45]">
+                              <CheckCircle className="w-4 h-4 shrink-0" />
+                              <span>YouTube video detected! Thumbnail will auto-generate if left empty.</span>
+                            </div>
+                          )}
                           <label className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-xs cursor-pointer border border-white/15">
                             <Upload className="w-3.5 h-3.5 text-[#C65D45]" />
                             <span>Upload Video File (MP4)</span>
@@ -681,18 +688,28 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                         {/* Thumbnail URL & File Upload */}
                         <div>
                           <label className="block text-xs font-montserrat uppercase text-white/60 mb-1">
-                            Poster Thumbnail URL
+                            Poster Thumbnail URL (Optional — auto-generated from video/YouTube)
                           </label>
                           <input
                             type="text"
                             value={editingReel.thumbnail_url || ''}
                             onChange={(e) => setEditingReel({ ...editingReel, thumbnail_url: e.target.value })}
                             className="w-full px-3 py-2 rounded-lg bg-black border border-white/15 text-sm text-white mb-2"
-                            placeholder="https://... or upload poster image"
+                            placeholder="Leave empty for auto thumbnail, or paste image URL"
                           />
+                          {isYouTubeUrl(editingReel.video_url) && !editingReel.thumbnail_url && (
+                            <div className="flex items-center gap-2 mb-2">
+                              <img
+                                src={getYouTubeThumbnail(editingReel.video_url) || ''}
+                                alt="Auto YouTube Thumbnail Preview"
+                                className="w-16 h-10 object-cover rounded border border-white/20"
+                              />
+                              <span className="text-[11px] text-white/60">Auto-generated YouTube thumbnail</span>
+                            </div>
+                          )}
                           <label className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-xs cursor-pointer border border-white/15">
                             <Upload className="w-3.5 h-3.5 text-[#C65D45]" />
-                            <span>Upload Thumbnail Poster</span>
+                            <span>Upload Custom Thumbnail</span>
                             <input
                               type="file"
                               accept="image/*"
@@ -918,14 +935,21 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
 
                         <div>
                           <label className="block text-xs font-montserrat uppercase text-white/60 mb-1">
-                            Video URL *
+                            Video URL (YouTube link or MP4) *
                           </label>
                           <input
                             type="text"
                             value={editingHorizontal.video_url || ''}
                             onChange={(e) => setEditingHorizontal({ ...editingHorizontal, video_url: e.target.value })}
                             className="w-full px-3 py-2 rounded-lg bg-black border border-white/15 text-sm text-white mb-2"
+                            placeholder="https://youtube.com/watch?v=... or https://youtu.be/... or .mp4"
                           />
+                          {isYouTubeUrl(editingHorizontal.video_url) && (
+                            <div className="flex items-center gap-2 mb-2 p-2 rounded-lg bg-[#C65D45]/15 border border-[#C65D45]/30 text-xs text-[#C65D45]">
+                              <CheckCircle className="w-4 h-4 shrink-0" />
+                              <span>YouTube video detected! Thumbnail will auto-generate if left empty.</span>
+                            </div>
+                          )}
                           <label className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-xs cursor-pointer border border-white/15">
                             <Upload className="w-3.5 h-3.5 text-[#C65D45]" />
                             <span>Upload Video File</span>
@@ -944,14 +968,25 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
 
                         <div>
                           <label className="block text-xs font-montserrat uppercase text-white/60 mb-1">
-                            Thumbnail URL
+                            Thumbnail URL (Optional — auto-generated from YouTube if empty)
                           </label>
                           <input
                             type="text"
                             value={editingHorizontal.thumbnail_url || ''}
                             onChange={(e) => setEditingHorizontal({ ...editingHorizontal, thumbnail_url: e.target.value })}
                             className="w-full px-3 py-2 rounded-lg bg-black border border-white/15 text-sm text-white mb-2"
+                            placeholder="Leave empty for auto thumbnail, or paste image URL"
                           />
+                          {isYouTubeUrl(editingHorizontal.video_url) && !editingHorizontal.thumbnail_url && (
+                            <div className="flex items-center gap-2 mb-2">
+                              <img
+                                src={getYouTubeThumbnail(editingHorizontal.video_url) || ''}
+                                alt="Auto YouTube Thumbnail Preview"
+                                className="w-16 h-10 object-cover rounded border border-white/20"
+                              />
+                              <span className="text-[11px] text-white/60">Auto-generated YouTube thumbnail</span>
+                            </div>
+                          )}
                           <label className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-xs cursor-pointer border border-white/15">
                             <Upload className="w-3.5 h-3.5 text-[#C65D45]" />
                             <span>Upload Thumbnail</span>
@@ -2253,14 +2288,28 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
 
                     <div>
                       <label className="block text-xs font-montserrat uppercase text-white/60 mb-1">
-                        Featured Master Showreel Video URL
+                        Featured Master Showreel Video URL (YouTube link or MP4)
                       </label>
                       <input
                         type="text"
                         value={settings.featured_showreel_url || ''}
                         onChange={(e) => setSettings({ ...settings, featured_showreel_url: e.target.value })}
                         className="w-full px-3 py-2 rounded-lg bg-black border border-white/15 text-sm text-white mb-2"
+                        placeholder="https://youtube.com/watch?v=... or https://youtu.be/... or .mp4"
                       />
+                      {isYouTubeUrl(settings.featured_showreel_url) && (
+                        <div className="flex items-center gap-3 mb-2 p-2 rounded-lg bg-[#C65D45]/15 border border-[#C65D45]/30">
+                          <img
+                            src={getYouTubeThumbnail(settings.featured_showreel_url) || ''}
+                            alt="YouTube Showreel Thumbnail"
+                            className="w-16 h-10 object-cover rounded border border-white/20 shrink-0"
+                          />
+                          <div className="text-xs text-[#C65D45]">
+                            <span className="font-bold">YouTube Showreel Connected!</span>
+                            <p className="text-[11px] text-white/60">Plays in fullscreen theater mode on click.</p>
+                          </div>
+                        </div>
+                      )}
                       <label className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-xs cursor-pointer border border-white/15">
                         <Upload className="w-3.5 h-3.5 text-[#C65D45]" />
                         <span>Upload Showreel Video</span>

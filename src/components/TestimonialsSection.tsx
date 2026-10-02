@@ -3,6 +3,7 @@ import { Play, Star, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Testimonial } from '../types';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { VideoAutoThumbnail } from './VideoAutoThumbnail';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -330,13 +331,10 @@ const HorizontalTestimonialCard: React.FC<HorizontalTestimonialCardProps> = ({
         data-cursor="play"
         className="relative w-full h-[240px] sm:h-[285px] md:h-[315px] overflow-hidden bg-black cursor-pointer group/video rounded-t-3xl"
       >
-        <img
-          src={
-            item.thumbnail_url ||
-            'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80'
-          }
+        <VideoAutoThumbnail
+          videoUrl={item.video_url}
+          thumbnailUrl={item.thumbnail_url}
           alt={item.client_name}
-          loading="lazy"
           className="w-full h-full object-cover group-hover/video:scale-105 transition-transform duration-700 ease-out"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/30 to-black/50 transition-opacity duration-300 group-hover/video:opacity-90" />

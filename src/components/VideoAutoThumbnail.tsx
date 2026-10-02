@@ -1,10 +1,12 @@
 import React, { useRef, useEffect } from 'react';
+import { isYouTubeUrl, getYouTubeThumbnail } from '../utils/videoUtils';
 
 /**
  * VideoAutoThumbnail
  *
  * - If thumbnailUrl is provided  → renders a normal <img> (fast, no cost).
- * - If thumbnailUrl is missing   → renders a <video> element with preload="metadata"
+ * - If videoUrl is a YouTube URL → renders YouTube thumbnail (hqdefault.jpg).
+ * - If neither and is MP4/video  → renders a <video> element with preload="metadata"
  *   and seeks to a random frame (10 %–80 % of duration) so visitors always see
  *   a real frame instead of a blank/black box.
  */
@@ -25,10 +27,15 @@ export const VideoAutoThumbnail: React.FC<VideoAutoThumbnailProps> = ({
   style,
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const isYt = isYouTubeUrl(videoUrl);
+  const ytThumbnail = isYt ? getYouTubeThumbnail(videoUrl) : null;
+
+  // Resolve the best thumbnail image source
+  const effectiveThumbnail = thumbnailUrl || ytThumbnail;
 
   useEffect(() => {
-    // Only relevant when we're in "auto-frame" mode (no thumbnail supplied)
-    if (thumbnailUrl || !videoRef.current) return;
+    // Only relevant when we're in "auto-frame" mode for native videos (no thumbnail supplied and not YouTube)
+    if (effectiveThumbnail || isYt || !videoRef.current) return;
 
     const video = videoRef.current;
 
@@ -43,12 +50,12 @@ export const VideoAutoThumbnail: React.FC<VideoAutoThumbnailProps> = ({
 
     video.addEventListener('loadedmetadata', seekToRandomFrame);
     return () => video.removeEventListener('loadedmetadata', seekToRandomFrame);
-  }, [videoUrl, thumbnailUrl]);
+  }, [videoUrl, effectiveThumbnail, isYt]);
 
-  if (thumbnailUrl) {
+  if (effectiveThumbnail) {
     return (
       <img
-        src={thumbnailUrl}
+        src={effectiveThumbnail}
         alt={alt}
         loading="lazy"
         className={className}
@@ -57,7 +64,7 @@ export const VideoAutoThumbnail: React.FC<VideoAutoThumbnailProps> = ({
     );
   }
 
-  // No thumbnail — stream just the metadata to grab a frame
+  // Native video fallback — stream just the metadata to grab a frame
   return (
     <video
       ref={videoRef}
@@ -70,3 +77,4 @@ export const VideoAutoThumbnail: React.FC<VideoAutoThumbnailProps> = ({
     />
   );
 };
+
