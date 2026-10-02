@@ -35,6 +35,7 @@ export const VideoModal: React.FC<VideoModalProps> = ({
   const videoRef = useRef<HTMLVideoElement>(null);
   const progressBarRef = useRef<HTMLDivElement>(null);
   const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const centerControlsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const [isPlaying, setIsPlaying] = useState(true);
   const [isMuted, setIsMuted] = useState(false);
@@ -48,11 +49,21 @@ export const VideoModal: React.FC<VideoModalProps> = ({
   const [isVertical, setIsVertical] = useState(false);
   const [isNativeFullscreen, setIsNativeFullscreen] = useState(false);
   const [showControls, setShowControls] = useState(true);
+  const [showCenterControls, setShowCenterControls] = useState(true);
   const [playbackSpeed, setPlaybackSpeed] = useState(1);
   const [showSpeedMenu, setShowSpeedMenu] = useState(false);
   const [hoverTime, setHoverTime] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<{ text: string; id: number } | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+
+  // Auto-hide center action buttons after exactly 1 second (1000ms)
+  const showCenterBriefly = useCallback((durationMs: number = 1000) => {
+    setShowCenterControls(true);
+    if (centerControlsTimeoutRef.current) clearTimeout(centerControlsTimeoutRef.current);
+    centerControlsTimeoutRef.current = setTimeout(() => {
+      setShowCenterControls(false);
+    }, durationMs);
+  }, []);
 
   const isYt = isYouTubeUrl(videoUrl);
   const isShortOrVertical =
@@ -86,7 +97,9 @@ export const VideoModal: React.FC<VideoModalProps> = ({
       setIsPlaying(false);
       triggerFeedback('Paused');
     }
-  }, [triggerFeedback]);
+    showCenterBriefly(1000);
+    resetControlsTimeout();
+  }, [triggerFeedback, showCenterBriefly, resetControlsTimeout]);
 
   // Duration Backward (-10 seconds)
   const handleBackward = useCallback(() => {
@@ -94,8 +107,9 @@ export const VideoModal: React.FC<VideoModalProps> = ({
     const newTime = Math.max(0, videoRef.current.currentTime - 10);
     videoRef.current.currentTime = newTime;
     triggerFeedback('-10s');
+    showCenterBriefly(1000);
     resetControlsTimeout();
-  }, [triggerFeedback]);
+  }, [triggerFeedback, showCenterBriefly, resetControlsTimeout]);
 
   // Duration Forward (+10 seconds)
   const handleForward = useCallback(() => {
@@ -104,8 +118,9 @@ export const VideoModal: React.FC<VideoModalProps> = ({
     const newTime = Math.min(dur, videoRef.current.currentTime + 10);
     videoRef.current.currentTime = newTime;
     triggerFeedback('+10s');
+    showCenterBriefly(1000);
     resetControlsTimeout();
-  }, [triggerFeedback]);
+  }, [triggerFeedback, showCenterBriefly, resetControlsTimeout]);
 
   // Toggle Mute
   const toggleMute = useCallback(() => {
@@ -166,6 +181,7 @@ export const VideoModal: React.FC<VideoModalProps> = ({
 
   const handleMouseMove = () => {
     resetControlsTimeout();
+    showCenterBriefly(1000);
   };
 
   // Keyboard controls
@@ -251,6 +267,7 @@ export const VideoModal: React.FC<VideoModalProps> = ({
         .catch(() => {
           setIsPlaying(false);
         });
+      showCenterBriefly(1000);
       resetControlsTimeout();
     }
 
@@ -261,9 +278,10 @@ export const VideoModal: React.FC<VideoModalProps> = ({
 
     return () => {
       if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
+      if (centerControlsTimeoutRef.current) clearTimeout(centerControlsTimeoutRef.current);
       document.removeEventListener('fullscreenchange', handleFullscreenChange);
     };
-  }, [isOpen, videoUrl, playbackSpeed, resetControlsTimeout]);
+  }, [isOpen, videoUrl, playbackSpeed, resetControlsTimeout, showCenterBriefly]);
 
   // Video time updates
   const handleTimeUpdate = () => {
@@ -485,47 +503,47 @@ export const VideoModal: React.FC<VideoModalProps> = ({
               </div>
             )}
 
-            {/* Center Hover Action Controls: -10s, Play/Pause, +10s */}
+            {/* Center Hover Action Controls: -10s, Play/Pause, +10s (compact, semi-transparent, 1s auto-hide) */}
             <div
               className={`absolute inset-0 flex items-center justify-center pointer-events-none transition-opacity duration-300 ${
-                showControls || !isPlaying ? 'opacity-100' : 'opacity-0'
+                showCenterControls ? 'opacity-100' : 'opacity-0'
               }`}
             >
-              <div className="flex items-center gap-6 sm:gap-10 pointer-events-auto">
+              <div className="flex items-center gap-3.5 sm:gap-5 pointer-events-auto">
                 {/* Center Backward -10s Button */}
                 <button
                   onClick={handleBackward}
-                  className="group/back flex flex-col items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-black/60 hover:bg-[#C65D45] border border-white/20 hover:border-[#C65D45] text-white hover:text-[#2B170F] backdrop-blur-xl transition-all duration-200 active:scale-90 shadow-xl cursor-pointer"
+                  className="group/back flex flex-col items-center justify-center w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-black/40 hover:bg-[#C65D45]/80 border border-white/20 hover:border-[#C65D45]/60 text-white/85 hover:text-[#FFF9F2] backdrop-blur-md transition-all duration-200 active:scale-90 shadow-lg cursor-pointer"
                   title="Duration Backward 10s (← Left Arrow)"
                   aria-label="Backward 10 seconds"
                 >
-                  <RotateCcw className="w-5 h-5 sm:w-6 sm:h-6 stroke-[2.2] group-hover/back:-rotate-45 transition-transform duration-300" />
-                  <span className="text-[10px] font-bold mt-0.5 tracking-tight">-10s</span>
+                  <RotateCcw className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[2.2] group-hover/back:-rotate-45 transition-transform duration-300" />
+                  <span className="text-[7.5px] sm:text-[8.5px] font-bold mt-0.5 tracking-tight">-10s</span>
                 </button>
 
-                {/* Big Central Play / Pause Button */}
+                {/* Compact Central Play / Pause Button */}
                 <button
                   onClick={togglePlay}
-                  className="flex items-center justify-center w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-[#C65D45] hover:bg-[#a84d38] text-[#2B170F] transition-all duration-300 transform hover:scale-110 active:scale-95 shadow-2xl cursor-pointer"
+                  className="flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-[#C65D45]/75 hover:bg-[#C65D45]/90 border border-white/25 text-[#FFF9F2] backdrop-blur-md transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-xl cursor-pointer"
                   title={isPlaying ? 'Pause (Space)' : 'Play (Space)'}
                   aria-label={isPlaying ? 'Pause' : 'Play'}
                 >
                   {isPlaying ? (
-                    <Pause className="w-9 h-9 sm:w-10 sm:h-10 fill-current" />
+                    <Pause className="w-5 h-5 sm:w-6 sm:h-6 fill-current" />
                   ) : (
-                    <Play className="w-9 h-9 sm:w-10 sm:h-10 fill-current ml-1" />
+                    <Play className="w-5 h-5 sm:w-6 sm:h-6 fill-current ml-0.5" />
                   )}
                 </button>
 
                 {/* Center Forward +10s Button */}
                 <button
                   onClick={handleForward}
-                  className="group/fwd flex flex-col items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-black/60 hover:bg-[#C65D45] border border-white/20 hover:border-[#C65D45] text-white hover:text-[#2B170F] backdrop-blur-xl transition-all duration-200 active:scale-90 shadow-xl cursor-pointer"
+                  className="group/fwd flex flex-col items-center justify-center w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-black/40 hover:bg-[#C65D45]/80 border border-white/20 hover:border-[#C65D45]/60 text-white/85 hover:text-[#FFF9F2] backdrop-blur-md transition-all duration-200 active:scale-90 shadow-lg cursor-pointer"
                   title="Duration Forward 10s (→ Right Arrow)"
                   aria-label="Forward 10 seconds"
                 >
-                  <RotateCw className="w-5 h-5 sm:w-6 sm:h-6 stroke-[2.2] group-hover/fwd:rotate-45 transition-transform duration-300" />
-                  <span className="text-[10px] font-bold mt-0.5 tracking-tight">+10s</span>
+                  <RotateCw className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[2.2] group-hover/fwd:rotate-45 transition-transform duration-300" />
+                  <span className="text-[7.5px] sm:text-[8.5px] font-bold mt-0.5 tracking-tight">+10s</span>
                 </button>
               </div>
             </div>
