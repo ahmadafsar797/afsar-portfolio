@@ -363,7 +363,7 @@ export const Hero: React.FC<HeroProps> = ({ settings, onWatchShowreel }) => {
                 <path d="M4 0l16 12.279-6.951 1.17 4.325 8.817-3.596 1.734-4.35-8.879-5.428 5.428z" />
               </svg>
               <div className="bg-[#C65D45] text-[#2B170F] px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-xl text-[11px] sm:text-xs font-sans font-bold border border-white/40 shadow-md">
-                Color & Motion
+                Motion Designer
               </div>
             </div>
           </div>
