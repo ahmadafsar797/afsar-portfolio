@@ -146,12 +146,9 @@ export const Navbar: React.FC<NavbarProps> = ({ settings, onOpenAdmin, isAdminLo
                 <span>A</span>
               )}
             </div>
-            <div className="flex items-center gap-1.5 whitespace-nowrap">
-              <span className="font-pogonia text-lg sm:text-2xl md:text-[26px] font-bold tracking-tight text-[#FFF9F2] group-hover:text-[#C65D45] transition-colors duration-300 whitespace-nowrap">
-                Afsar Ahmad
-              </span>
-              <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#C65D45] shrink-0 inline-block" />
-            </div>
+            <span className="font-pogonia text-lg sm:text-2xl md:text-[26px] font-bold tracking-tight text-[#FFF9F2] group-hover:text-[#C65D45] transition-colors duration-300 whitespace-nowrap">
+              Afsar Ahmad
+            </span>
           </a>
 
           {/* Desktop Nav */}
