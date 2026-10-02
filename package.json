@@ -8,7 +8,7 @@
     "server": "node server/server.js",
     "client": "vite",
     "build": "vite build",
-    "render-build": "npm install --include=dev && npm run build",
+    "render-build": "npm install --include=dev && npm rebuild better-sqlite3 --build-from-source && npm run build",
     "start": "node server/server.js"
   },
   "keywords": [],
