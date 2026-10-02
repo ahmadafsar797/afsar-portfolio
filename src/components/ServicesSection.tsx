@@ -23,17 +23,18 @@ interface ServicesSectionProps {
 
 export const ServicesSection: React.FC<ServicesSectionProps> = ({ services, onSelectService }) => {
   const getIcon = (iconName?: string) => {
+    const iconClass = "w-6 h-6 text-[#C65D45] group-hover:text-[#FFF9F2] group-active:text-[#FFF9F2] transition-colors duration-300";
     switch (iconName?.toLowerCase()) {
-      case 'smartphone': return <Smartphone className="w-6 h-6 text-[#C65D45]" />;
-      case 'youtube': return <MonitorPlay className="w-6 h-6 text-[#C65D45]" />;
-      case 'flame': return <Flame className="w-6 h-6 text-[#C65D45]" />;
-      case 'film': return <Film className="w-6 h-6 text-[#C65D45]" />;
-      case 'package': return <Package className="w-6 h-6 text-[#C65D45]" />;
-      case 'sparkles': return <Sparkles className="w-6 h-6 text-[#C65D45]" />;
-      case 'palette': return <Palette className="w-6 h-6 text-[#C65D45]" />;
-      case 'volume2': return <Volume2 className="w-6 h-6 text-[#C65D45]" />;
-      case 'briefcase': return <Briefcase className="w-6 h-6 text-[#C65D45]" />;
-      default: return <Film className="w-6 h-6 text-[#C65D45]" />;
+      case 'smartphone': return <Smartphone className={iconClass} />;
+      case 'youtube': return <MonitorPlay className={iconClass} />;
+      case 'flame': return <Flame className={iconClass} />;
+      case 'film': return <Film className={iconClass} />;
+      case 'package': return <Package className={iconClass} />;
+      case 'sparkles': return <Sparkles className={iconClass} />;
+      case 'palette': return <Palette className={iconClass} />;
+      case 'volume2': return <Volume2 className={iconClass} />;
+      case 'briefcase': return <Briefcase className={iconClass} />;
+      default: return <Film className={iconClass} />;
     }
   };
 
@@ -83,36 +84,42 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ services, onSe
           {services.map((service, idx) => (
             <div
               key={service.id || idx}
-              className="service-card group relative p-8 rounded-3xl bg-[#F8F1E7] border border-[#2B170F]/10 hover:border-[#C65D45] transition-all duration-500 shadow-sm hover:shadow-xl hover:shadow-[#C65D45]/10 hover:-translate-y-1 flex flex-col justify-between"
+              className="service-card group relative p-8 rounded-3xl bg-[#F8F1E7] border border-[#2B170F]/10 hover:border-[#C65D45] transition-all duration-500 shadow-sm hover:shadow-2xl hover:shadow-[#2B170F]/35 hover:-translate-y-2 flex flex-col justify-between overflow-hidden cursor-pointer active:scale-[0.98]"
               style={{ willChange: 'transform' }}
             >
-              <div>
+              {/* Chocolate Background Layer — smoothly envelopes card on hover & active */}
+              <div className="absolute inset-0 rounded-3xl bg-gradient-to-b from-[#2B170F] via-[#24130C] to-[#180D07] opacity-0 group-hover:opacity-100 group-active:opacity-100 transition-opacity duration-500 pointer-events-none" />
+
+              {/* Ambient Copper Lighting Effect inside card */}
+              <div className="absolute -top-12 -right-12 w-40 h-40 bg-[#C65D45]/20 rounded-full blur-2xl opacity-0 group-hover:opacity-100 group-active:opacity-100 transition-opacity duration-500 pointer-events-none" />
+
+              <div className="relative z-10">
                 {/* Icon & Turnaround */}
                 <div className="flex items-center justify-between mb-6">
-                  <div className="w-12 h-12 rounded-2xl bg-[#FFF9F2] border border-[#2B170F]/10 flex items-center justify-center group-hover:scale-110 group-hover:bg-[#C65D45]/20 group-hover:border-[#C65D45]/40 transition-all duration-300">
+                  <div className="w-12 h-12 rounded-2xl bg-[#FFF9F2] border border-[#2B170F]/10 flex items-center justify-center group-hover:scale-110 group-hover:bg-[#C65D45] group-hover:border-[#C65D45] group-active:bg-[#C65D45] transition-all duration-300 shadow-sm group-hover:shadow-[0_0_20px_rgba(198,93,69,0.5)]">
                     {getIcon(service.icon_name)}
                   </div>
                   {service.turnaround && (
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FFF9F2] border border-[#2B170F]/10 text-[11px] font-montserrat font-medium text-[#756A62]">
-                      <Clock className="w-3 h-3 text-[#C65D45]" />
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FFF9F2] border border-[#2B170F]/10 text-[11px] font-montserrat font-medium text-[#756A62] group-hover:bg-white/10 group-hover:border-white/15 group-hover:text-[#FFF9F2] group-active:bg-white/10 group-active:text-[#FFF9F2] transition-all duration-300">
+                      <Clock className="w-3 h-3 text-[#C65D45] group-hover:text-[#FFA07A] transition-colors" />
                       <span>{service.turnaround}</span>
                     </span>
                   )}
                 </div>
 
-                <h3 className="font-pogonia text-2xl sm:text-3xl font-bold text-[#2B170F] group-hover:text-[#C65D45] transition-colors mb-3 leading-snug">
+                <h3 className="font-pogonia text-2xl sm:text-3xl font-bold text-[#2B170F] group-hover:text-[#FFF9F2] group-active:text-[#FFF9F2] transition-colors duration-300 mb-3 leading-snug">
                   {service.title}
                 </h3>
-                <p className="text-xs sm:text-sm font-montserrat font-medium text-[#756A62] leading-relaxed mb-6">
+                <p className="text-xs sm:text-sm font-montserrat font-medium text-[#756A62] group-hover:text-[#FFF9F2]/80 group-active:text-[#FFF9F2]/80 transition-colors duration-300 leading-relaxed mb-6">
                   {service.short_description}
                 </p>
 
                 {service.deliverables && (
-                  <div className="pt-4 border-t border-[#2B170F]/10 mb-6">
-                    <span className="text-[10px] font-montserrat font-semibold uppercase tracking-wider text-[#756A62]/60 block mb-2">
+                  <div className="pt-4 border-t border-[#2B170F]/10 group-hover:border-white/15 group-active:border-white/15 transition-colors duration-300 mb-6">
+                    <span className="text-[10px] font-montserrat font-bold uppercase tracking-wider text-[#756A62]/60 group-hover:text-[#C65D45] group-active:text-[#C65D45] transition-colors duration-300 block mb-2">
                       Key Deliverables
                     </span>
-                    <p className="text-xs text-[#756A62] font-montserrat font-medium leading-relaxed">
+                    <p className="text-xs text-[#756A62] group-hover:text-[#FFF9F2]/80 group-active:text-[#FFF9F2]/80 font-montserrat font-medium leading-relaxed transition-colors duration-300">
                       {service.deliverables}
                     </p>
                   </div>
@@ -126,10 +133,10 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ services, onSe
                 onMouseMove={handleArrowMagnetic}
                 onMouseLeave={handleArrowLeave}
                 data-cursor="open"
-                className="inline-flex items-center gap-2 text-xs font-montserrat uppercase font-semibold tracking-wider text-[#2B170F] group-hover:text-[#C65D45] transition-colors pt-3 border-t border-[#2B170F]/10 mt-auto"
+                className="relative z-10 inline-flex items-center justify-between text-xs font-montserrat uppercase font-bold tracking-wider text-[#2B170F] group-hover:text-[#FFF9F2] group-active:text-[#FFF9F2] transition-all duration-300 pt-3 border-t border-[#2B170F]/10 group-hover:border-white/15 group-active:border-white/15 mt-auto"
               >
                 <span>Book This Service</span>
-                <ArrowRight className="service-arrow w-3.5 h-3.5 text-[#C65D45]" />
+                <ArrowRight className="service-arrow w-3.5 h-3.5 text-[#C65D45] group-hover:text-[#FFA07A] group-hover:translate-x-1 transition-all" />
               </a>
             </div>
           ))}
