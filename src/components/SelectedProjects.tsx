@@ -53,7 +53,7 @@ export const SelectedProjects: React.FC<SelectedProjectsProps> = ({ projects, on
 
                 <button
                   onClick={() => onOpenLightbox(project.video_url, project.title, project.client, project.category)}
-                  className="group/play relative inline-flex items-center gap-2 px-6 py-3 rounded-full text-xs font-montserrat uppercase font-black tracking-widest text-[#FFF9F2] bg-gradient-to-r from-[#C65D45] via-[#D8684F] to-[#E2725B] shadow-[0_6px_24px_rgba(198,93,69,0.5),inset_0_1px_1px_rgba(255,255,255,0.35)] hover:shadow-[0_8px_32px_rgba(198,93,69,0.7)] hover:scale-105 active:scale-95 transition-all duration-300 border border-[#E2725B]/50"
+                  className="group/play relative inline-flex items-center gap-2 px-6 py-3 rounded-full text-xs font-montserrat uppercase font-black tracking-wide text-[#FFF9F2] bg-gradient-to-r from-[#C65D45] via-[#D8684F] to-[#E2725B] shadow-[0_6px_24px_rgba(198,93,69,0.5),inset_0_1px_1px_rgba(255,255,255,0.35)] hover:shadow-[0_8px_32px_rgba(198,93,69,0.7)] hover:scale-105 active:scale-95 transition-all duration-300 border border-[#E2725B]/50"
                 >
                   <span className="absolute inset-0 rounded-full overflow-hidden pointer-events-none">
                     <span className="absolute inset-0 -translate-x-full group-hover/play:translate-x-full group-active/play:translate-x-full transition-transform duration-500 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
@@ -187,3 +187,4 @@ export const SelectedProjects: React.FC<SelectedProjectsProps> = ({ projects, on
     </section>
   );
 };
+

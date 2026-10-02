@@ -72,7 +72,7 @@ export const ReelsSection: React.FC<ReelsSectionProps> = ({ reels, onOpenLightbo
                 <button
                   key={cat}
                   onClick={() => setSelectedCategory(cat)}
-                  className={`group/filter relative text-xs font-sans uppercase tracking-widest px-5 py-2.5 rounded-full whitespace-nowrap transition-all duration-300 cursor-pointer font-black ${
+                  className={`group/filter relative text-xs font-sans uppercase tracking-wide px-5 py-2.5 rounded-full whitespace-nowrap transition-all duration-300 cursor-pointer font-black ${
                     active
                       ? 'bg-gradient-to-r from-[#C65D45] via-[#D8684F] to-[#E2725B] text-[#FFF9F2] shadow-[0_4px_18px_rgba(198,93,69,0.45)] scale-105 border border-[#C65D45]/60'
                       : 'bg-white/70 hover:bg-white text-[#5C4A3D] hover:text-[#2B170F] border border-[#2B170F]/20 hover:border-[#C65D45]/40 hover:shadow-[0_2px_10px_rgba(198,93,69,0.15)] font-semibold'
@@ -300,3 +300,4 @@ const ReelCard: React.FC<ReelCardProps> = ({
     </div>
   );
 };
+
