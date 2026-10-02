@@ -71,6 +71,38 @@ export const VideoModal: React.FC<VideoModalProps> = ({
     (videoUrl && videoUrl.includes('/shorts/')) ||
     Boolean(category && /reel|short|9:16|vertical/i.test(category));
 
+  // Ref to prevent double-closing when user clicks manual Back button vs hardware back button
+  const isClosingRef = useRef(false);
+
+  const handleManualClose = useCallback(() => {
+    isClosingRef.current = true;
+    if (window.history.state?.videoModal) {
+      window.history.back();
+    }
+    onClose();
+  }, [onClose]);
+
+  // Mobile Back Button & Desktop Back Cursor handling
+  useEffect(() => {
+    if (!isOpen) return;
+
+    isClosingRef.current = false;
+
+    // Push dummy history entry so back button closes modal instead of closing the website
+    window.history.pushState({ videoModal: true }, '', window.location.href);
+
+    const handlePopState = () => {
+      if (isClosingRef.current) return;
+      onClose();
+    };
+
+    window.addEventListener('popstate', handlePopState);
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [isOpen, onClose]);
+
   // Trigger brief visual feedback (e.g. "+10s", "-10s", "Paused")
   const triggerFeedback = useCallback((text: string) => {
     setFeedback({ text, id: Date.now() });
@@ -195,7 +227,7 @@ export const VideoModal: React.FC<VideoModalProps> = ({
       switch (e.key) {
         case 'Escape':
           e.preventDefault();
-          onClose();
+          handleManualClose();
           break;
         case ' ':
         case 'k':
@@ -254,7 +286,7 @@ export const VideoModal: React.FC<VideoModalProps> = ({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, togglePlay, handleBackward, handleForward, toggleMute, onClose]);
+  }, [isOpen, togglePlay, handleBackward, handleForward, toggleMute, handleManualClose]);
 
   // Reset video state when modal opens with a new URL
   useEffect(() => {
@@ -383,7 +415,7 @@ export const VideoModal: React.FC<VideoModalProps> = ({
       ref={containerRef}
       onMouseMove={handleMouseMove}
       onClick={resetControlsTimeout}
-      className="fixed inset-0 z-[99999] w-screen h-screen bg-black/98 backdrop-blur-2xl flex flex-col justify-between overflow-hidden select-none font-montserrat animate-in fade-in duration-200"
+      className="fixed inset-0 z-[99999] w-screen h-screen bg-black overflow-hidden select-none font-montserrat animate-in fade-in duration-200"
     >
       {/* Ambient background glow matching the video */}
       <div className="absolute inset-0 pointer-events-none opacity-20 overflow-hidden blur-3xl scale-125">
@@ -403,9 +435,9 @@ export const VideoModal: React.FC<VideoModalProps> = ({
         )}
       </div>
 
-      {/* ── TOP HEADER BAR: TITLE, METADATA & CUT / CLOSE BUTTON ────────────── */}
+      {/* ── TOP HEADER BAR: TITLE, METADATA & CUT / CLOSE BUTTON (Overlay) ────────────── */}
       <header
-        className={`relative z-50 w-full px-5 sm:px-8 py-4 sm:py-6 flex items-center justify-between bg-gradient-to-b from-black/95 via-black/70 to-transparent transition-opacity duration-300 ${
+        className={`absolute top-0 inset-x-0 z-50 w-full px-4 sm:px-8 py-3.5 sm:py-5 flex items-center justify-between bg-gradient-to-b from-black/90 via-black/40 to-transparent transition-opacity duration-300 ${
           showControls || isYt ? 'opacity-100' : 'opacity-0 pointer-events-none'
         }`}
       >
@@ -423,11 +455,11 @@ export const VideoModal: React.FC<VideoModalProps> = ({
                   {client} •
                 </span>
               )}
-              <h2 className="font-pogonia text-lg sm:text-2xl text-white font-bold truncate">
+              <h2 className="font-pogonia text-base sm:text-2xl text-white font-bold truncate">
                 {title || 'Cinematic Video'}
               </h2>
             </div>
-            <div className="flex items-center gap-2 text-[11px] text-white/50 mt-0.5">
+            <div className="flex items-center gap-2 text-[10px] sm:text-[11px] text-white/50 mt-0.5">
               <span>{isShortOrVertical ? '9:16 Vertical Reel' : '16:9 Cinema 4K'}</span>
               <span>•</span>
               <span>{isYt ? 'YouTube Player' : duration}</span>
@@ -438,33 +470,33 @@ export const VideoModal: React.FC<VideoModalProps> = ({
         {/* Right: BACK OPTION (Prominent Close / Back Button) */}
         <div className="flex items-center gap-3">
           <button
-            onClick={onClose}
-            className="group/cut flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 hover:bg-[#C65D45] border border-white/20 hover:border-[#C65D45] text-white hover:text-[#2B170F] transition-all duration-300 shadow-xl cursor-pointer active:scale-95"
-            title="Back / Close Video (Esc)"
+            onClick={handleManualClose}
+            className="group/cut flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-white/10 hover:bg-[#C65D45] border border-white/20 hover:border-[#C65D45] text-white hover:text-[#2B170F] transition-all duration-300 shadow-xl cursor-pointer active:scale-95"
+            title="Back / Close Video (Esc or Back Button)"
             aria-label="Back / Close Video"
           >
-            <span className="text-xs font-bold uppercase tracking-wider group-hover/cut:text-[#2B170F] transition-colors">
+            <span className="text-[11px] sm:text-xs font-bold uppercase tracking-wider group-hover/cut:text-[#2B170F] transition-colors">
               Back
             </span>
-            <X className="w-5 h-5 text-[#C65D45] group-hover/cut:text-[#2B170F] group-hover/cut:rotate-90 transition-all duration-300" />
+            <X className="w-4 h-4 sm:w-5 sm:h-5 text-[#C65D45] group-hover/cut:text-[#2B170F] group-hover/cut:rotate-90 transition-all duration-300" />
           </button>
         </div>
       </header>
 
-      {/* ── CENTRAL FULLSCREEN VIDEO STAGE ─────────────────────────────────── */}
-      <main className="relative flex-1 w-full h-full flex items-center justify-center overflow-hidden p-2 sm:p-6">
+      {/* ── CENTRAL FULLSCREEN VIDEO STAGE (Full Viewport Edge-to-Edge) ─────────── */}
+      <main className="absolute inset-0 w-full h-full flex items-center justify-center overflow-hidden">
         {isYt ? (
           <div
             className={`relative flex items-center justify-center w-full h-full ${
-              isShortOrVertical ? 'max-w-[420px]' : 'max-w-5xl'
+              isShortOrVertical ? 'max-w-none sm:max-w-[440px] h-full sm:h-auto' : 'max-w-6xl'
             }`}
           >
             <iframe
               src={getYouTubeEmbedUrl(videoUrl, true) || ''}
               title={title || 'YouTube Video'}
               className={`w-full ${
-                isShortOrVertical ? 'aspect-9-16 max-h-[85vh]' : 'aspect-16-9 max-h-[85vh]'
-              } rounded-xl sm:rounded-2xl shadow-2xl border border-white/15 bg-black`}
+                isShortOrVertical ? 'h-full sm:h-auto sm:aspect-9-16 sm:max-h-[95vh]' : 'aspect-16-9 max-h-[88vh]'
+              } sm:rounded-2xl shadow-2xl border-0 sm:border sm:border-white/15 bg-black`}
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
               allowFullScreen
             />
@@ -482,9 +514,9 @@ export const VideoModal: React.FC<VideoModalProps> = ({
               onLoadedMetadata={handleLoadedMetadata}
               onClick={togglePlay}
               className={`cursor-pointer transition-all duration-300 ${
-                isVertical
-                  ? 'h-full max-h-screen w-auto aspect-9-16 shadow-2xl rounded-lg sm:rounded-2xl border border-white/10'
-                  : 'w-full h-full max-w-full max-h-full object-contain'
+                isShortOrVertical
+                  ? 'w-full h-full object-cover sm:object-contain sm:h-full sm:w-auto sm:max-h-screen sm:aspect-9-16'
+                  : 'w-full h-full max-w-7xl max-h-screen object-contain'
               }`}
             />
 
@@ -551,10 +583,10 @@ export const VideoModal: React.FC<VideoModalProps> = ({
         )}
       </main>
 
-      {/* ── BOTTOM DURATION & CONTROL DECK (HTML5 Videos only) ──────────────────────────────────── */}
+      {/* ── BOTTOM DURATION & CONTROL DECK (HTML5 Videos only - Floating Overlay) ─────────── */}
       {!isYt && (
         <footer
-          className={`relative z-50 w-full px-4 sm:px-8 pb-5 pt-10 sm:pb-6 bg-gradient-to-t from-black via-black/85 to-transparent transition-opacity duration-300 ${
+          className={`absolute bottom-0 inset-x-0 z-50 w-full px-4 sm:px-8 pb-4 pt-12 sm:pb-6 bg-gradient-to-t from-black/95 via-black/60 to-transparent transition-opacity duration-300 ${
             showControls || !isPlaying
               ? 'opacity-100'
               : 'opacity-0 pointer-events-none'
