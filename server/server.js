@@ -868,20 +868,22 @@ if (fs.existsSync(distDir)) {
 
 const http = require('http');
 
-app.listen(PORT, () => {
-  console.log(`Cinematic Portfolio API server running on http://localhost:${PORT}`);
+// Wait for sql.js database to initialize, then start the server
+db.initDb().then(() => {
+  app.listen(PORT, () => {
+    console.log(`Cinematic Portfolio API server running on http://localhost:${PORT}`);
+  });
+
+  // Also bind to port 3000 if available
+  try {
+    const server3000 = http.createServer((req, res) => { app(req, res); });
+    server3000.listen(3000, () => {
+      console.log(`Portfolio also accessible on http://localhost:3000`);
+    });
+    server3000.on('error', () => {});
+  } catch (e) {}
+
+}).catch(err => {
+  console.error('Failed to initialize database:', err);
+  process.exit(1);
 });
-
-// Also bind to port 3000 if available, so visitors navigating to port 3000 are served seamlessly
-try {
-  const server3000 = http.createServer((req, res) => {
-    app(req, res);
-  });
-  server3000.listen(3000, () => {
-    console.log(`Portfolio also accessible on http://localhost:3000`);
-  });
-  server3000.on('error', (e) => {
-    // If port 3000 is occupied, port 5000 remains primary
-  });
-} catch (e) {}
-
