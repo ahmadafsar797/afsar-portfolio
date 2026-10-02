@@ -34,8 +34,8 @@ export const VideoModal: React.FC<VideoModalProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const progressBarRef = useRef<HTMLDivElement>(null);
-  const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const centerControlsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const controlsTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const centerControlsTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [isPlaying, setIsPlaying] = useState(true);
   const [isMuted, setIsMuted] = useState(false);
@@ -53,8 +53,20 @@ export const VideoModal: React.FC<VideoModalProps> = ({
   const [playbackSpeed, setPlaybackSpeed] = useState(1);
   const [showSpeedMenu, setShowSpeedMenu] = useState(false);
   const [hoverTime, setHoverTime] = useState<string | null>(null);
+  const [hoverPosition, setHoverPosition] = useState(0);
   const [feedback, setFeedback] = useState<{ text: string; id: number } | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+
+  // Auto-hide controls timer
+  const resetControlsTimeout = useCallback(() => {
+    setShowControls(true);
+    if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
+    controlsTimeoutRef.current = setTimeout(() => {
+      if (videoRef.current && !videoRef.current.paused) {
+        setShowControls(false);
+      }
+    }, 3200);
+  }, []);
 
   // Auto-hide center action buttons after exactly 1 second (1000ms)
   const showCenterBriefly = useCallback((durationMs: number = 1000) => {
@@ -200,16 +212,6 @@ export const VideoModal: React.FC<VideoModalProps> = ({
     }
   };
 
-  // Auto-hide controls timer
-  const resetControlsTimeout = useCallback(() => {
-    setShowControls(true);
-    if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
-    controlsTimeoutRef.current = setTimeout(() => {
-      if (videoRef.current && !videoRef.current.paused) {
-        setShowControls(false);
-      }
-    }, 3200);
-  }, []);
 
   const handleMouseMove = () => {
     resetControlsTimeout();
