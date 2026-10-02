@@ -3,6 +3,7 @@ import { Play, Film, Clock, Calendar, ArrowUpRight } from 'lucide-react';
 import { HorizontalVideo } from '../types';
 import { gsap } from 'gsap';
 import { useFadeUpOnScroll, useRevealOnScroll } from '../hooks/useAnimations';
+import { VideoAutoThumbnail } from './VideoAutoThumbnail';
 
 interface HorizontalSectionProps {
   videos: HorizontalVideo[];
@@ -96,10 +97,10 @@ const HorizontalVideoCard: React.FC<HorizontalVideoCardProps> = ({ video, index,
           isEven ? 'lg:order-1' : 'lg:order-2'
         }`}
       >
-        <img
-          src={video.thumbnail_url || 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1200&q=80'}
+        <VideoAutoThumbnail
+          videoUrl={video.video_url}
+          thumbnailUrl={video.thumbnail_url}
           alt={video.title}
-          loading="lazy"
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/30 group-hover:opacity-60 transition-opacity duration-500" />

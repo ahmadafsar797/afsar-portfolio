@@ -4,6 +4,7 @@ import { Reel } from '../types';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useStaggerOnScroll, useFadeUpOnScroll } from '../hooks/useAnimations';
+import { VideoAutoThumbnail } from './VideoAutoThumbnail';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -204,11 +205,11 @@ const ReelCard: React.FC<ReelCardProps> = ({
     >
       {/* 9:16 Vertical Video Frame */}
       <div className="relative w-full aspect-9-16 overflow-hidden bg-black">
-        {/* Poster */}
-        <img
-          src={reel.thumbnail_url || 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?auto=format&fit=crop&w=600&q=80'}
+        {/* Poster / Auto-thumbnail */}
+        <VideoAutoThumbnail
+          videoUrl={reel.video_url}
+          thumbnailUrl={reel.thumbnail_url}
           alt={reel.title}
-          loading="lazy"
           className={`w-full h-full object-cover transition-all duration-700 ease-out group-hover:scale-105 ${
             isHovered ? 'opacity-0' : 'opacity-100'
           }`}
