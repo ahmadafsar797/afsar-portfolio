@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { Navbar } from './components/Navbar';
-import { PageLoader } from './components/PageLoader';
 import { Hero } from './components/Hero';
 import { Showreel } from './components/Showreel';
 import { ReelsSection } from './components/ReelsSection';
@@ -32,7 +31,6 @@ const ScrollAnimations: React.FC = () => {
 
 export const App: React.FC = () => {
   const [loading, setLoading] = useState(true);
-  const [showLoader, setShowLoader] = useState(true);
   const [settings, setSettings] = useState<SettingsData>({});
   const [about, setAbout] = useState<AboutData | undefined>();
   const [reels, setReels] = useState<Reel[]>([]);
@@ -122,10 +120,6 @@ export const App: React.FC = () => {
     setPreselectedService(serviceTitle);
   };
 
-  const handleLoaderComplete = () => {
-    setShowLoader(false);
-  };
-
   // Minimal dark splash while initial database API call resolves
   if (loading) {
     return (
@@ -142,8 +136,6 @@ export const App: React.FC = () => {
 
   return (
     <div className="bg-[#F8F1E7] text-[#756A62] min-h-screen relative font-sans selection:bg-[#C65D45] selection:text-[#2B170F]">
-      {/* Cinematic curtain loader — appears first, then splits away */}
-      {showLoader && <PageLoader onComplete={handleLoaderComplete} />}
       {/* Scroll-driven layout animation engine — mounts after DOM is full */}
       <ScrollAnimations />
       <Navbar
