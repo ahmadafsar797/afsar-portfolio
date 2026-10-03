@@ -151,8 +151,16 @@ export const App: React.FC = () => {
 
   // Dynamically apply selected website fonts across all components
   useEffect(() => {
-    applyDynamicFonts(settings?.heading_font, settings?.body_font);
-  }, [settings?.heading_font, settings?.body_font]);
+    applyDynamicFonts(settings);
+  }, [
+    settings?.heading_font,
+    settings?.body_font,
+    settings?.hero_title_font,
+    settings?.section_title_font,
+    settings?.cta_font,
+    settings?.badge_font,
+    settings?.nav_font,
+  ]);
 
   const openLightbox = (videoUrl: string, title: string, client?: string, category?: string) => {
     setLightboxState({

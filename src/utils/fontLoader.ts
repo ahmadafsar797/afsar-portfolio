@@ -1,40 +1,81 @@
 /**
- * Font loader utility: dynamically loads Google Fonts and applies them across the entire website
+ * Font loader utility: dynamically loads Google Fonts and applies granular styling across the entire website
  */
 
-export interface FontOption {
-  name: string;
-  category: string;
-  preview: string;
+export interface FontCategory {
+  family: string;
+  fonts: { name: string; label: string }[];
 }
 
-export const POPULAR_FONTS: FontOption[] = [
-  { name: 'Pogonia', category: 'Luxury Editorial (Default Heading)', preview: 'Pogonia • Cinematic Master' },
-  { name: 'Montserrat', category: 'Modern Geometric (Default Body)', preview: 'Montserrat • Clean & Crisp' },
-  { name: 'Inter', category: 'Clean Modern Tech', preview: 'Inter • Precision & Flow' },
-  { name: 'Poppins', category: 'Bold Geometric Sans', preview: 'Poppins • Striking & Modern' },
-  { name: 'Outfit', category: 'Futuristic Minimalist', preview: 'Outfit • Sleek & Polished' },
-  { name: 'Plus Jakarta Sans', category: 'Contemporary Neo-Grotesk', preview: 'Plus Jakarta • High-End Tech' },
-  { name: 'Syne', category: 'Artistic High-Impact Display', preview: 'Syne • Bold Artistic Cut' },
-  { name: 'Space Grotesk', category: 'Brutalist / Cyber', preview: 'Space Grotesk • Raw Motion' },
-  { name: 'Cinzel', category: 'Cinematic & Classical', preview: 'Cinzel • Roman Prestige' },
-  { name: 'Playfair Display', category: 'Luxury Editorial Serif', preview: 'Playfair • Editorial Vogue' },
-  { name: 'Oswald', category: 'Punchy Condensed Title', preview: 'Oswald • Loud & Focused' },
-  { name: 'Bebas Neue', category: 'All-Caps Poster Display', preview: 'Bebas Neue • Bold Impact' },
-  { name: 'DM Sans', category: 'Geometric Balanced Sans', preview: 'DM Sans • Smooth Typography' },
-  { name: 'Raleway', category: 'Elegant & Sophisticated', preview: 'Raleway • Refined Angles' },
-  { name: 'Urbanist', category: 'Architectural Geometric', preview: 'Urbanist • Balanced Pacing' },
-  { name: 'Sora', category: 'Modern Digital Display', preview: 'Sora • High Readability' },
-  { name: 'Manrope', category: 'Semi-condensed Modern', preview: 'Manrope • Dynamic Rhythm' },
+export const FONT_FAMILIES: FontCategory[] = [
+  {
+    family: 'Serif & Luxury Editorial',
+    fonts: [
+      { name: 'Pogonia', label: 'Pogonia (Custom Luxury — Default)' },
+      { name: 'Cinzel', label: 'Cinzel (Cinematic & Epic)' },
+      { name: 'Playfair Display', label: 'Playfair Display (Vogue Editorial)' },
+      { name: 'Cormorant Garamond', label: 'Cormorant Garamond (Classical Elegance)' },
+      { name: 'Bodoni Moda', label: 'Bodoni Moda (High-Fashion Title)' },
+      { name: 'Prata', label: 'Prata (Refined Luxury Serif)' },
+      { name: 'Lora', label: 'Lora (Contemporary Serif)' },
+    ],
+  },
+  {
+    family: 'Modern Sans-Serif',
+    fonts: [
+      { name: 'Montserrat', label: 'Montserrat (Geometric — Default)' },
+      { name: 'Inter', label: 'Inter (Ultra-Clean Modern Tech)' },
+      { name: 'Plus Jakarta Sans', label: 'Plus Jakarta Sans (Premium Tech)' },
+      { name: 'Poppins', label: 'Poppins (Bold & Friendly Geometric)' },
+      { name: 'Outfit', label: 'Outfit (Sleek Futuristic)' },
+      { name: 'DM Sans', label: 'DM Sans (Balanced & Crisp)' },
+      { name: 'Urbanist', label: 'Urbanist (Minimalist Architecture)' },
+      { name: 'Raleway', label: 'Raleway (Sophisticated Thin/Bold)' },
+      { name: 'Manrope', label: 'Manrope (Modern Dynamic Pacing)' },
+    ],
+  },
+  {
+    family: 'Display & Bold Cinematic',
+    fonts: [
+      { name: 'Syne', label: 'Syne (Artistic High-Impact Display)' },
+      { name: 'Bebas Neue', label: 'Bebas Neue (Punchy All-Caps Title)' },
+      { name: 'Oswald', label: 'Oswald (Tall Impact Condensed)' },
+      { name: 'Space Grotesk', label: 'Space Grotesk (Cyber / Raw Kinetic)' },
+      { name: 'Anton', label: 'Anton (Heavy Impact Headline)' },
+      { name: 'Righteous', label: 'Righteous (Retro Neo-Modern)' },
+      { name: 'Russo One', label: 'Russo One (Heavy Solid Motion)' },
+    ],
+  },
+  {
+    family: 'Tech & Monospace',
+    fonts: [
+      { name: 'Space Mono', label: 'Space Mono (Brutalist Code)' },
+      { name: 'JetBrains Mono', label: 'JetBrains Mono (Developer Clean)' },
+      { name: 'Fira Code', label: 'Fira Code (Modern Monospace)' },
+    ],
+  },
 ];
 
+// Flat list for quick lookups
+export const ALL_PRESET_FONTS = FONT_FAMILIES.flatMap((cat) => cat.fonts);
+
+export interface TypographySettings {
+  heading_font?: string;
+  body_font?: string;
+  hero_title_font?: string;
+  section_title_font?: string;
+  cta_font?: string;
+  badge_font?: string;
+  nav_font?: string;
+}
+
 /**
- * Injects a Google Font stylesheet if not already present
+ * Loads a single Google Font dynamically if not Pogonia
  */
-export function loadGoogleFont(fontName: string) {
+export function loadGoogleFont(fontName?: string) {
   if (!fontName) return;
   const clean = fontName.trim();
-  if (clean.toLowerCase() === 'pogonia') return; // Locally hosted font
+  if (!clean || clean.toLowerCase() === 'pogonia' || clean.toLowerCase() === 'inherit') return;
 
   const linkId = `google-font-${clean.toLowerCase().replace(/[^a-z0-9]/g, '-')}`;
   if (document.getElementById(linkId)) return;
@@ -46,7 +87,7 @@ export function loadGoogleFont(fontName: string) {
   link.href = `https://fonts.googleapis.com/css2?family=${encodedName}:ital,wght@0,300..900;1,300..900&display=swap`;
 
   link.onerror = () => {
-    // If variable weight range fails, fallback to simple family query
+    // Fallback without weight range for single-weight fonts
     link.href = `https://fonts.googleapis.com/css2?family=${encodedName}&display=swap`;
   };
 
@@ -54,20 +95,53 @@ export function loadGoogleFont(fontName: string) {
 }
 
 /**
- * Applies custom heading and body fonts across the entire website via CSS custom properties and styles
+ * Resolves a font name with fallback
  */
-export function applyDynamicFonts(headingFont?: string, bodyFont?: string) {
-  const hFont = (headingFont && headingFont.trim()) || 'Pogonia';
-  const bFont = (bodyFont && bodyFont.trim()) || 'Montserrat';
+function resolveFont(font?: string, fallback: string = 'Montserrat') {
+  if (!font || font.trim().toLowerCase() === 'inherit' || font.trim() === '') {
+    return fallback;
+  }
+  return font.trim();
+}
 
-  // Load Google Fonts
-  loadGoogleFont(hFont);
-  loadGoogleFont(bFont);
+/**
+ * Applies typography settings across the entire website
+ */
+export function applyDynamicFonts(
+  settingsOrHeading?: TypographySettings | string,
+  bodyFallback?: string
+) {
+  let settings: TypographySettings;
 
-  // Set CSS Variables
+  if (typeof settingsOrHeading === 'object' && settingsOrHeading !== null) {
+    settings = settingsOrHeading;
+  } else {
+    settings = {
+      heading_font: settingsOrHeading,
+      body_font: bodyFallback,
+    };
+  }
+
+  const hFont = resolveFont(settings.heading_font, 'Pogonia');
+  const bFont = resolveFont(settings.body_font, 'Montserrat');
+  const heroFont = resolveFont(settings.hero_title_font, hFont);
+  const secFont = resolveFont(settings.section_title_font, hFont);
+  const ctaFont = resolveFont(settings.cta_font, bFont);
+  const badgeFont = resolveFont(settings.badge_font, bFont);
+  const navFont = resolveFont(settings.nav_font, bFont);
+
+  // Load all selected Google fonts
+  [hFont, bFont, heroFont, secFont, ctaFont, badgeFont, navFont].forEach(loadGoogleFont);
+
+  // Set CSS Custom Properties on document root
   const root = document.documentElement;
-  root.style.setProperty('--font-custom-heading', `'${hFont}', 'Pogonia', 'Montserrat', serif`);
+  root.style.setProperty('--font-custom-heading', `'${hFont}', 'Pogonia', serif`);
   root.style.setProperty('--font-custom-body', `'${bFont}', 'Montserrat', system-ui, sans-serif`);
+  root.style.setProperty('--font-custom-hero-title', `'${heroFont}', '${hFont}', 'Pogonia', serif`);
+  root.style.setProperty('--font-custom-section-title', `'${secFont}', '${hFont}', 'Pogonia', serif`);
+  root.style.setProperty('--font-custom-cta', `'${ctaFont}', '${bFont}', 'Montserrat', sans-serif`);
+  root.style.setProperty('--font-custom-badge', `'${badgeFont}', '${bFont}', 'Montserrat', sans-serif`);
+  root.style.setProperty('--font-custom-nav', `'${navFont}', '${bFont}', 'Montserrat', sans-serif`);
 
   // Direct body style
   document.body.style.fontFamily = `'${bFont}', 'Montserrat', system-ui, sans-serif`;
@@ -82,15 +156,49 @@ export function applyDynamicFonts(headingFont?: string, bodyFont?: string) {
 
   styleEl.textContent = `
     :root {
-      --font-pogonia: '${hFont}', 'Pogonia', 'Montserrat', serif !important;
+      --font-pogonia: '${hFont}', 'Pogonia', serif !important;
       --font-montserrat: '${bFont}', 'Montserrat', system-ui, sans-serif !important;
       --font-sans: '${bFont}', 'Montserrat', system-ui, sans-serif !important;
+      --font-custom-heading: '${hFont}', 'Pogonia', serif !important;
+      --font-custom-body: '${bFont}', 'Montserrat', system-ui, sans-serif !important;
+      --font-custom-hero-title: '${heroFont}', '${hFont}', 'Pogonia', serif !important;
+      --font-custom-section-title: '${secFont}', '${hFont}', 'Pogonia', serif !important;
+      --font-custom-cta: '${ctaFont}', '${bFont}', 'Montserrat', sans-serif !important;
+      --font-custom-badge: '${badgeFont}', '${bFont}', 'Montserrat', sans-serif !important;
+      --font-custom-nav: '${navFont}', '${bFont}', 'Montserrat', sans-serif !important;
     }
-    .font-pogonia, .font-editorial, .font-serif {
-      font-family: '${hFont}', 'Pogonia', 'Montserrat', serif !important;
+
+    /* Global Headings & Body Defaults */
+    .font-pogonia, .font-editorial, .font-serif, h1, h2, h3, h4, h5, h6 {
+      font-family: var(--font-custom-heading) !important;
     }
-    .font-montserrat, .font-sans, .font-ui, body, button, input, select, textarea {
-      font-family: '${bFont}', 'Montserrat', system-ui, sans-serif !important;
+    .font-montserrat, .font-sans, .font-ui, body, p, blockquote, label {
+      font-family: var(--font-custom-body) !important;
+    }
+
+    /* Specific: Hero Main Title (Highest Specificity for Hero) */
+    .font-hero-title, [data-font="hero-title"], #hero h1, #hero h1.font-pogonia, #hero .hero-headline {
+      font-family: var(--font-custom-hero-title) !important;
+    }
+
+    /* Specific: Section Titles (Overrides global .font-pogonia on section headings) */
+    .font-section-title, [data-font="section-title"], section h2, section h2.font-pogonia, section div h2, main h2 {
+      font-family: var(--font-custom-section-title) !important;
+    }
+
+    /* Specific: CTA Buttons & Action Triggers */
+    .font-cta, [data-font="cta"], button:not([data-font-ignore]), button.font-montserrat, a[data-cursor="open"], a[data-cursor="play"], .group\\/explore, .group\\/hire, .group\\/story, .group\\/play {
+      font-family: var(--font-custom-cta) !important;
+    }
+
+    /* Specific: Badges, View Counters & Category Tags */
+    .font-badge, [data-font="badge"], .badge-pill, span[class*="tracking-wider"], span[class*="tracking-widest"] {
+      font-family: var(--font-custom-badge) !important;
+    }
+
+    /* Specific: Navbar & Brand Name */
+    .font-nav, [data-font="nav"], nav, nav a, nav span, header a, header span, nav .font-pogonia, nav .font-montserrat {
+      font-family: var(--font-custom-nav) !important;
     }
   `;
 }

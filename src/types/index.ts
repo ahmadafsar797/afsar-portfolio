@@ -103,6 +103,11 @@ export interface SettingsData {
   profile_picture_url?: string;
   heading_font?: string;
   body_font?: string;
+  hero_title_font?: string;
+  section_title_font?: string;
+  cta_font?: string;
+  badge_font?: string;
+  nav_font?: string;
 }
 
 export interface ContactMessage {

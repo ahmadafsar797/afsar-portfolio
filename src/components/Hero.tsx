@@ -162,7 +162,8 @@ export const Hero: React.FC<HeroProps> = ({ settings, onWatchShowreel }) => {
             {/* Main Headline */}
             <h1
               ref={headlineRef}
-              className="font-pogonia text-3xl sm:text-5xl md:text-6xl lg:text-6xl xl:text-7xl font-bold leading-[1.24] sm:leading-[1.12] lg:leading-[1.08] text-[#2B170F] tracking-tight mb-4"
+              data-font="hero-title"
+              className="font-hero-title font-pogonia text-3xl sm:text-5xl md:text-6xl lg:text-6xl xl:text-7xl font-bold leading-[1.24] sm:leading-[1.12] lg:leading-[1.08] text-[#2B170F] tracking-tight mb-4"
             >
               I'm{' '}
               <span className="text-[#C65D45] underline decoration-[#C65D45] decoration-2 sm:decoration-4 underline-offset-[3px] sm:underline-offset-6 lg:underline-offset-8">
@@ -191,7 +192,8 @@ export const Hero: React.FC<HeroProps> = ({ settings, onWatchShowreel }) => {
                 <a
                   href="#reels"
                   data-cursor="open"
-                  className="group/explore relative z-10 px-5 sm:px-6 py-2.5 sm:py-3 rounded-l-full bg-gradient-to-r from-[#C65D45] via-[#D8684F] to-[#E2725B] text-[#FFF9F2] font-sans font-black text-xs uppercase tracking-wide shadow-[inset_0_1px_2px_rgba(255,255,255,0.45),0_0_16px_rgba(198,93,69,0.35)] hover:brightness-110 active:scale-98 transition-all duration-200 flex items-center gap-2"
+                  data-font="cta"
+                  className="font-cta group/explore relative z-10 px-5 sm:px-6 py-2.5 sm:py-3 rounded-l-full bg-gradient-to-r from-[#C65D45] via-[#D8684F] to-[#E2725B] text-[#FFF9F2] font-sans font-black text-xs uppercase tracking-wide shadow-[inset_0_1px_2px_rgba(255,255,255,0.45),0_0_16px_rgba(198,93,69,0.35)] hover:brightness-110 active:scale-98 transition-all duration-200 flex items-center gap-2"
                 >
                   <span className="absolute inset-0 rounded-l-full overflow-hidden pointer-events-none">
                     <span className="absolute inset-0 -translate-x-full group-hover/explore:translate-x-full group-active/explore:translate-x-full transition-transform duration-500 bg-gradient-to-r from-transparent via-white/25 to-transparent" />
@@ -206,6 +208,7 @@ export const Hero: React.FC<HeroProps> = ({ settings, onWatchShowreel }) => {
                   onMouseMove={handlePlayMagnetic}
                   onMouseLeave={handlePlayLeave}
                   data-cursor="play"
+                  data-font="cta"
                   className="relative z-10 ml-1 px-4 sm:px-5 py-2.5 sm:py-3 rounded-full bg-gradient-to-b from-[#341C13] via-[#24130C] to-[#160B06] border border-white/20 text-[#FFF9F2] flex items-center gap-3 shadow-[-4px_0_12px_rgba(0,0,0,0.55),0_4px_10px_rgba(0,0,0,0.6),inset_0_1px_1px_rgba(255,255,255,0.25)] group-hover:shadow-[-6px_0_16px_rgba(0,0,0,0.65),0_6px_14px_rgba(0,0,0,0.7),0_0_20px_rgba(198,93,69,0.3)] group-hover:border-[#C65D45]/60 transition-all duration-300 cursor-pointer active:scale-95"
                   title="Watch Master Showreel"
                   aria-label="Watch Master Showreel"
@@ -218,7 +221,8 @@ export const Hero: React.FC<HeroProps> = ({ settings, onWatchShowreel }) => {
               <a
                 href="#contact"
                 data-cursor="open"
-                className="group/hire relative px-6 sm:px-7 py-3.5 sm:py-4 rounded-full bg-gradient-to-b from-[#28150D] via-[#1E0F09] to-[#140A06] text-[#FFF9F2] font-sans font-black text-xs uppercase tracking-wide border border-[#2B170F]/50 shadow-[0_4px_14px_rgba(0,0,0,0.25),inset_0_1px_1px_rgba(255,255,255,0.15)] hover:border-[#C65D45] hover:shadow-[0_4px_22px_rgba(198,93,69,0.45)] hover:scale-105 active:scale-95 transition-all duration-300"
+                data-font="cta"
+                className="font-cta group/hire relative px-6 sm:px-7 py-3.5 sm:py-4 rounded-full bg-gradient-to-b from-[#28150D] via-[#1E0F09] to-[#140A06] text-[#FFF9F2] font-sans font-black text-xs uppercase tracking-wide border border-[#2B170F]/50 shadow-[0_4px_14px_rgba(0,0,0,0.25),inset_0_1px_1px_rgba(255,255,255,0.15)] hover:border-[#C65D45] hover:shadow-[0_4px_22px_rgba(198,93,69,0.45)] hover:scale-105 active:scale-95 transition-all duration-300"
               >
                 <span className="absolute inset-0 rounded-full overflow-hidden pointer-events-none">
                   <span className="absolute inset-0 -translate-x-full group-hover/hire:translate-x-full group-active/hire:translate-x-full transition-transform duration-500 bg-gradient-to-r from-transparent via-white/10 to-transparent" />

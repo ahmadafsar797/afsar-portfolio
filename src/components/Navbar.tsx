@@ -146,13 +146,13 @@ export const Navbar: React.FC<NavbarProps> = ({ settings, onOpenAdmin, isAdminLo
                 <span>A</span>
               )}
             </div>
-            <span className="font-pogonia text-lg sm:text-2xl md:text-[26px] font-bold tracking-tight text-[#FFF9F2] group-hover:text-[#C65D45] transition-colors duration-300 whitespace-nowrap">
+            <span data-font="nav" className="font-nav font-pogonia text-lg sm:text-2xl md:text-[26px] font-bold tracking-tight text-[#FFF9F2] group-hover:text-[#C65D45] transition-colors duration-300 whitespace-nowrap">
               Afsar Ahmad
             </span>
           </a>
 
           {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-7 lg:gap-10 xl:gap-12">
+          <nav data-font="nav" className="font-nav hidden md:flex items-center gap-7 lg:gap-10 xl:gap-12">
             {NAV_LINKS.map((link) => (
               <a
                 key={link.name}
