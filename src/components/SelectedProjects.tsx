@@ -150,7 +150,7 @@ export const SelectedProjects: React.FC<SelectedProjectsProps> = ({ projects, on
                         videoUrl={project.video_url}
                         thumbnailUrl={project.thumbnail_url}
                         alt={project.title}
-                        className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-700"
+                        className="w-full h-full object-cover"
                       />
                       <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
                         <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white group-hover/img:scale-110 group-hover/img:bg-[#C65D45] group-hover/img:text-[#2B170F] transition-all duration-300">

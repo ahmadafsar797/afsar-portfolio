@@ -335,7 +335,7 @@ const HorizontalTestimonialCard: React.FC<HorizontalTestimonialCardProps> = ({
           videoUrl={item.video_url}
           thumbnailUrl={item.thumbnail_url}
           alt={item.client_name}
-          className="w-full h-full object-cover group-hover/video:scale-105 transition-transform duration-700 ease-out"
+          className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/30 to-black/50 transition-opacity duration-300 group-hover/video:opacity-90" />
 

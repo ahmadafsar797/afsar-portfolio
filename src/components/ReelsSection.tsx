@@ -221,7 +221,7 @@ const ReelCard: React.FC<ReelCardProps> = ({
           videoUrl={reel.video_url}
           thumbnailUrl={reel.thumbnail_url}
           alt={reel.title}
-          className={`w-full h-full object-cover transition-all duration-700 ease-out group-hover:scale-105 ${
+          className={`w-full h-full object-cover transition-opacity duration-300 ${
             isHovered && !isYt ? 'opacity-0' : 'opacity-100'
           }`}
         />
