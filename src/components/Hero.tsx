@@ -120,23 +120,75 @@ export const Hero: React.FC<HeroProps> = ({ settings, onWatchShowreel }) => {
     gsap.to(playBtnRef.current, { x: 0, y: 0, scale: 1, duration: 0.55, ease: 'elastic.out(1, 0.4)' });
   };
 
+  const hasBgVideo = Boolean(settings?.hero_bg_video_url && settings?.hero_bg_video_enabled !== '0');
+  const videoOpacity = (Number(settings?.hero_bg_video_opacity ?? '75')) / 100;
+  const overlayStyle = settings?.hero_bg_video_overlay || 'warm'; // 'warm' | 'dark' | 'none'
+  const overlayOpacity = (Number(settings?.hero_bg_video_overlay_opacity ?? '65')) / 100;
+  const videoBlur = Number(settings?.hero_bg_video_blur ?? '0');
+  const isDarkTheme = settings?.hero_text_theme === 'light' || (hasBgVideo && overlayStyle === 'dark' && settings?.hero_text_theme !== 'dark');
+
   return (
     <section
       ref={heroRef}
       id="home"
       onMouseMove={handleHeroMouseMove}
       onMouseLeave={handleHeroMouseLeave}
-      className="relative w-full min-h-[100dvh] lg:h-screen lg:max-h-[1080px] flex flex-col justify-between bg-[#F8F1E7] overflow-hidden font-sans select-none"
+      className={`relative w-full min-h-[100dvh] lg:h-screen lg:max-h-[1080px] flex flex-col justify-between overflow-hidden font-sans select-none transition-colors duration-500 ${
+        isDarkTheme ? 'bg-[#0E0907]' : 'bg-[#F8F1E7]'
+      }`}
     >
+      {/* Fullscreen Video Background */}
+      {hasBgVideo && (
+        <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="w-full h-full object-cover transition-opacity duration-700"
+            style={{
+              opacity: videoOpacity,
+              filter: videoBlur > 0 ? `blur(${videoBlur}px)` : undefined,
+              transform: videoBlur > 0 ? 'scale(1.05)' : undefined,
+            }}
+            src={settings?.hero_bg_video_url}
+          />
+
+          {/* Calibrated Overlay Tint */}
+          {overlayStyle === 'dark' ? (
+            <div
+              className="absolute inset-0 bg-gradient-to-r from-black/95 via-black/80 to-black/60 pointer-events-none"
+              style={{ opacity: overlayOpacity }}
+            />
+          ) : overlayStyle === 'none' ? null : (
+            /* Warm Editorial Parchment Tint */
+            <div
+              className="absolute inset-0 bg-gradient-to-r from-[#F8F1E7]/95 via-[#F8F1E7]/80 to-[#F8F1E7]/60 pointer-events-none"
+              style={{ opacity: overlayOpacity }}
+            />
+          )}
+
+          {/* Bottom Edge Fade for Seamless Section Continuity */}
+          <div
+            className={`absolute inset-x-0 bottom-0 h-28 pointer-events-none ${
+              isDarkTheme
+                ? 'bg-gradient-to-t from-[#0E0907] to-transparent'
+                : 'bg-gradient-to-t from-[#F8F1E7] to-transparent'
+            }`}
+          />
+        </div>
+      )}
+
       {/* Subtle Demo Background Grid & Geometric Rings */}
-      <div className="absolute inset-0 pointer-events-none opacity-40">
-        <div className="absolute top-16 left-10 w-80 h-80 rounded-full border border-[#2B170F]/10" />
-        <div className="absolute top-32 right-16 w-[440px] h-[440px] rounded-full border border-[#2B170F]/10" />
+      <div className={`absolute inset-0 pointer-events-none ${hasBgVideo ? 'opacity-20' : 'opacity-40'}`}>
+        <div className={`absolute top-16 left-10 w-80 h-80 rounded-full border ${isDarkTheme ? 'border-white/10' : 'border-[#2B170F]/10'}`} />
+        <div className={`absolute top-32 right-16 w-[440px] h-[440px] rounded-full border ${isDarkTheme ? 'border-white/10' : 'border-[#2B170F]/10'}`} />
         <div
           className="w-full h-full"
           style={{
-            backgroundImage:
-              'radial-gradient(circle at 1px 1px, rgba(43, 23, 15, 0.06) 1px, transparent 0)',
+            backgroundImage: isDarkTheme
+              ? 'radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.08) 1px, transparent 0)'
+              : 'radial-gradient(circle at 1px 1px, rgba(43, 23, 15, 0.06) 1px, transparent 0)',
             backgroundSize: '36px 36px',
           }}
         />
@@ -150,7 +202,9 @@ export const Hero: React.FC<HeroProps> = ({ settings, onWatchShowreel }) => {
             {/* Bounding-box tag */}
             <div
               ref={tagRef}
-              className="relative inline-flex items-center px-3.5 py-1 border border-[#C65D45] bg-[#FFF9F2] rounded-sm text-xs font-sans font-semibold text-[#2B170F] shadow-sm mb-4 select-none"
+              className={`relative inline-flex items-center px-3.5 py-1 border border-[#C65D45] rounded-sm text-xs font-sans font-semibold shadow-sm mb-4 select-none ${
+                isDarkTheme ? 'bg-[#180E09]/90 text-white' : 'bg-[#FFF9F2] text-[#2B170F]'
+              }`}
             >
               <span className="absolute -top-1 -left-1 w-2 h-2 bg-[#C65D45] border border-[#FFF9F2]" />
               <span className="absolute -top-1 -right-1 w-2 h-2 bg-[#C65D45] border border-[#FFF9F2]" />
@@ -163,7 +217,9 @@ export const Hero: React.FC<HeroProps> = ({ settings, onWatchShowreel }) => {
             <h1
               ref={headlineRef}
               data-font="hero-title"
-              className="font-hero-title font-pogonia text-3xl sm:text-5xl md:text-6xl lg:text-6xl xl:text-7xl font-bold leading-[1.24] sm:leading-[1.12] lg:leading-[1.08] text-[#2B170F] tracking-tight mb-4"
+              className={`font-hero-title font-pogonia text-3xl sm:text-5xl md:text-6xl lg:text-6xl xl:text-7xl font-bold leading-[1.24] sm:leading-[1.12] lg:leading-[1.08] tracking-tight mb-4 ${
+                isDarkTheme ? 'text-[#FFF9F2]' : 'text-[#2B170F]'
+              }`}
             >
               I'm{' '}
               <span className="text-[#C65D45] underline decoration-[#C65D45] decoration-2 sm:decoration-4 underline-offset-[3px] sm:underline-offset-6 lg:underline-offset-8">
@@ -178,7 +234,9 @@ export const Hero: React.FC<HeroProps> = ({ settings, onWatchShowreel }) => {
             {/* Subtitle */}
             <p
               ref={subtitleRef}
-              className="font-sans text-xs sm:text-sm md:text-base text-[#756A62] max-w-md xl:max-w-lg leading-relaxed mb-6 font-medium"
+              className={`font-sans text-xs sm:text-sm md:text-base max-w-md xl:max-w-lg leading-relaxed mb-6 font-medium ${
+                isDarkTheme ? 'text-white/80' : 'text-[#756A62]'
+              }`}
             >
               {settings?.hero_subtitle ||
                 "I'm a dedicated Video Editor with 2+ years of hands-on experience, collaborating with high-retention creators, commercial brands, and ambitious channels worldwide."}
@@ -255,7 +313,9 @@ export const Hero: React.FC<HeroProps> = ({ settings, onWatchShowreel }) => {
 
             {/* Subtle contour ring framing the circle */}
             <div
-              className="absolute top-[40%] sm:top-[42%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[270px] sm:w-[370px] md:w-[430px] lg:w-[460px] h-[270px] sm:h-[370px] md:h-[430px] lg:h-[460px] rounded-full border border-[#2B170F]/15 pointer-events-none"
+              className={`absolute top-[40%] sm:top-[42%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[270px] sm:w-[370px] md:w-[430px] lg:w-[460px] h-[270px] sm:h-[370px] md:h-[430px] lg:h-[460px] rounded-full border pointer-events-none ${
+                isDarkTheme ? 'border-white/25' : 'border-[#2B170F]/15'
+              }`}
               style={{
                 maskImage: 'linear-gradient(to bottom, black 45%, transparent 92%)',
                 WebkitMaskImage: 'linear-gradient(to bottom, black 45%, transparent 92%)',

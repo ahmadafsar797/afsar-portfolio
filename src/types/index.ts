@@ -115,6 +115,13 @@ export interface SettingsData {
   badge_font_weight?: string;
   nav_font?: string;
   nav_font_weight?: string;
+  hero_bg_video_url?: string;
+  hero_bg_video_enabled?: string;
+  hero_bg_video_opacity?: string;
+  hero_bg_video_overlay?: string;
+  hero_bg_video_overlay_opacity?: string;
+  hero_bg_video_blur?: string;
+  hero_text_theme?: string;
 }
 
 export interface ContactMessage {

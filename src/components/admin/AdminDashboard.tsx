@@ -56,8 +56,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
 
   // Active Admin Tab
   const [activeTab, setActiveTab] = useState<
-    'overview' | 'reels' | 'horizontal' | 'testimonials' | 'services' | 'about' | 'settings'
+    'overview' | 'reels' | 'horizontal' | 'testimonials' | 'services' | 'about' | 'hero-bg' | 'settings'
   >('overview');
+
+  // Hero Background Video
+  const [heroVideoUploading, setHeroVideoUploading] = useState(false);
 
   // Loaded Data
   const [reels, setReels] = useState<Reel[]>([]);
@@ -228,6 +231,60 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
       showNotice('Profile picture removed.');
     } catch (err: any) {
       showNotice(err.message || 'Failed to remove profile picture', 'error');
+    }
+  };
+
+  const handleHeroVideoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const validExts = ['mp4', 'webm', 'mov', 'm4v'];
+    const ext = file.name.split('.').pop()?.toLowerCase();
+    if (!ext || !validExts.includes(ext)) {
+      showNotice('Please upload a video file (.mp4, .webm, or .mov)', 'error');
+      return;
+    }
+
+    if (file.size > 100 * 1024 * 1024) {
+      showNotice('Video file exceeds 100MB limit', 'error');
+      return;
+    }
+
+    try {
+      setHeroVideoUploading(true);
+      showNotice('Uploading background video to server...', 'info');
+      const res = await api.uploadFile(file);
+      const updated = {
+        ...settings,
+        hero_bg_video_url: res.url,
+        hero_bg_video_enabled: '1',
+      };
+      setSettings(updated);
+      await api.updateSettings(updated);
+      showNotice('Landing page background video uploaded and activated!');
+      onDataChanged();
+    } catch (err: any) {
+      showNotice(err.message || 'Failed to upload video', 'error');
+    } finally {
+      setHeroVideoUploading(false);
+      e.target.value = '';
+    }
+  };
+
+  const handleRemoveHeroVideo = async () => {
+    if (!confirm('Remove the background video from the landing page?')) return;
+    try {
+      const updated = {
+        ...settings,
+        hero_bg_video_url: '',
+        hero_bg_video_enabled: '0',
+      };
+      setSettings(updated);
+      await api.updateSettings(updated);
+      showNotice('Background video removed. Restored editorial background.');
+      onDataChanged();
+    } catch (err: any) {
+      showNotice(err.message || 'Error removing video', 'error');
     }
   };
 
@@ -430,6 +487,21 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
               >
                 <User className="w-4 h-4" />
                 <span>About & Bio</span>
+              </button>
+
+              <button
+                onClick={() => setActiveTab('hero-bg')}
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-montserrat uppercase tracking-wider transition-all text-left whitespace-nowrap ${
+                  activeTab === 'hero-bg' ? 'bg-[#C65D45] text-[#2B170F] font-bold font-medium shadow-md' : 'text-white/70 hover:bg-white/5 hover:text-white'
+                }`}
+              >
+                <div className="flex items-center gap-2.5">
+                  <Film className="w-4 h-4" />
+                  <span>Landing Video BG</span>
+                </div>
+                {settings?.hero_bg_video_url && settings?.hero_bg_video_enabled !== '0' && (
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                )}
               </button>
 
               <button
@@ -1585,6 +1657,482 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                 </div>
               )}
 
+              {/* TAB 7: LANDING PAGE BACKGROUND VIDEO STUDIO */}
+              {activeTab === 'hero-bg' && (
+                <div className="space-y-6 max-w-4xl">
+                  {/* Header */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/10">
+                    <div>
+                      <div className="flex items-center gap-2.5">
+                        <h3 className="font-pogonia text-3xl font-normal text-white">
+                          Landing Page Background Video
+                        </h3>
+                        <span
+                          className={`text-[10px] px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider ${
+                            settings.hero_bg_video_url && settings.hero_bg_video_enabled !== '0'
+                              ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                              : 'bg-white/10 text-white/50'
+                          }`}
+                        >
+                          {settings.hero_bg_video_url && settings.hero_bg_video_enabled !== '0'
+                            ? '● Active On Landing Page'
+                            : '○ Standby / Disabled'}
+                        </span>
+                      </div>
+                      <p className="text-xs text-white/50 mt-1">
+                        Upload or link a video that loops seamlessly in the background across the entire landing page hero screen.
+                      </p>
+                    </div>
+
+                    {settings.hero_bg_video_url && (
+                      <div className="flex items-center gap-2 self-start sm:self-auto">
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            const newEnabled = settings.hero_bg_video_enabled === '0' ? '1' : '0';
+                            const updated = { ...settings, hero_bg_video_enabled: newEnabled };
+                            setSettings(updated);
+                            await api.updateSettings(updated);
+                            showNotice(
+                              newEnabled === '1'
+                                ? 'Background video enabled on landing page!'
+                                : 'Background video paused.'
+                            );
+                            onDataChanged();
+                          }}
+                          className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold uppercase tracking-wider border transition-all cursor-pointer ${
+                            settings.hero_bg_video_enabled !== '0'
+                              ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-300 hover:bg-emerald-500/25'
+                              : 'bg-white/5 border-white/15 text-white/60 hover:bg-white/10'
+                          }`}
+                        >
+                          {settings.hero_bg_video_enabled !== '0' ? '● Video Visible' : '○ Video Paused'}
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={handleRemoveHeroVideo}
+                          className="px-3 py-1.5 rounded-xl text-xs font-semibold uppercase tracking-wider border border-red-500/30 text-red-400 hover:bg-red-500/10 transition-all cursor-pointer flex items-center gap-1.5"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                          <span>Remove</span>
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* 1. UPLOAD & SOURCE CARD */}
+                  <div className="p-6 rounded-2xl bg-[#101018] border border-white/10 space-y-5">
+                    <div className="flex items-center justify-between pb-3 border-b border-white/10">
+                      <div className="flex items-center gap-2">
+                        <Film className="w-4 h-4 text-[#C65D45]" />
+                        <h4 className="text-sm font-bold text-white uppercase tracking-wider">
+                          1. Video File Source
+                        </h4>
+                      </div>
+                      <span className="text-[11px] text-white/40">MP4, WebM, MOV · Max 100MB</span>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-stretch">
+                      {/* Direct File Upload Drop Area */}
+                      <label
+                        className={`relative rounded-2xl border-2 border-dashed p-6 flex flex-col items-center justify-center text-center cursor-pointer transition-all ${
+                          heroVideoUploading
+                            ? 'border-white/20 bg-white/[0.02] opacity-60 pointer-events-none'
+                            : 'border-[#C65D45]/40 hover:border-[#C65D45] bg-[#C65D45]/5 hover:bg-[#C65D45]/10'
+                        }`}
+                      >
+                        <input
+                          type="file"
+                          accept="video/mp4,video/webm,video/quicktime,video/*"
+                          className="hidden"
+                          disabled={heroVideoUploading}
+                          onChange={handleHeroVideoUpload}
+                        />
+                        <div className="w-12 h-12 rounded-2xl bg-[#C65D45]/20 border border-[#C65D45]/40 flex items-center justify-center text-[#C65D45] mb-3">
+                          {heroVideoUploading ? (
+                            <RefreshCw className="w-6 h-6 animate-spin" />
+                          ) : (
+                            <Upload className="w-6 h-6" />
+                          )}
+                        </div>
+                        <span className="text-sm font-bold text-white mb-1">
+                          {heroVideoUploading ? 'Uploading Video to Server...' : 'Upload Video File'}
+                        </span>
+                        <p className="text-xs text-white/50 max-w-xs">
+                          Click to browse and upload your showreel or cinematic background loop
+                        </p>
+                      </label>
+
+                      {/* Direct URL Input */}
+                      <div className="p-5 rounded-2xl bg-black/40 border border-white/5 flex flex-col justify-between space-y-3">
+                        <div>
+                          <label className="block text-xs font-montserrat uppercase text-white/60 mb-1">
+                            Or Paste Video URL
+                          </label>
+                          <input
+                            type="text"
+                            placeholder="https://.../video.mp4 or /uploads/..."
+                            value={settings.hero_bg_video_url || ''}
+                            onChange={(e) => {
+                              setSettings({
+                                ...settings,
+                                hero_bg_video_url: e.target.value,
+                                hero_bg_video_enabled: e.target.value ? '1' : '0',
+                              });
+                            }}
+                            className="w-full px-3 py-2.5 rounded-xl bg-black border border-white/15 text-sm text-white focus:border-[#C65D45] outline-none"
+                          />
+                          <p className="text-[11px] text-white/40 mt-1.5">
+                            Direct MP4/WebM URL. Works with local uploads or external cloud video hosts.
+                          </p>
+                        </div>
+
+                        {/* Quick Presets */}
+                        <div>
+                          <span className="block text-[10px] text-white/40 uppercase font-mono mb-1.5">
+                            Quick Sample Loops:
+                          </span>
+                          <div className="flex flex-wrap gap-2">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setSettings({
+                                  ...settings,
+                                  hero_bg_video_url:
+                                    'https://assets.mixkit.co/videos/preview/mixkit-set-of-plateaus-seen-from-the-sky-in-a-sunset-26070-large.mp4',
+                                  hero_bg_video_enabled: '1',
+                                  hero_bg_video_overlay: 'warm',
+                                });
+                                showNotice('Sample Sunset Aerial loop loaded!');
+                              }}
+                              className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-[11px] text-white/70 hover:text-white transition-all cursor-pointer"
+                            >
+                              Sunset Aerial
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setSettings({
+                                  ...settings,
+                                  hero_bg_video_url:
+                                    'https://assets.mixkit.co/videos/preview/mixkit-vertical-video-of-a-dj-controlling-the-mixer-board-43187-large.mp4',
+                                  hero_bg_video_enabled: '1',
+                                  hero_bg_video_overlay: 'dark',
+                                });
+                                showNotice('Sample Kinetic Studio loop loaded!');
+                              }}
+                              className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-[11px] text-white/70 hover:text-white transition-all cursor-pointer"
+                            >
+                              Kinetic Studio
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 2. CINEMATIC OVERLAY & CONTRAST TUNING */}
+                  <div className="p-6 rounded-2xl bg-[#101018] border border-white/10 space-y-5">
+                    <div className="flex items-center justify-between pb-3 border-b border-white/10">
+                      <div className="flex items-center gap-2">
+                        <Sparkles className="w-4 h-4 text-[#ffba3b]" />
+                        <h4 className="text-sm font-bold text-white uppercase tracking-wider">
+                          2. Visual Overlay & Readability Controls
+                        </h4>
+                      </div>
+                      <span className="text-[11px] text-white/40">Keep headline & avatar crystal clear</span>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                      {/* Control A: Overlay Style */}
+                      <div className="p-4 rounded-xl bg-black/40 border border-white/5 space-y-2">
+                        <label className="block text-xs font-montserrat uppercase font-bold text-white">
+                          Overlay Tint Style
+                        </label>
+                        <select
+                          value={settings.hero_bg_video_overlay || 'warm'}
+                          onChange={(e) => setSettings({ ...settings, hero_bg_video_overlay: e.target.value })}
+                          className="w-full px-2.5 py-2 rounded-lg bg-[#181822] border border-white/15 text-xs text-white cursor-pointer focus:border-[#C65D45] outline-none"
+                        >
+                          <option value="warm">🍂 Warm Editorial (Matches Portfolio)</option>
+                          <option value="dark">🎬 Cinematic Dark (Film Noir Mode)</option>
+                          <option value="none">⚡ Pure / No Tint (Raw Video)</option>
+                        </select>
+                        <p className="text-[10px] text-white/40">
+                          Warm preserves paper aesthetic; Dark gives high cinematic contrast.
+                        </p>
+                      </div>
+
+                      {/* Control B: Video Opacity */}
+                      <div className="p-4 rounded-xl bg-black/40 border border-white/5 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <label className="text-xs font-montserrat uppercase font-bold text-white">
+                            Video Opacity
+                          </label>
+                          <span className="text-xs font-mono text-[#C65D45]">
+                            {settings.hero_bg_video_opacity ?? '75'}%
+                          </span>
+                        </div>
+                        <input
+                          type="range"
+                          min="10"
+                          max="100"
+                          step="5"
+                          value={settings.hero_bg_video_opacity ?? '75'}
+                          onChange={(e) => setSettings({ ...settings, hero_bg_video_opacity: e.target.value })}
+                          className="w-full accent-[#C65D45] cursor-pointer"
+                        />
+                        <div className="flex justify-between text-[10px] text-white/30 font-mono">
+                          <span>Subtle (20%)</span>
+                          <span>Full (100%)</span>
+                        </div>
+                      </div>
+
+                      {/* Control C: Overlay Tint Strength */}
+                      <div className="p-4 rounded-xl bg-black/40 border border-white/5 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <label className="text-xs font-montserrat uppercase font-bold text-white">
+                            Overlay Tint Strength
+                          </label>
+                          <span className="text-xs font-mono text-[#C65D45]">
+                            {settings.hero_bg_video_overlay_opacity ?? '65'}%
+                          </span>
+                        </div>
+                        <input
+                          type="range"
+                          min="0"
+                          max="100"
+                          step="5"
+                          value={settings.hero_bg_video_overlay_opacity ?? '65'}
+                          onChange={(e) =>
+                            setSettings({ ...settings, hero_bg_video_overlay_opacity: e.target.value })
+                          }
+                          className="w-full accent-[#C65D45] cursor-pointer"
+                        />
+                        <div className="flex justify-between text-[10px] text-white/30 font-mono">
+                          <span>Clear (0%)</span>
+                          <span>Solid (100%)</span>
+                        </div>
+                      </div>
+
+                      {/* Control D: Video Blur */}
+                      <div className="p-4 rounded-xl bg-black/40 border border-white/5 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <label className="text-xs font-montserrat uppercase font-bold text-white">
+                            Cinematic Blur
+                          </label>
+                          <span className="text-xs font-mono text-[#C65D45]">
+                            {settings.hero_bg_video_blur ?? '0'}px
+                          </span>
+                        </div>
+                        <input
+                          type="range"
+                          min="0"
+                          max="10"
+                          step="1"
+                          value={settings.hero_bg_video_blur ?? '0'}
+                          onChange={(e) => setSettings({ ...settings, hero_bg_video_blur: e.target.value })}
+                          className="w-full accent-[#C65D45] cursor-pointer"
+                        />
+                        <div className="flex justify-between text-[10px] text-white/30 font-mono">
+                          <span>Crisp (0px)</span>
+                          <span>Ambient (10px)</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Headline Text Tone Switch */}
+                    <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/5 flex flex-wrap items-center justify-between gap-3">
+                      <div>
+                        <span className="text-xs font-bold text-white block">
+                          Headline & Text Theme Color
+                        </span>
+                        <span className="text-[11px] text-white/50">
+                          Choose whether headline & subtitle use dark charcoal or light white contrast
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setSettings({ ...settings, hero_text_theme: 'dark' })}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all cursor-pointer ${
+                            settings.hero_text_theme === 'dark' ||
+                            (!settings.hero_text_theme && settings.hero_bg_video_overlay !== 'dark')
+                              ? 'bg-[#2B170F] border-[#C65D45] text-white font-bold shadow-md'
+                              : 'bg-white/5 border-white/10 text-white/60 hover:text-white'
+                          }`}
+                        >
+                          Dark Charcoal (Default)
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setSettings({ ...settings, hero_text_theme: 'light' })}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all cursor-pointer ${
+                            settings.hero_text_theme === 'light' ||
+                            (!settings.hero_text_theme && settings.hero_bg_video_overlay === 'dark')
+                              ? 'bg-white border-[#C65D45] text-[#2B170F] font-bold shadow-md'
+                              : 'bg-white/5 border-white/10 text-white/60 hover:text-white'
+                          }`}
+                        >
+                          Luminous White (For Dark Videos)
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 3. LIVE INTERACTIVE HERO PREVIEW */}
+                  <div className="p-6 rounded-2xl bg-[#101018] border border-white/10 space-y-4">
+                    <div className="flex items-center justify-between pb-3 border-b border-white/10">
+                      <div className="flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                        <h4 className="text-sm font-bold text-white uppercase tracking-wider">
+                          3. Real-Time Landing Page Mockup Preview
+                        </h4>
+                      </div>
+                      <span className="text-[11px] text-white/40">
+                        Exact live rendering with your video & overlays
+                      </span>
+                    </div>
+
+                    {/* Miniature Scaled Hero Preview Container */}
+                    <div
+                      className={`relative w-full rounded-2xl overflow-hidden border border-white/15 p-6 sm:p-8 min-h-[360px] flex items-center transition-colors duration-500 ${
+                        settings.hero_text_theme === 'light' ||
+                        (settings.hero_bg_video_overlay === 'dark' && settings.hero_text_theme !== 'dark')
+                          ? 'bg-[#0E0907]'
+                          : 'bg-[#F8F1E7]'
+                      }`}
+                    >
+                      {/* Preview Background Video */}
+                      {settings.hero_bg_video_url && settings.hero_bg_video_enabled !== '0' ? (
+                        <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+                          <video
+                            autoPlay
+                            loop
+                            muted
+                            playsInline
+                            key={settings.hero_bg_video_url}
+                            className="w-full h-full object-cover transition-opacity duration-300"
+                            style={{
+                              opacity: (Number(settings.hero_bg_video_opacity ?? '75')) / 100,
+                              filter:
+                                Number(settings.hero_bg_video_blur ?? '0') > 0
+                                  ? `blur(${settings.hero_bg_video_blur}px)`
+                                  : undefined,
+                              transform:
+                                Number(settings.hero_bg_video_blur ?? '0') > 0
+                                  ? 'scale(1.05)'
+                                  : undefined,
+                            }}
+                            src={settings.hero_bg_video_url}
+                          />
+
+                          {/* Preview Overlay */}
+                          {settings.hero_bg_video_overlay === 'dark' ? (
+                            <div
+                              className="absolute inset-0 bg-gradient-to-r from-black/95 via-black/80 to-black/60 pointer-events-none"
+                              style={{
+                                opacity: (Number(settings.hero_bg_video_overlay_opacity ?? '65')) / 100,
+                              }}
+                            />
+                          ) : settings.hero_bg_video_overlay === 'none' ? null : (
+                            <div
+                              className="absolute inset-0 bg-gradient-to-r from-[#F8F1E7]/95 via-[#F8F1E7]/80 to-[#F8F1E7]/60 pointer-events-none"
+                              style={{
+                                opacity: (Number(settings.hero_bg_video_overlay_opacity ?? '65')) / 100,
+                              }}
+                            />
+                          )}
+                        </div>
+                      ) : (
+                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                          <span className="text-xs uppercase font-mono tracking-widest text-black/30 font-bold">
+                            Standard Editorial Paper Background (No Video Active)
+                          </span>
+                        </div>
+                      )}
+
+                      {/* Foreground Preview Content */}
+                      <div className="relative z-10 w-full flex flex-col md:flex-row items-center justify-between gap-6">
+                        <div className="max-w-md space-y-3">
+                          <div className="inline-block px-3 py-1 rounded border border-[#C65D45] bg-[#FFF9F2] text-[#2B170F] text-[10px] font-bold uppercase tracking-wider">
+                            Hello There!
+                          </div>
+
+                          <div
+                            className={`font-pogonia text-2xl sm:text-3xl font-bold leading-tight ${
+                              settings.hero_text_theme === 'light' ||
+                              (settings.hero_bg_video_overlay === 'dark' &&
+                                settings.hero_text_theme !== 'dark')
+                                ? 'text-[#FFF9F2]'
+                                : 'text-[#2B170F]'
+                            }`}
+                          >
+                            I'm <span className="text-[#C65D45] underline">Afsar Ahmad,</span>
+                            <br />
+                            Video Editor Based in Mumbai.
+                          </div>
+
+                          <p
+                            className={`text-xs line-clamp-2 leading-relaxed ${
+                              settings.hero_text_theme === 'light' ||
+                              (settings.hero_bg_video_overlay === 'dark' &&
+                                settings.hero_text_theme !== 'dark')
+                                ? 'text-white/80'
+                                : 'text-[#756A62]'
+                            }`}
+                          >
+                            Creative Video Editor specializing in high-retention short-form reels,
+                            cinematic commercial brand films, and engaging long-form YouTube content.
+                          </p>
+
+                          <div className="flex items-center gap-2 pt-1">
+                            <span className="px-4 py-2 rounded-full text-[11px] font-bold uppercase text-white bg-gradient-to-r from-[#C65D45] to-[#E2725B] shadow-md">
+                              Explore Portfolio
+                            </span>
+                            <span className="px-4 py-2 rounded-full text-[11px] font-bold uppercase text-white bg-[#140A06] border border-white/20">
+                              Hire Me
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Character preview circle */}
+                        <div className="w-36 h-36 sm:w-44 sm:h-44 rounded-full bg-gradient-to-tr from-[#C65D45] to-[#ffba3b] p-1 shadow-2xl shrink-0 overflow-hidden relative">
+                          <img
+                            src="/images/hero-character.png"
+                            alt="Character"
+                            className="w-full h-full object-contain filter drop-shadow"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 4. SAVE BUTTON */}
+                  <div className="flex items-center justify-between pt-2">
+                    <p className="text-xs text-white/50">
+                      Changes publish instantly to your live landing page upon clicking save.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        try {
+                          await api.updateSettings(settings);
+                          showNotice('Landing page background video settings saved and published!');
+                          onDataChanged();
+                        } catch (err: any) {
+                          showNotice(err.message || 'Error saving settings', 'error');
+                        }
+                      }}
+                      className="px-6 py-2.5 rounded-full text-xs font-montserrat uppercase tracking-wider text-white bg-[#C65D45] hover:bg-[#D76E56] font-semibold transition-all shadow-lg hover:shadow-xl cursor-pointer"
+                    >
+                      Save Landing Video Settings
+                    </button>
+                  </div>
+                </div>
+              )}
+
               {/* TAB 8: SETTINGS */}
               {activeTab === 'settings' && (
                 <div className="space-y-6 max-w-3xl">
@@ -1657,6 +2205,45 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                         <p className="text-[11px] text-white/30">JPG, PNG, WebP · Max 5MB · Square crop recommended</p>
                       </div>
                     </div>
+                  </div>
+                  {/* ─────────────────────────────────────────────────────── */}
+
+                  {/* ── LANDING PAGE BACKGROUND VIDEO SHORTCUT CARD ── */}
+                  <div className="p-6 rounded-2xl bg-[#101018] border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="flex items-center gap-3.5">
+                      <div className="w-11 h-11 rounded-xl bg-[#C65D45]/15 border border-[#C65D45]/30 flex items-center justify-center text-[#C65D45] shrink-0">
+                        <Film className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h4 className="text-sm font-bold text-white uppercase tracking-wider">
+                            Landing Page Background Video
+                          </h4>
+                          <span
+                            className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${
+                              settings.hero_bg_video_url && settings.hero_bg_video_enabled !== '0'
+                                ? 'bg-emerald-500/20 text-emerald-300'
+                                : 'bg-white/10 text-white/50'
+                            }`}
+                          >
+                            {settings.hero_bg_video_url && settings.hero_bg_video_enabled !== '0'
+                              ? 'Active'
+                              : 'Disabled'}
+                          </span>
+                        </div>
+                        <p className="text-xs text-white/40 mt-0.5">
+                          Upload showreel videos, calibrate cinematic dark/warm tints, and preview live.
+                        </p>
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab('hero-bg')}
+                      className="px-4 py-2 rounded-xl text-xs font-semibold uppercase tracking-wider bg-[#C65D45]/20 hover:bg-[#C65D45] text-[#C65D45] hover:text-white border border-[#C65D45]/40 transition-all cursor-pointer whitespace-nowrap self-start sm:self-auto"
+                    >
+                      Open Video BG Studio →
+                    </button>
                   </div>
                   {/* ─────────────────────────────────────────────────────── */}
 
