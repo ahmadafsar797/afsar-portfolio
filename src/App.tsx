@@ -143,6 +143,11 @@ export const App: React.FC = () => {
     };
   }, [settings?.profile_picture_url]);
 
+  // Synchronize browser tab title
+  useEffect(() => {
+    document.title = settings?.site_name || 'AFSAR AHMAD | Video Editor & Motion Designer';
+  }, [settings?.site_name]);
+
   const openLightbox = (videoUrl: string, title: string, client?: string, category?: string) => {
     setLightboxState({
       isOpen: true,

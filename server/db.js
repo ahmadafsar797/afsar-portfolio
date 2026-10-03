@@ -272,7 +272,7 @@ function seedDefaultData() {
   const settingsCount = _db.prepare('SELECT COUNT(*) as count FROM settings').get();
   if (settingsCount.count === 0) {
     const defaultSettings = [
-      ['site_name', 'AFSAR AHMAD | Video Editor & Visual Storyteller'],
+      ['site_name', 'AFSAR AHMAD | Video Editor & Motion Designer'],
       ['hero_headline', 'I Edit Stories That Make People Stop Scrolling.'],
       ['hero_subtitle', 'Creative Video Editor specializing in high-retention short-form reels, cinematic commercial brand films, and engaging long-form YouTube content.'],
       ['availability', 'Available for Select Projects (Q1/Q2 2026)'],
