@@ -9,7 +9,6 @@ import {
   Film,
   Video,
   MessageSquareQuote,
-  Briefcase,
   Layers,
   Settings,
   User,
@@ -30,7 +29,6 @@ import {
   Reel,
   HorizontalVideo,
   Testimonial,
-  Project,
   Service,
   AboutData,
   SettingsData,
@@ -51,14 +49,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
 
   // Active Admin Tab
   const [activeTab, setActiveTab] = useState<
-    'overview' | 'reels' | 'horizontal' | 'testimonials' | 'projects' | 'services' | 'about' | 'settings'
+    'overview' | 'reels' | 'horizontal' | 'testimonials' | 'services' | 'about' | 'settings'
   >('overview');
 
   // Loaded Data
   const [reels, setReels] = useState<Reel[]>([]);
   const [horizontalVideos, setHorizontalVideos] = useState<HorizontalVideo[]>([]);
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
-  const [projects, setProjects] = useState<Project[]>([]);
   const [services, setServices] = useState<Service[]>([]);
   const [about, setAbout] = useState<AboutData | null>(null);
   const [settings, setSettings] = useState<SettingsData>({});
@@ -74,7 +71,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
   const [editingReel, setEditingReel] = useState<Partial<Reel> | null>(null);
   const [editingHorizontal, setEditingHorizontal] = useState<Partial<HorizontalVideo> | null>(null);
   const [editingTestimonial, setEditingTestimonial] = useState<Partial<Testimonial> | null>(null);
-  const [editingProject, setEditingProject] = useState<Partial<Project> | null>(null);
   const [editingService, setEditingService] = useState<Partial<Service> | null>(null);
 
   // Profile picture
@@ -167,11 +163,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
 
   const loadAllAdminData = async () => {
     try {
-      const [r, h, t, p, s, a, set] = await Promise.all([
+      const [r, h, t, s, a, set] = await Promise.all([
         api.getReels(),
         api.getHorizontalVideos(),
         api.getTestimonials(),
-        api.getProjects(),
         api.getServices(),
         api.getAbout(),
         api.getSettings(),
@@ -179,7 +174,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
       setReels(r);
       setHorizontalVideos(h);
       setTestimonials(t);
-      setProjects(p);
       setServices(s);
       setAbout(a);
       setSettings(set);
@@ -407,21 +401,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
               </button>
 
               <button
-                onClick={() => setActiveTab('projects')}
-                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-montserrat uppercase tracking-wider transition-all text-left whitespace-nowrap ${
-                  activeTab === 'projects' ? 'bg-[#C65D45] text-[#2B170F] font-bold font-medium shadow-md' : 'text-white/70 hover:bg-white/5 hover:text-white'
-                }`}
-              >
-                <div className="flex items-center gap-2.5">
-                  <Briefcase className="w-4 h-4" />
-                  <span>Case Studies</span>
-                </div>
-                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-white/10 font-montserrat">
-                  {projects.length}
-                </span>
-              </button>
-
-              <button
                 onClick={() => setActiveTab('services')}
                 className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-montserrat uppercase tracking-wider transition-all text-left whitespace-nowrap ${
                   activeTab === 'services' ? 'bg-[#C65D45] text-[#2B170F] font-bold font-medium shadow-md' : 'text-white/70 hover:bg-white/5 hover:text-white'
@@ -492,9 +471,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                       </div>
                     </div>
                     <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/10">
-                      <span className="text-xs text-white/50 font-montserrat uppercase">Case Studies</span>
+                      <span className="text-xs text-white/50 font-montserrat uppercase">Services</span>
                       <div className="font-pogonia text-4xl text-[#C65D45] font-semibold mt-1">
-                        {projects.length}
+                        {services.length}
                       </div>
                     </div>
                   </div>
@@ -1273,288 +1252,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                 </div>
               )}
 
-              {/* TAB 5: CASE STUDIES / PROJECTS */}
-              {activeTab === 'projects' && (
-                <div className="space-y-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="font-pogonia text-3xl font-normal text-white">
-                        Manage Case Studies & Before/After
-                      </h3>
-                      <p className="text-xs text-white/50">
-                        Configure editorial breakdowns, raw vs color grade comparison images, and deliverables.
-                      </p>
-                    </div>
-
-                    <button
-                      onClick={() =>
-                        setEditingProject({
-                          title: '',
-                          client: '',
-                          category: 'Commercial Campaign',
-                          video_url: '',
-                          thumbnail_url: '',
-                          brief: '',
-                          approach: '',
-                          deliverables: '',
-                          software_used: 'Premiere Pro, AI Tools (Firefly, Runway ML)',
-                          before_image_url: '',
-                          after_image_url: '',
-                          metrics: '',
-                        })
-                      }
-                      className="px-4 py-2 rounded-full text-xs font-montserrat uppercase tracking-wider text-white bg-[#C65D45] font-semibold flex items-center gap-1.5"
-                    >
-                      <Plus className="w-4 h-4" />
-                      <span>Add Case Study</span>
-                    </button>
-                  </div>
-
-                  {editingProject && (
-                    <div className="p-6 rounded-2xl bg-[#14141f] border border-[#C65D45]/50 shadow-2xl space-y-4">
-                      <div className="flex items-center justify-between pb-3 border-b border-white/10">
-                        <h4 className="font-pogonia text-xl text-white">
-                          {editingProject.id ? 'Edit Case Study' : 'Create Case Study'}
-                        </h4>
-                        <button onClick={() => setEditingProject(null)} className="text-white/50 hover:text-white">
-                          <X className="w-4 h-4" />
-                        </button>
-                      </div>
-
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-xs font-montserrat uppercase text-white/60 mb-1">
-                            Project Title *
-                          </label>
-                          <input
-                            type="text"
-                            value={editingProject.title || ''}
-                            onChange={(e) => setEditingProject({ ...editingProject, title: e.target.value })}
-                            className="w-full px-3 py-2 rounded-lg bg-black border border-white/15 text-sm text-white"
-                          />
-                        </div>
-
-                        <div>
-                          <label className="block text-xs font-montserrat uppercase text-white/60 mb-1">
-                            Category
-                          </label>
-                          <input
-                            type="text"
-                            value={editingProject.category || ''}
-                            onChange={(e) => setEditingProject({ ...editingProject, category: e.target.value })}
-                            className="w-full px-3 py-2 rounded-lg bg-black border border-white/15 text-sm text-white"
-                            placeholder="e.g. Commercial Campaign"
-                          />
-                        </div>
-
-                        <div>
-                          <label className="block text-xs font-montserrat uppercase text-white/60 mb-1">
-                            Software Used
-                          </label>
-                          <input
-                            type="text"
-                            value={editingProject.software_used || ''}
-                            onChange={(e) => setEditingProject({ ...editingProject, software_used: e.target.value })}
-                            className="w-full px-3 py-2 rounded-lg bg-black border border-white/15 text-sm text-white"
-                            placeholder="Premiere Pro, AI Tools (Firefly, Runway ML)"
-                          />
-                        </div>
-
-                        <div>
-                          <label className="block text-xs font-montserrat uppercase text-white/60 mb-1">
-                            Video Master URL *
-                          </label>
-                          <input
-                            type="text"
-                            value={editingProject.video_url || ''}
-                            onChange={(e) => setEditingProject({ ...editingProject, video_url: e.target.value })}
-                            className="w-full px-3 py-2 rounded-lg bg-black border border-white/15 text-sm text-white mb-2"
-                          />
-                          <label className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-xs cursor-pointer border border-white/15">
-                            <Upload className="w-3.5 h-3.5 text-[#C65D45]" />
-                            <span>Upload Video File</span>
-                            <input
-                              type="file"
-                              accept="video/*"
-                              className="hidden"
-                              onChange={(e) =>
-                                handleFileUpload(e, (url) =>
-                                  setEditingProject({ ...editingProject, video_url: url })
-                                )
-                              }
-                            />
-                          </label>
-                        </div>
-
-                        <div>
-                          <label className="block text-xs font-montserrat uppercase text-white/60 mb-1">
-                            Metrics / Impact
-                          </label>
-                          <input
-                            type="text"
-                            value={editingProject.metrics || ''}
-                            onChange={(e) => setEditingProject({ ...editingProject, metrics: e.target.value })}
-                            className="w-full px-3 py-2 rounded-lg bg-black border border-white/15 text-sm text-white"
-                            placeholder="e.g. 4.8M Impressions • 310% Lift"
-                          />
-                        </div>
-
-                        {/* Before Image URL */}
-                        <div>
-                          <label className="block text-xs font-montserrat uppercase text-white/60 mb-1">
-                            Before Image (Raw LOG Footage)
-                          </label>
-                          <input
-                            type="text"
-                            value={editingProject.before_image_url || ''}
-                            onChange={(e) => setEditingProject({ ...editingProject, before_image_url: e.target.value })}
-                            className="w-full px-3 py-2 rounded-lg bg-black border border-white/15 text-sm text-white mb-2"
-                          />
-                          <label className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-xs cursor-pointer border border-white/15">
-                            <Upload className="w-3.5 h-3.5 text-[#C65D45]" />
-                            <span>Upload Before Image</span>
-                            <input
-                              type="file"
-                              accept="image/*"
-                              className="hidden"
-                              onChange={(e) =>
-                                handleFileUpload(e, (url) =>
-                                  setEditingProject({ ...editingProject, before_image_url: url })
-                                )
-                              }
-                            />
-                          </label>
-                        </div>
-
-                        {/* After Image URL */}
-                        <div>
-                          <label className="block text-xs font-montserrat uppercase text-white/60 mb-1">
-                            After Image (Final Color Master)
-                          </label>
-                          <input
-                            type="text"
-                            value={editingProject.after_image_url || ''}
-                            onChange={(e) => setEditingProject({ ...editingProject, after_image_url: e.target.value })}
-                            className="w-full px-3 py-2 rounded-lg bg-black border border-white/15 text-sm text-white mb-2"
-                          />
-                          <label className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-xs cursor-pointer border border-white/15">
-                            <Upload className="w-3.5 h-3.5 text-[#C65D45]" />
-                            <span>Upload After Image</span>
-                            <input
-                              type="file"
-                              accept="image/*"
-                              className="hidden"
-                              onChange={(e) =>
-                                handleFileUpload(e, (url) =>
-                                  setEditingProject({ ...editingProject, after_image_url: url })
-                                )
-                              }
-                            />
-                          </label>
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="block text-xs font-montserrat uppercase text-white/60 mb-1">
-                          The Creative Brief
-                        </label>
-                        <textarea
-                          rows={2}
-                          value={editingProject.brief || ''}
-                          onChange={(e) => setEditingProject({ ...editingProject, brief: e.target.value })}
-                          className="w-full px-3 py-2 rounded-lg bg-black border border-white/15 text-sm text-white"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-xs font-montserrat uppercase text-white/60 mb-1">
-                          Editing Approach & Narrative Techniques
-                        </label>
-                        <textarea
-                          rows={2}
-                          value={editingProject.approach || ''}
-                          onChange={(e) => setEditingProject({ ...editingProject, approach: e.target.value })}
-                          className="w-full px-3 py-2 rounded-lg bg-black border border-white/15 text-sm text-white"
-                        />
-                      </div>
-
-                      <div className="flex justify-end gap-3 pt-3 border-t border-white/10">
-                        <button
-                          onClick={() => setEditingProject(null)}
-                          className="px-4 py-2 rounded-full text-xs text-white/70 hover:text-white"
-                        >
-                          Cancel
-                        </button>
-                        <button
-                          onClick={async () => {
-                            if (!editingProject.title || !editingProject.video_url) {
-                              showNotice('Title and video URL are required', 'error');
-                              return;
-                            }
-                            try {
-                              if (editingProject.id) {
-                                await api.updateProject(editingProject.id, editingProject);
-                                showNotice('Case study updated!');
-                              } else {
-                                await api.createProject(editingProject);
-                                showNotice('New case study created!');
-                              }
-                              setEditingProject(null);
-                              loadAllAdminData();
-                              onDataChanged();
-                            } catch (err: any) {
-                              showNotice(err.message || 'Error saving case study', 'error');
-                            }
-                          }}
-                          className="px-5 py-2 rounded-full text-xs font-montserrat uppercase tracking-wider text-white bg-[#C65D45] font-semibold"
-                        >
-                          Save Case Study
-                        </button>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Projects List */}
-                  <div className="space-y-3">
-                    {projects.map((p) => (
-                      <div
-                        key={p.id}
-                        className="p-4 rounded-2xl bg-[#0e0e15] border border-white/10 flex items-center justify-between gap-4"
-                      >
-                        <div>
-                          <div className="text-xs text-[#C65D45] font-montserrat uppercase">{p.category}</div>
-                          <h4 className="font-pogonia text-2xl text-white mt-0.5">{p.title}</h4>
-                          <p className="text-xs text-white/50 line-clamp-1 mt-1">{p.brief}</p>
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => setEditingProject(p)}
-                            className="p-2 rounded-lg bg-white/5 hover:bg-white/15 text-white/70 hover:text-white"
-                          >
-                            <Edit className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={async () => {
-                              if (confirm(`Delete case study "${p.title}"?`)) {
-                                await api.deleteProject(p.id);
-                                showNotice('Case study deleted');
-                                loadAllAdminData();
-                                onDataChanged();
-                              }
-                            }}
-                            className="p-2 rounded-lg bg-white/5 hover:bg-red-500/20 text-white/70 hover:text-red-400"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* TAB 6: SERVICES */}
+              {/* TAB 5: SERVICES */}
               {activeTab === 'services' && (
                 <div className="space-y-6">
                   <div className="flex items-center justify-between">
