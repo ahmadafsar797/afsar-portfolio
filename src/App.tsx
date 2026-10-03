@@ -22,6 +22,7 @@ import {
   SettingsData,
 } from './types';
 import { useScrollAnimationEngine } from './hooks/useScrollAnimationEngine';
+import { applyDynamicFonts } from './utils/fontLoader';
 
 /** Mounts only after all content has loaded so GSAP can find DOM elements */
 const ScrollAnimations: React.FC = () => {
@@ -147,6 +148,11 @@ export const App: React.FC = () => {
   useEffect(() => {
     document.title = settings?.site_name || 'AFSAR AHMAD | Video Editor & Motion Designer';
   }, [settings?.site_name]);
+
+  // Dynamically apply selected website fonts across all components
+  useEffect(() => {
+    applyDynamicFonts(settings?.heading_font, settings?.body_font);
+  }, [settings?.heading_font, settings?.body_font]);
 
   const openLightbox = (videoUrl: string, title: string, client?: string, category?: string) => {
     setLightboxState({

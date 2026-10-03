@@ -22,9 +22,11 @@ import {
   RefreshCw,
   Lock,
   Camera,
+  Type,
 } from 'lucide-react';
 import { VideoFramePickerModal } from '../VideoFramePickerModal';
 import { api } from '../../services/api';
+import { POPULAR_FONTS, applyDynamicFonts } from '../../utils/fontLoader';
 import {
   Reel,
   HorizontalVideo,
@@ -1715,6 +1717,221 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                       </button>
                     </div>
                   </form>
+                  {/* ─────────────────────────────────────────────────────── */}
+
+                  {/* ─── TYPOGRAPHY & FONT CUSTOMIZER ───────────────────── */}
+                  <div className="space-y-5 p-6 rounded-2xl bg-[#101018] border border-white/10">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-white/10">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-[#C65D45]/15 border border-[#C65D45]/30 flex items-center justify-center text-[#C65D45]">
+                          <Type className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <h4 className="text-base font-bold text-white uppercase tracking-wider">
+                            Website Typography & Fonts
+                          </h4>
+                          <p className="text-xs text-white/50">
+                            Change website fonts anytime. Choose from popular styles or type any Google Font name.
+                          </p>
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const updated = {
+                            ...settings,
+                            heading_font: 'Pogonia',
+                            body_font: 'Montserrat',
+                          };
+                          setSettings(updated);
+                          applyDynamicFonts('Pogonia', 'Montserrat');
+                          showNotice('Reset fonts to default (Pogonia & Montserrat)');
+                        }}
+                        className="text-xs text-white/50 hover:text-[#C65D45] transition-colors flex items-center gap-1 cursor-pointer self-start sm:self-center"
+                      >
+                        <RefreshCw className="w-3.5 h-3.5" />
+                        <span>Reset to Defaults</span>
+                      </button>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                      {/* 1. Heading Font */}
+                      <div className="space-y-3 p-4 rounded-xl bg-black/40 border border-white/5">
+                        <div className="flex items-center justify-between">
+                          <label className="text-xs font-montserrat uppercase font-semibold text-white/80 block">
+                            Heading / Title Font
+                          </label>
+                          <span className="text-[10px] text-[#C65D45] font-mono">
+                            Current: {settings.heading_font || 'Pogonia (Default)'}
+                          </span>
+                        </div>
+
+                        {/* Preset Dropdown */}
+                        <div>
+                          <label className="block text-[11px] text-white/50 mb-1">Choose Preset:</label>
+                          <select
+                            value={POPULAR_FONTS.some((f) => f.name.toLowerCase() === (settings.heading_font || 'pogonia').toLowerCase()) ? (settings.heading_font || 'Pogonia') : 'custom'}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              if (val !== 'custom') {
+                                const updated = { ...settings, heading_font: val };
+                                setSettings(updated);
+                                applyDynamicFonts(val, settings.body_font);
+                              }
+                            }}
+                            className="w-full px-3 py-2 rounded-lg bg-[#181822] border border-white/15 text-xs text-white cursor-pointer focus:border-[#C65D45] outline-none"
+                          >
+                            {POPULAR_FONTS.map((font) => (
+                              <option key={font.name} value={font.name}>
+                                {font.name} — {font.category}
+                              </option>
+                            ))}
+                            <option value="custom">-- Custom Google Font --</option>
+                          </select>
+                        </div>
+
+                        {/* Custom Input */}
+                        <div>
+                          <label className="block text-[11px] text-white/50 mb-1">Or Type Any Google Font:</label>
+                          <input
+                            type="text"
+                            value={settings.heading_font || ''}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              setSettings({ ...settings, heading_font: val });
+                              applyDynamicFonts(val, settings.body_font);
+                            }}
+                            placeholder="e.g. Syne, Cinzel, Space Grotesk, Playfair Display"
+                            className="w-full px-3 py-2 rounded-lg bg-black border border-white/15 text-xs text-white focus:border-[#C65D45] outline-none"
+                          />
+                        </div>
+                      </div>
+
+                      {/* 2. Body Font */}
+                      <div className="space-y-3 p-4 rounded-xl bg-black/40 border border-white/5">
+                        <div className="flex items-center justify-between">
+                          <label className="text-xs font-montserrat uppercase font-semibold text-white/80 block">
+                            Body / Paragraph Font
+                          </label>
+                          <span className="text-[10px] text-[#C65D45] font-mono">
+                            Current: {settings.body_font || 'Montserrat (Default)'}
+                          </span>
+                        </div>
+
+                        {/* Preset Dropdown */}
+                        <div>
+                          <label className="block text-[11px] text-white/50 mb-1">Choose Preset:</label>
+                          <select
+                            value={POPULAR_FONTS.some((f) => f.name.toLowerCase() === (settings.body_font || 'montserrat').toLowerCase()) ? (settings.body_font || 'Montserrat') : 'custom'}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              if (val !== 'custom') {
+                                const updated = { ...settings, body_font: val };
+                                setSettings(updated);
+                                applyDynamicFonts(settings.heading_font, val);
+                              }
+                            }}
+                            className="w-full px-3 py-2 rounded-lg bg-[#181822] border border-white/15 text-xs text-white cursor-pointer focus:border-[#C65D45] outline-none"
+                          >
+                            {POPULAR_FONTS.map((font) => (
+                              <option key={font.name} value={font.name}>
+                                {font.name} — {font.category}
+                              </option>
+                            ))}
+                            <option value="custom">-- Custom Google Font --</option>
+                          </select>
+                        </div>
+
+                        {/* Custom Input */}
+                        <div>
+                          <label className="block text-[11px] text-white/50 mb-1">Or Type Any Google Font:</label>
+                          <input
+                            type="text"
+                            value={settings.body_font || ''}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              setSettings({ ...settings, body_font: val });
+                              applyDynamicFonts(settings.heading_font, val);
+                            }}
+                            placeholder="e.g. Inter, Poppins, Outfit, Plus Jakarta Sans"
+                            className="w-full px-3 py-2 rounded-lg bg-black border border-white/15 text-xs text-white focus:border-[#C65D45] outline-none"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Quick Sync One-Click Buttons */}
+                    <div className="flex flex-wrap items-center gap-2 pt-1">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const target = settings.heading_font || 'Pogonia';
+                          const updated = { ...settings, body_font: target };
+                          setSettings(updated);
+                          applyDynamicFonts(target, target);
+                          showNotice(`Applied "${target}" to entire website!`);
+                        }}
+                        className="px-3.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-xs text-white/80 hover:text-white transition-all cursor-pointer"
+                      >
+                        Apply Heading Font to Entire Site
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const target = settings.body_font || 'Montserrat';
+                          const updated = { ...settings, heading_font: target };
+                          setSettings(updated);
+                          applyDynamicFonts(target, target);
+                          showNotice(`Applied "${target}" to entire website!`);
+                        }}
+                        className="px-3.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-xs text-white/80 hover:text-white transition-all cursor-pointer"
+                      >
+                        Apply Body Font to Entire Site
+                      </button>
+                    </div>
+
+                    {/* Live Font Preview Box */}
+                    <div className="p-5 rounded-xl bg-black/60 border border-white/10 space-y-2">
+                      <div className="text-[10px] font-mono uppercase tracking-wider text-white/40">
+                        Live Preview (Updates instantly):
+                      </div>
+                      <div
+                        className="text-2xl sm:text-3xl font-bold text-white transition-all leading-tight"
+                        style={{ fontFamily: `'${settings.heading_font || 'Pogonia'}', 'Pogonia', serif` }}
+                      >
+                        Afsar Ahmad — I Edit Stories That Stop The Scroll.
+                      </div>
+                      <div
+                        className="text-xs sm:text-sm text-white/70 transition-all leading-relaxed"
+                        style={{ fontFamily: `'${settings.body_font || 'Montserrat'}', 'Montserrat', sans-serif` }}
+                      >
+                        High-retention short-form reels, commercial brand films, and engaging narrative YouTube content. Pacing, rhythm, and color mastery that captivate audiences.
+                      </div>
+                    </div>
+
+                    {/* Save Fonts Button */}
+                    <div className="pt-2 flex items-center justify-between">
+                      <p className="text-[11px] text-white/40">
+                        Changes preview immediately and will be published permanently when saved.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          try {
+                            await api.updateSettings(settings);
+                            showNotice('Typography settings saved successfully!');
+                            onDataChanged();
+                          } catch (err: any) {
+                            showNotice(err.message || 'Error saving fonts', 'error');
+                          }
+                        }}
+                        className="px-5 py-2 rounded-full text-xs font-montserrat uppercase tracking-wider text-white bg-[#C65D45] hover:bg-[#D76E56] font-semibold transition-all cursor-pointer"
+                      >
+                        Save Fonts
+                      </button>
+                    </div>
+                  </div>
                   {/* ─────────────────────────────────────────────────────── */}
 
                   <div className="space-y-4 p-6 rounded-2xl bg-[#101018] border border-white/10">

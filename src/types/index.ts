@@ -101,6 +101,8 @@ export interface SettingsData {
   youtube_url?: string;
   twitter_url?: string;
   profile_picture_url?: string;
+  heading_font?: string;
+  body_font?: string;
 }
 
 export interface ContactMessage {

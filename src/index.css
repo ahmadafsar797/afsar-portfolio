@@ -127,13 +127,22 @@ body {
   }
 }
 
-/* Typography assignments: strictly Montserrat (Medium by default) and Pogonia */
+/* Typography assignments: dynamic custom properties with Pogonia and Montserrat defaults */
+:root {
+  --font-custom-heading: 'Pogonia', 'Montserrat', serif;
+  --font-custom-body: 'Montserrat', system-ui, sans-serif;
+}
+
+body {
+  font-family: var(--font-custom-body, 'Montserrat', sans-serif);
+}
+
 .font-editorial, .font-pogonia, .font-serif {
-  font-family: 'Pogonia', 'Montserrat', serif;
+  font-family: var(--font-custom-heading, 'Pogonia', 'Montserrat', serif);
 }
 
 .font-ui, .font-sans, .font-montserrat {
-  font-family: 'Montserrat', sans-serif;
+  font-family: var(--font-custom-body, 'Montserrat', sans-serif);
   font-weight: 500;
 }
 
