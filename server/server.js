@@ -30,7 +30,7 @@ app.use(
       res.setHeader('Access-Control-Allow-Origin', '*');
       res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
       if (filePath.match(/\.(jpg|jpeg|png|webp|gif|svg|ico)$/i)) {
-        res.setHeader('Cache-Control', 'public, max-age=86400, stale-while-revalidate=604800');
+        res.setHeader('Cache-Control', 'no-cache, must-revalidate');
       }
     },
   })

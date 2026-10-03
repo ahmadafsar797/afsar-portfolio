@@ -293,7 +293,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
         const thumbBlob = await extractFrameFromVideoFile(file);
         if (thumbBlob) {
           const safeName = file.name.replace(/\.[^/.]+$/, '').replace(/[^a-zA-Z0-9_-]/g, '_');
-          const thumbFile = new File([thumbBlob], `${safeName}-thumb.jpg`, { type: 'image/jpeg' });
+          const thumbFile = new File([thumbBlob], `${safeName}-cover.jpg`, { type: 'image/jpeg' });
           const thumbRes = await api.uploadFile(thumbFile);
           autoThumbUrl = thumbRes.url;
         }

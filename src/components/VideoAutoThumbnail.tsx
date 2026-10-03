@@ -4,14 +4,11 @@ import { isYouTubeUrl, getYouTubeThumbnail } from '../utils/videoUtils';
 /**
  * VideoAutoThumbnail
  *
- * Super-fast thumbnail renderer for video cards:
- * 1. If thumbnailUrl is provided → renders an optimized <img> tag (loads in <50ms).
- * 2. If YouTube URL → renders official high-quality YouTube thumbnail image.
- * 3. If uploaded MP4 (/uploads/...) → automatically falls back to /uploads/xxx-thumb.jpg.
- * 4. In-memory & sessionStorage caching: Once a frame/thumbnail is resolved, subsequent
- *    views load in 0ms directly from cache.
- * 5. Native video fallback with instant frame-0 (#t=0.001) decode & auto-canvas caching.
- * 6. Includes a sleek dark shimmer skeleton so users never see an empty black box.
+ * Ultra-fast, unzoomed thumbnail renderer:
+ * 1. Renders high-quality static thumbnail with exact aspect ratio (0ms delay).
+ * 2. If uploaded MP4 without thumbnail → automatically uses /uploads/xxx-cover.jpg.
+ * 3. Never zooms or stretches: uses object-cover with centered alignment.
+ * 4. Fallback video element loads frame-0 (#t=0.001) smoothly with dark skeleton shimmer.
  */
 interface VideoAutoThumbnailProps {
   videoUrl: string;
@@ -19,34 +16,6 @@ interface VideoAutoThumbnailProps {
   alt: string;
   className?: string;
   style?: React.CSSProperties;
-}
-
-// In-memory cache for the entire session
-const inMemoryCache = new Map<string, string>();
-
-function getCachedThumb(url: string): string | null {
-  if (!url) return null;
-  if (inMemoryCache.has(url)) return inMemoryCache.get(url)!;
-  try {
-    const stored = sessionStorage.getItem(`thumb_${url}`);
-    if (stored) {
-      inMemoryCache.set(url, stored);
-      return stored;
-    }
-  } catch {
-    // Ignore storage errors in private browsing
-  }
-  return null;
-}
-
-function setCachedThumb(url: string, thumbUrl: string) {
-  if (!url || !thumbUrl) return;
-  inMemoryCache.set(url, thumbUrl);
-  try {
-    sessionStorage.setItem(`thumb_${url}`, thumbUrl);
-  } catch {
-    // Ignore storage quota errors
-  }
 }
 
 export const VideoAutoThumbnail: React.FC<VideoAutoThumbnailProps> = ({
@@ -59,28 +28,28 @@ export const VideoAutoThumbnail: React.FC<VideoAutoThumbnailProps> = ({
   const isYt = isYouTubeUrl(videoUrl);
   const ytThumbnail = isYt ? getYouTubeThumbnail(videoUrl) : null;
 
-  // Derive static thumb if uploaded MP4
-  const derivedUploadThumb =
+  // Derive static cover if uploaded MP4
+  const derivedUploadCover =
     !thumbnailUrl && !isYt && videoUrl.startsWith('/uploads/') && videoUrl.endsWith('.mp4')
-      ? videoUrl.replace(/\.mp4$/i, '-thumb.jpg')
+      ? videoUrl.replace(/\.mp4$/i, '-cover.jpg')
       : null;
 
-  const cached = getCachedThumb(videoUrl);
+  const resolvedThumb = thumbnailUrl || ytThumbnail || derivedUploadCover || null;
 
-  const initialThumb = thumbnailUrl || ytThumbnail || derivedUploadThumb || cached;
-  const [imageSrc, setImageSrc] = useState<string | null>(initialThumb);
+  const [imageSrc, setImageSrc] = useState<string | null>(resolvedThumb);
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
   const [imageFailed, setImageFailed] = useState<boolean>(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   // Sync when props change
   useEffect(() => {
-    const freshThumb = thumbnailUrl || ytThumbnail || derivedUploadThumb || getCachedThumb(videoUrl);
-    setImageSrc(freshThumb);
+    const nextThumb = thumbnailUrl || ytThumbnail || derivedUploadCover || null;
+    setImageSrc(nextThumb);
     setImageFailed(false);
-  }, [thumbnailUrl, videoUrl, ytThumbnail, derivedUploadThumb]);
+    setIsLoaded(false);
+  }, [thumbnailUrl, videoUrl, ytThumbnail, derivedUploadCover]);
 
-  // Video frame extraction fallback if no static image is available or image failed
+  // Video fallback when no static image exists or image failed to load
   useEffect(() => {
     if (imageSrc && !imageFailed) return;
     if (isYt || !videoRef.current) return;
@@ -88,49 +57,34 @@ export const VideoAutoThumbnail: React.FC<VideoAutoThumbnailProps> = ({
     const video = videoRef.current;
     let isCancelled = false;
 
-    const captureFrame = () => {
-      if (isCancelled) return;
-      try {
-        if (video.videoWidth > 0 && video.videoHeight > 0) {
-          const canvas = document.createElement('canvas');
-          canvas.width = Math.min(video.videoWidth, 640);
-          canvas.height = Math.round((canvas.width * video.videoHeight) / video.videoWidth);
-          const ctx = canvas.getContext('2d');
-          if (ctx) {
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-            const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-            setCachedThumb(videoUrl, dataUrl);
-            setImageSrc(dataUrl);
-            setImageFailed(false);
-          }
-        }
-      } catch {
-        // Fallback silently
+    const onData = () => {
+      if (!isCancelled) {
+        setIsLoaded(true);
       }
     };
 
-    video.addEventListener('loadeddata', captureFrame);
-    video.addEventListener('seeked', captureFrame);
+    video.addEventListener('loadeddata', onData);
+    video.addEventListener('seeked', onData);
 
     return () => {
       isCancelled = true;
-      video.removeEventListener('loadeddata', captureFrame);
-      video.removeEventListener('seeked', captureFrame);
+      video.removeEventListener('loadeddata', onData);
+      video.removeEventListener('seeked', onData);
     };
   }, [imageSrc, imageFailed, isYt, videoUrl]);
 
   return (
-    <div className={`relative w-full h-full overflow-hidden bg-[#111118] ${className}`} style={style}>
-      {/* Sleek Skeleton Pulse until loaded */}
+    <div className={`relative w-full h-full overflow-hidden bg-black ${className}`} style={style}>
+      {/* Sleek Skeleton Pulse while loading */}
       {!isLoaded && (
-        <div className="absolute inset-0 bg-neutral-900/80 animate-pulse flex items-center justify-center">
-          <div className="w-8 h-8 rounded-full border border-white/10 bg-white/5 flex items-center justify-center opacity-40">
+        <div className="absolute inset-0 bg-[#121216] animate-pulse flex items-center justify-center pointer-events-none z-0">
+          <div className="w-8 h-8 rounded-full border border-white/10 bg-white/5 flex items-center justify-center opacity-30">
             <div className="w-0 h-0 border-y-[5px] border-y-transparent border-l-[8px] border-l-white/60 ml-0.5" />
           </div>
         </div>
       )}
 
-      {/* Primary Image View */}
+      {/* Primary Image View: Unzoomed, perfectly centered */}
       {imageSrc && !imageFailed ? (
         <img
           src={imageSrc}
@@ -139,16 +93,13 @@ export const VideoAutoThumbnail: React.FC<VideoAutoThumbnailProps> = ({
           decoding="async"
           fetchPriority="high"
           onLoad={() => setIsLoaded(true)}
-          onError={() => {
-            // If derived thumbnail failed to load, fall back to native video frame
-            setImageFailed(true);
-          }}
-          className={`w-full h-full object-cover transition-opacity duration-300 ${
+          onError={() => setImageFailed(true)}
+          className={`w-full h-full object-cover object-center transition-opacity duration-300 ${
             isLoaded ? 'opacity-100' : 'opacity-0'
           }`}
         />
       ) : (
-        /* Video Frame Fallback with Media Fragment for instant Frame 0 seek */
+        /* Video Fallback with Media Fragment for instant Frame 0 */
         <video
           ref={videoRef}
           src={videoUrl ? `${videoUrl}#t=0.001` : undefined}
@@ -156,7 +107,7 @@ export const VideoAutoThumbnail: React.FC<VideoAutoThumbnailProps> = ({
           playsInline
           preload="metadata"
           onLoadedData={() => setIsLoaded(true)}
-          className={`w-full h-full object-cover transition-opacity duration-300 ${
+          className={`w-full h-full object-cover object-center transition-opacity duration-300 ${
             isLoaded ? 'opacity-100' : 'opacity-0'
           }`}
         />
