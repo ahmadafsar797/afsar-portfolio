@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { Play, ArrowUpRight } from 'lucide-react';
 import { SettingsData } from '../types';
 import { gsap } from 'gsap';
@@ -120,6 +120,8 @@ export const Hero: React.FC<HeroProps> = ({ settings, onWatchShowreel }) => {
     gsap.to(playBtnRef.current, { x: 0, y: 0, scale: 1, duration: 0.55, ease: 'elastic.out(1, 0.4)' });
   };
 
+  const [videoLoaded, setVideoLoaded] = useState(false);
+
   const hasBgVideo = Boolean(settings?.hero_bg_video_url && settings?.hero_bg_video_enabled !== '0');
   const videoOpacity = (Number(settings?.hero_bg_video_opacity ?? '75')) / 100;
   const overlayStyle = settings?.hero_bg_video_overlay || 'warm'; // 'warm' | 'dark' | 'none'
@@ -137,17 +139,36 @@ export const Hero: React.FC<HeroProps> = ({ settings, onWatchShowreel }) => {
         isDarkTheme ? 'bg-[#0E0907]' : 'bg-[#F8F1E7]'
       }`}
     >
-      {/* Fullscreen Video Background */}
+      {/* Fullscreen Video Background Optimized for Slow Internet */}
       {hasBgVideo && (
         <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+          {/* Instant First-Frame Poster (renders in milliseconds on slow/cellular connections) */}
+          {settings?.hero_bg_video_poster && (
+            <img
+              src={settings.hero_bg_video_poster}
+              alt="Cinematic Background Preview"
+              className="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000"
+              style={{
+                opacity: videoOpacity,
+                filter: videoBlur > 0 ? `blur(${videoBlur}px)` : undefined,
+                transform: videoBlur > 0 ? 'scale(1.05)' : undefined,
+              }}
+            />
+          )}
+
+          {/* Progressive Video Stream */}
           <video
             autoPlay
             loop
             muted
             playsInline
-            className="w-full h-full object-cover transition-opacity duration-700"
+            preload="auto"
+            poster={settings?.hero_bg_video_poster}
+            onCanPlay={() => setVideoLoaded(true)}
+            onPlaying={() => setVideoLoaded(true)}
+            className="w-full h-full object-cover transition-opacity duration-1000"
             style={{
-              opacity: videoOpacity,
+              opacity: videoLoaded || !settings?.hero_bg_video_poster ? videoOpacity : 0,
               filter: videoBlur > 0 ? `blur(${videoBlur}px)` : undefined,
               transform: videoBlur > 0 ? 'scale(1.05)' : undefined,
             }}

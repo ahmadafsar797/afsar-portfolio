@@ -122,6 +122,7 @@ export interface SettingsData {
   hero_bg_video_overlay_opacity?: string;
   hero_bg_video_blur?: string;
   hero_text_theme?: string;
+  hero_bg_video_poster?: string;
 }
 
 export interface ContactMessage {

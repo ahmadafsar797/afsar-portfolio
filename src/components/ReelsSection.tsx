@@ -11,7 +11,13 @@ gsap.registerPlugin(ScrollTrigger);
 
 interface ReelsSectionProps {
   reels: Reel[];
-  onOpenLightbox: (videoUrl: string, title: string, client?: string, category?: string) => void;
+  onOpenLightbox: (
+    videoUrl: string,
+    title: string,
+    client?: string,
+    category?: string,
+    poster?: string
+  ) => void;
 }
 
 export const ReelsSection: React.FC<ReelsSectionProps> = ({ reels, onOpenLightbox }) => {
@@ -109,7 +115,7 @@ export const ReelsSection: React.FC<ReelsSectionProps> = ({ reels, onOpenLightbo
                   e.stopPropagation();
                   setUnmutedReelId(unmutedReelId === reel.id ? null : reel.id);
                 }}
-                onClick={() => onOpenLightbox(reel.video_url, reel.title, undefined, reel.category)}
+                onClick={() => onOpenLightbox(reel.video_url, reel.title, undefined, reel.category, reel.thumbnail_url)}
               />
             </div>
           ))}
