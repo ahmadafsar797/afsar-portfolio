@@ -44,7 +44,7 @@ export const SelectedProjects: React.FC<SelectedProjectsProps> = ({ projects, on
               <div className="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-[#2B170F]/10 mb-8">
                 <div>
                   <span className="text-xs font-montserrat uppercase font-semibold tracking-wider text-[#C65D45] block mb-1">
-                    {project.client} • {project.category}
+                    {project.category}
                   </span>
                   <h3 className="font-pogonia text-3xl sm:text-5xl font-bold text-[#2B170F]">
                     {project.title}
@@ -52,7 +52,7 @@ export const SelectedProjects: React.FC<SelectedProjectsProps> = ({ projects, on
                 </div>
 
                 <button
-                  onClick={() => onOpenLightbox(project.video_url, project.title, project.client, project.category)}
+                  onClick={() => onOpenLightbox(project.video_url, project.title, undefined, project.category)}
                   className="group/play relative inline-flex items-center gap-2 px-6 py-3 rounded-full text-xs font-montserrat uppercase font-black tracking-wide text-[#FFF9F2] bg-gradient-to-r from-[#C65D45] via-[#D8684F] to-[#E2725B] shadow-[0_6px_24px_rgba(198,93,69,0.5),inset_0_1px_1px_rgba(255,255,255,0.35)] hover:shadow-[0_8px_32px_rgba(198,93,69,0.7)] hover:scale-105 active:scale-95 transition-all duration-300 border border-[#E2725B]/50"
                 >
                   <span className="absolute inset-0 rounded-full overflow-hidden pointer-events-none">
@@ -143,7 +143,7 @@ export const SelectedProjects: React.FC<SelectedProjectsProps> = ({ projects, on
                     />
                   ) : (
                     <div
-                      onClick={() => onOpenLightbox(project.video_url, project.title, project.client, project.category)}
+                      onClick={() => onOpenLightbox(project.video_url, project.title, undefined, project.category)}
                       className="relative w-full aspect-16-9 rounded-2xl overflow-hidden cursor-pointer bg-black border border-[#2B170F]/10 group/img shadow-xl"
                     >
                       <VideoAutoThumbnail
@@ -162,7 +162,7 @@ export const SelectedProjects: React.FC<SelectedProjectsProps> = ({ projects, on
 
                   {/* Video Play Trigger Card */}
                   <div
-                    onClick={() => onOpenLightbox(project.video_url, project.title, project.client, project.category)}
+                    onClick={() => onOpenLightbox(project.video_url, project.title, undefined, project.category)}
                     className="p-4 rounded-2xl bg-[#F8F1E7] hover:bg-[#ece4da] border border-[#2B170F]/10 cursor-pointer transition-all flex items-center justify-between group/play shadow-sm"
                   >
                     <div className="flex items-center gap-3">

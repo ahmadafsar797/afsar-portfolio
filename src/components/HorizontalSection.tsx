@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { Play, Film, Clock, Calendar, ArrowUpRight } from 'lucide-react';
+import { Play, Clock, Calendar } from 'lucide-react';
 import { HorizontalVideo } from '../types';
 import { gsap } from 'gsap';
 import { useFadeUpOnScroll, useRevealOnScroll } from '../hooks/useAnimations';
@@ -89,7 +89,7 @@ const HorizontalVideoCard: React.FC<HorizontalVideoCardProps> = ({ video, index,
       {/* 16:9 Video Canvas */}
       <div
         ref={videoBoxRef}
-        onClick={() => onOpenLightbox(video.video_url, video.title, video.client, video.category)}
+        onClick={() => onOpenLightbox(video.video_url, video.title, undefined, video.category)}
         onMouseMove={handlePlayMagnetic}
         onMouseLeave={handlePlayLeave}
         data-cursor="play"
@@ -125,56 +125,24 @@ const HorizontalVideoCard: React.FC<HorizontalVideoCardProps> = ({ video, index,
 
       {/* Editorial Content */}
       <div ref={contentRef} className={`lg:col-span-5 flex flex-col justify-center ${isEven ? 'lg:order-2' : 'lg:order-1'}`}>
-        <div className="flex items-center gap-4 text-xs font-sans tracking-wider text-[#756A62] uppercase mb-3">
-          <span className="text-[#C65D45] font-bold">{video.client}</span>
-          <span>•</span>
-          <div className="flex items-center gap-1">
-            <Calendar className="w-3 h-3 text-[#756A62]/60" />
+        <div className="flex items-center gap-2 text-xs font-sans tracking-wider text-[#756A62] uppercase mb-3">
+          <div className="flex items-center gap-1.5 font-bold text-[#C65D45]">
+            <Calendar className="w-3.5 h-3.5 text-[#C65D45]" />
             <span>{video.year || '2025'}</span>
           </div>
         </div>
 
         <h3
-          onClick={() => onOpenLightbox(video.video_url, video.title, video.client, video.category)}
-          className="font-pogonia text-3xl sm:text-4xl lg:text-5xl font-bold text-[#2B170F] group-hover:text-[#C65D45] transition-colors leading-[1.15] cursor-pointer mb-5"
+          onClick={() => onOpenLightbox(video.video_url, video.title, undefined, video.category)}
+          className="font-pogonia text-3xl sm:text-4xl lg:text-5xl font-bold text-[#2B170F] group-hover:text-[#C65D45] transition-colors leading-[1.15] cursor-pointer mb-4"
         >
           {video.title}
         </h3>
 
-        <p className="text-sm sm:text-base font-sans font-medium text-[#756A62] leading-relaxed mb-8">
+        <p className="text-sm sm:text-base font-sans font-medium text-[#756A62] leading-relaxed">
           {video.description ||
             'Editorial post-production featuring 4K multi-cam rhythm cutting, high-fidelity sound synthesis, and calibrated film color grading.'}
         </p>
-
-        <div className="flex items-center gap-4 sm:gap-6 flex-wrap sm:flex-nowrap">
-          <button
-            onClick={() => onOpenLightbox(video.video_url, video.title, video.client, video.category)}
-            data-cursor="play"
-            className="group/watchbtn relative inline-flex items-center gap-3 px-6 sm:px-7 py-2.5 sm:py-3 rounded-full font-sans font-bold text-xs sm:text-sm uppercase text-[#FFF9F2] bg-gradient-to-r from-[#C65D45] via-[#D8684F] to-[#E2725B] shadow-[0_6px_24px_rgba(198,93,69,0.55),inset_0_1px_1px_rgba(255,255,255,0.35)] hover:shadow-[0_8px_32px_rgba(198,93,69,0.75),inset_0_1px_1px_rgba(255,255,255,0.4)] hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer border border-[#E2725B]/50 shrink-0"
-          >
-            {/* shimmer clipped in its own wrapper — outer glow not cut */}
-            <span className="absolute inset-0 rounded-full overflow-hidden pointer-events-none">
-              <span className="absolute inset-0 -translate-x-full group-hover/watchbtn:translate-x-full group-active/watchbtn:translate-x-full transition-transform duration-500 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-            </span>
-            <Play className="relative w-4 h-4 fill-current drop-shadow shrink-0" />
-            <span className="relative flex flex-col items-center justify-center font-bold tracking-wider leading-[1.18] text-center">
-              <span>WATCH FULL</span>
-              <span>FILM</span>
-            </span>
-          </button>
-
-          <a
-            href="#contact"
-            data-cursor="open"
-            className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-sans font-bold uppercase tracking-wider text-[#756A62] hover:text-[#2B170F] transition-colors group/link shrink-0"
-          >
-            <span className="flex flex-col items-start font-bold leading-[1.18] text-left">
-              <span>INQUIRE SIMILAR</span>
-              <span>PROJECT</span>
-            </span>
-            <ArrowUpRight className="w-4 h-4 shrink-0 font-bold group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5 transition-transform" />
-          </a>
-        </div>
       </div>
     </div>
   );

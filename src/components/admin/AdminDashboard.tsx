@@ -884,18 +884,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                           </select>
                         </div>
 
-                        <div>
-                          <label className="block text-xs font-montserrat uppercase text-white/60 mb-1">
-                            Client Name
-                          </label>
-                          <input
-                            type="text"
-                            value={editingHorizontal.client || ''}
-                            onChange={(e) => setEditingHorizontal({ ...editingHorizontal, client: e.target.value })}
-                            className="w-full px-3 py-2 rounded-lg bg-black border border-white/15 text-sm text-white"
-                          />
-                        </div>
-
                         <div className="grid grid-cols-2 gap-2">
                           <div>
                             <label className="block text-xs font-montserrat uppercase text-white/60 mb-1">
@@ -1050,7 +1038,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                           <th className="p-3">Thumbnail</th>
                           <th className="p-3">Title</th>
                           <th className="p-3">Category</th>
-                          <th className="p-3">Client</th>
                           <th className="p-3">Duration</th>
                           <th className="p-3 text-right">Actions</th>
                         </tr>
@@ -1067,7 +1054,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                             </td>
                             <td className="p-3 font-medium text-white">{v.title}</td>
                             <td className="p-3 text-[#C65D45]">{v.category}</td>
-                            <td className="p-3 text-white/70">{v.client}</td>
                             <td className="p-3 text-white/50">{v.duration}</td>
                             <td className="p-3 text-right">
                               <div className="flex items-center justify-end gap-2">
@@ -1404,18 +1390,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
 
                         <div>
                           <label className="block text-xs font-montserrat uppercase text-white/60 mb-1">
-                            Client Name *
-                          </label>
-                          <input
-                            type="text"
-                            value={editingProject.client || ''}
-                            onChange={(e) => setEditingProject({ ...editingProject, client: e.target.value })}
-                            className="w-full px-3 py-2 rounded-lg bg-black border border-white/15 text-sm text-white"
-                          />
-                        </div>
-
-                        <div>
-                          <label className="block text-xs font-montserrat uppercase text-white/60 mb-1">
                             Category
                           </label>
                           <input
@@ -1602,7 +1576,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                         className="p-4 rounded-2xl bg-[#0e0e15] border border-white/10 flex items-center justify-between gap-4"
                       >
                         <div>
-                          <div className="text-xs text-[#C65D45] font-montserrat uppercase">{p.client} • {p.category}</div>
+                          <div className="text-xs text-[#C65D45] font-montserrat uppercase">{p.category}</div>
                           <h4 className="font-pogonia text-2xl text-white mt-0.5">{p.title}</h4>
                           <p className="text-xs text-white/50 line-clamp-1 mt-1">{p.brief}</p>
                         </div>

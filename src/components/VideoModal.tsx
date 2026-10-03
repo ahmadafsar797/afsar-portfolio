@@ -453,11 +453,6 @@ export const VideoModal: React.FC<VideoModalProps> = ({
           )}
           <div>
             <div className="flex items-center gap-2">
-              {client && (
-                <span className="text-xs font-bold text-[#C65D45] uppercase tracking-wider">
-                  {client} •
-                </span>
-              )}
               <h2 className="font-pogonia text-base sm:text-2xl text-white font-bold truncate">
                 {title || 'Cinematic Video'}
               </h2>
