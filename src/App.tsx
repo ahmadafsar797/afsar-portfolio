@@ -152,7 +152,7 @@ export const App: React.FC = () => {
           onWatchShowreel={() =>
             openLightbox(
               settings.featured_showreel_url ||
-                'https://assets.mixkit.co/videos/preview/mixkit-cinematographer-filming-with-a-professional-camera-42861-large.mp4',
+                '/uploads/Cinematic_Reel_2-1791004710300-248821251.mp4',
               'Master Cinematic Showreel',
               'Afsar Ahmad Films',
               'Showreel'
@@ -188,7 +188,7 @@ export const App: React.FC = () => {
           onOpenShowreel={() =>
             openLightbox(
               settings.featured_showreel_url ||
-                'https://assets.mixkit.co/videos/preview/mixkit-cinematographer-filming-with-a-professional-camera-42861-large.mp4',
+                '/uploads/Cinematic_Reel_2-1791004710300-248821251.mp4',
               'Master Cinematic Showreel',
               'Afsar Ahmad Films',
               'Showreel'

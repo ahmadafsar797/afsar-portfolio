@@ -27,8 +27,10 @@ export const Showreel: React.FC<ShowreelProps> = ({ settings, onOpenLightbox }) 
 
   const videoUrl =
     settings?.featured_showreel_url ||
-    'https://assets.mixkit.co/videos/preview/mixkit-cinematographer-filming-with-a-professional-camera-42861-large.mp4';
-  const posterUrl = settings?.featured_showreel_poster || null;
+    '/uploads/Cinematic_Reel_2-1791004710300-248821251.mp4';
+  const posterUrl =
+    settings?.featured_showreel_poster ||
+    '/uploads/master-showreel-thumb-1791004753890-1791004755766-85054138.jpg';
   const isYt = isYouTubeUrl(videoUrl);
   const effectivePoster = posterUrl || (isYt ? getYouTubeThumbnail(videoUrl) : autoThumbnail);
 
