@@ -1,16 +1,25 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Play, Pause, Volume2, VolumeX, Maximize2, Sparkles, Layers, Sliders, Disc } from 'lucide-react';
+import { Play, Pause, Volume2, VolumeX, Maximize2, Sparkles, Layers, Sliders, Disc, Camera } from 'lucide-react';
 import { SettingsData } from '../types';
 import { gsap } from 'gsap';
 import { useRevealOnScroll, useFadeUpOnScroll } from '../hooks/useAnimations';
 import { isYouTubeUrl, getYouTubeThumbnail } from '../utils/videoUtils';
+import { VideoFramePickerModal } from './VideoFramePickerModal';
+import { api } from '../services/api';
 
 interface ShowreelProps {
   settings?: SettingsData;
   onOpenLightbox: (videoUrl: string, title: string, client?: string) => void;
+  isAdminLoggedIn?: boolean;
+  onPosterUpdated?: (newPosterUrl: string) => void;
 }
 
-export const Showreel: React.FC<ShowreelProps> = ({ settings, onOpenLightbox }) => {
+export const Showreel: React.FC<ShowreelProps> = ({
+  settings,
+  onOpenLightbox,
+  isAdminLoggedIn,
+  onPosterUpdated,
+}) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
@@ -25,31 +34,39 @@ export const Showreel: React.FC<ShowreelProps> = ({ settings, onOpenLightbox }) 
   const statsRef = useFadeUpOnScroll<HTMLDivElement>(0.15);
   const playBtnRef = useRef<HTMLButtonElement>(null);
 
+  const [isPickerOpen, setIsPickerOpen] = useState(false);
+  const [customPoster, setCustomPoster] = useState<string | null>(
+    settings?.featured_showreel_poster || null
+  );
+
+  useEffect(() => {
+    setCustomPoster(settings?.featured_showreel_poster || null);
+  }, [settings?.featured_showreel_poster]);
+
   const videoUrl =
     settings?.featured_showreel_url ||
     'https://assets.mixkit.co/videos/preview/mixkit-cinematographer-filming-with-a-professional-camera-42861-large.mp4';
-  const posterUrl = settings?.featured_showreel_poster || null;
   const isYt = isYouTubeUrl(videoUrl);
-  const effectivePoster = posterUrl || (isYt ? getYouTubeThumbnail(videoUrl) : autoThumbnail);
+  const effectivePoster = customPoster || (isYt ? getYouTubeThumbnail(videoUrl) : autoThumbnail);
 
-  // Auto-capture a random frame from native video when no poster is set
+  // Auto-capture a reliable action frame from native video when no custom poster is set
   useEffect(() => {
-    if (posterUrl || isYt) {
-      setAutoThumbnail(null); // has a real poster or YouTube thumbnail, no need
+    if (customPoster || isYt || !videoUrl) {
+      setAutoThumbnail(null);
       return;
     }
     const video = document.createElement('video');
+    video.crossOrigin = 'anonymous';
     video.src = videoUrl;
     video.muted = true;
     video.playsInline = true;
-    video.crossOrigin = 'anonymous';
-    video.preload = 'metadata';
+    video.preload = 'auto';
 
     video.addEventListener('loadedmetadata', () => {
       const dur = video.duration;
       if (!dur || !isFinite(dur)) return;
-      // Seek to a random frame between 10% and 80% of the video
-      video.currentTime = dur * (0.1 + Math.random() * 0.7);
+      // Seek to an engaging action moment (~25% of duration)
+      video.currentTime = Math.min(4, Math.max(1, dur * 0.25));
     });
 
     video.addEventListener('seeked', () => {
@@ -60,16 +77,15 @@ export const Showreel: React.FC<ShowreelProps> = ({ settings, onOpenLightbox }) 
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-        // Only use if it's not a blank/empty frame
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.88);
         if (dataUrl && dataUrl !== 'data:,') {
           setAutoThumbnail(dataUrl);
         }
       } catch {
-        // CORS or other error — silently ignore, video will show normally
+        // Silently handled
       }
     });
-  }, [videoUrl, posterUrl]);
+  }, [videoUrl, customPoster, isYt]);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -105,6 +121,20 @@ export const Showreel: React.FC<ShowreelProps> = ({ settings, onOpenLightbox }) 
   const handleLoadedMetadata = () => {
     if (!videoRef.current) return;
     setDuration(formatTime(videoRef.current.duration));
+    // If no custom poster is set, seek paused video element to an action frame (~25%) so it immediately paints that frame
+    if (!customPoster && !autoThumbnail && videoRef.current.duration > 1) {
+      videoRef.current.currentTime = Math.min(3.5, Math.max(1, videoRef.current.duration * 0.25));
+    }
+  };
+
+  const handleSavePoster = async (newPosterUrl: string) => {
+    setCustomPoster(newPosterUrl);
+    try {
+      await api.updateSettings({ featured_showreel_poster: newPosterUrl });
+      if (onPosterUpdated) onPosterUpdated(newPosterUrl);
+    } catch (err) {
+      console.warn('Could not save to settings directly:', err);
+    }
   };
 
   const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -168,6 +198,20 @@ export const Showreel: React.FC<ShowreelProps> = ({ settings, onOpenLightbox }) 
           className="group relative w-full aspect-16-9 rounded-2xl overflow-hidden bg-black border border-[#2B170F]/15 shadow-xl transition-shadow duration-500 hover:shadow-2xl hover:shadow-[#C65D45]/10 hover:border-[#C65D45]/50"
           onMouseEnter={() => setShowControls(true)}
         >
+          {/* Top Right: Choose Thumbnail Button */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsPickerOpen(true);
+            }}
+            className="absolute top-3 right-3 sm:top-4 sm:right-4 z-30 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/70 hover:bg-[#C65D45] text-white hover:text-[#2B170F] backdrop-blur-md border border-white/20 hover:border-[#C65D45] transition-all duration-200 text-[11px] font-bold shadow-xl cursor-pointer active:scale-95 group/btn"
+            title="Choose Thumbnail from Video Frames"
+          >
+            <Camera className="w-3.5 h-3.5 text-[#C65D45] group-hover/btn:text-[#2B170F] transition-colors" />
+            <span className="hidden sm:inline">Choose Thumbnail</span>
+            <span className="sm:hidden">Thumbnail</span>
+          </button>
+
           {isYt ? (
             <img
               src={effectivePoster || ''}
@@ -304,6 +348,16 @@ export const Showreel: React.FC<ShowreelProps> = ({ settings, onOpenLightbox }) 
           ))}
         </div>
       </div>
+
+      {/* Video Frame Picker Modal */}
+      <VideoFramePickerModal
+        isOpen={isPickerOpen}
+        onClose={() => setIsPickerOpen(false)}
+        videoUrl={videoUrl}
+        currentPoster={effectivePoster}
+        onSavePoster={handleSavePoster}
+        title="Master Showreel"
+      />
     </section>
   );
 };

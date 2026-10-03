@@ -22,7 +22,9 @@ import {
   Eye,
   RefreshCw,
   Lock,
+  Camera,
 } from 'lucide-react';
+import { VideoFramePickerModal } from '../VideoFramePickerModal';
 import { api } from '../../services/api';
 import {
   Reel,
@@ -80,6 +82,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
   // Profile picture
   const [profilePicUploading, setProfilePicUploading] = useState(false);
   const [profilePicPreview, setProfilePicPreview] = useState<string | null>(null);
+
+  // Showreel frame picker modal
+  const [showreelPickerOpen, setShowreelPickerOpen] = useState(false);
 
   // Password change state
   const [passwordForm, setPasswordForm] = useState({
@@ -2295,20 +2300,71 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                           </div>
                         </div>
                       )}
-                      <label className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-xs cursor-pointer border border-white/15">
-                        <Upload className="w-3.5 h-3.5 text-[#C65D45]" />
-                        <span>Upload Showreel Video</span>
-                        <input
-                          type="file"
-                          accept="video/*"
-                          className="hidden"
-                          onChange={(e) =>
-                            handleFileUpload(e, (url) =>
-                              setSettings({ ...settings, featured_showreel_url: url })
-                            )
-                          }
-                        />
-                      </label>
+                      <div className="flex flex-wrap items-center gap-2 mb-3">
+                        <label className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-xs cursor-pointer border border-white/15">
+                          <Upload className="w-3.5 h-3.5 text-[#C65D45]" />
+                          <span>Upload Showreel Video</span>
+                          <input
+                            type="file"
+                            accept="video/*"
+                            className="hidden"
+                            onChange={(e) =>
+                              handleFileUpload(e, (url) =>
+                                setSettings({ ...settings, featured_showreel_url: url })
+                              )
+                            }
+                          />
+                        </label>
+
+                        {/* Button to Choose Thumbnail from Video Frames */}
+                        {settings.featured_showreel_url && (
+                          <button
+                            type="button"
+                            onClick={() => setShowreelPickerOpen(true)}
+                            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#C65D45]/20 hover:bg-[#C65D45]/30 text-xs font-bold text-[#C65D45] cursor-pointer border border-[#C65D45]/40 transition-colors"
+                          >
+                            <Camera className="w-3.5 h-3.5" />
+                            <span>Choose Thumbnail from Video Frames</span>
+                          </button>
+                        )}
+                      </div>
+
+                      {/* Poster Thumbnail URL input & Preview */}
+                      <div>
+                        <label className="block text-xs font-montserrat uppercase text-white/60 mb-1">
+                          Showreel Poster / Thumbnail URL (Auto from video frames or custom URL)
+                        </label>
+                        <div className="flex items-center gap-3">
+                          <input
+                            type="text"
+                            value={settings.featured_showreel_poster || ''}
+                            onChange={(e) => setSettings({ ...settings, featured_showreel_poster: e.target.value })}
+                            className="flex-1 px-3 py-2 rounded-lg bg-black border border-white/15 text-sm text-white"
+                            placeholder="Auto-generated from video or paste image URL"
+                          />
+                          {settings.featured_showreel_poster && (
+                            <img
+                              src={settings.featured_showreel_poster}
+                              alt="Showreel Poster Preview"
+                              className="w-14 h-9 object-cover rounded border border-white/20 shrink-0"
+                            />
+                          )}
+                          <label className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-xs cursor-pointer border border-white/15 shrink-0">
+                            <Upload className="w-3 h-3 text-[#C65D45]" />
+                            <span>Upload Image</span>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              className="hidden"
+                              onChange={(e) =>
+                                handleFileUpload(e, (url) =>
+                                  setSettings({ ...settings, featured_showreel_poster: url })
+                                )
+                              }
+                            />
+                          </label>
+                        </div>
+                      </div>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
@@ -2385,6 +2441,21 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
           </div>
         )}
       </div>
+
+      {/* Showreel Frame Picker Modal */}
+      {settings.featured_showreel_url && (
+        <VideoFramePickerModal
+          isOpen={showreelPickerOpen}
+          onClose={() => setShowreelPickerOpen(false)}
+          videoUrl={settings.featured_showreel_url}
+          currentPoster={settings.featured_showreel_poster}
+          onSavePoster={(url) => {
+            setSettings((prev) => ({ ...prev, featured_showreel_poster: url }));
+            showNotice('Thumbnail frame selected! Click "Save Settings" below to persist.');
+          }}
+          title="Master Showreel"
+        />
+      )}
     </div>
   );
 };
