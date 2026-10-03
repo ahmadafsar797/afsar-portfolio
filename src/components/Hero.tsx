@@ -120,58 +120,41 @@ export const Hero: React.FC<HeroProps> = ({ settings, onWatchShowreel }) => {
     gsap.to(playBtnRef.current, { x: 0, y: 0, scale: 1, duration: 0.55, ease: 'elastic.out(1, 0.4)' });
   };
 
-  const tickerItems = [
+  const crimeSceneTape = [
+    { text: 'CRIME SCENE // DO NOT CROSS', badge: '⚠️' },
+    { text: 'POST-PRODUCTION CRIME SCENE', badge: '⚡' },
+    { text: 'HIGH-RETENTION ZONE', badge: '///' },
+    { text: 'CRIME SCENE // DO NOT CROSS', badge: '⚠️' },
+    { text: 'FRAME-PERFECT CUTS & PACING', badge: '✦' },
+    { text: 'CASE FILE #AFSAR-2026', badge: '⚡' },
+    { text: 'CRIME SCENE // DO NOT CROSS', badge: '⚠️' },
+    { text: 'COLOR GRADE & SFX UNIT', badge: '///' },
+  ];
+
+  const softwareEvidenceTape = [
     {
       id: 'premiere',
+      label: 'EVIDENCE 01',
       text: 'ADOBE PREMIERE PRO',
-      icon: (
-        <div className="w-10 h-10 sm:w-11 sm:h-11 shrink-0 flex items-center justify-center">
-          <img
-            src="/images/icon-premiere.webp"
-            alt="Adobe Premiere Pro"
-            className="w-full h-full object-contain drop-shadow-md"
-          />
-        </div>
-      ),
+      icon: '/images/icon-premiere.webp',
     },
     {
       id: 'after-effects',
+      label: 'EVIDENCE 02',
       text: 'ADOBE AFTER EFFECTS',
-      icon: (
-        <div className="w-10 h-10 sm:w-11 sm:h-11 shrink-0 flex items-center justify-center">
-          <img
-            src="/images/icon-aftereffects.png"
-            alt="Adobe After Effects"
-            className="w-full h-full object-contain drop-shadow-md"
-          />
-        </div>
-      ),
+      icon: '/images/icon-aftereffects.png',
     },
     {
       id: 'photoshop',
+      label: 'EVIDENCE 03',
       text: 'ADOBE PHOTOSHOP',
-      icon: (
-        <div className="w-10 h-10 sm:w-11 sm:h-11 shrink-0 flex items-center justify-center">
-          <img
-            src="/images/icon-photoshop.png"
-            alt="Adobe Photoshop"
-            className="w-full h-full object-contain drop-shadow-md"
-          />
-        </div>
-      ),
+      icon: '/images/icon-photoshop.png',
     },
     {
       id: 'illustrator',
+      label: 'EVIDENCE 04',
       text: 'ADOBE ILLUSTRATOR',
-      icon: (
-        <div className="w-10 h-10 sm:w-11 sm:h-11 shrink-0 flex items-center justify-center">
-          <img
-            src="/images/icon-illustrator.png"
-            alt="Adobe Illustrator"
-            className="w-full h-full object-contain drop-shadow-md"
-          />
-        </div>
-      ),
+      icon: '/images/icon-illustrator.png',
     },
   ];
 
@@ -370,106 +353,123 @@ export const Hero: React.FC<HeroProps> = ({ settings, onWatchShowreel }) => {
         </div>
       </div>
 
-      {/* Bottom Ticker */}
-      <div
-        className="relative w-full shrink-0 overflow-hidden bg-[#C65D45] py-3 sm:py-3.5 border-t-2 border-b-2 border-[#2B170F] shadow-lg z-20"
-        style={{
-          boxShadow: [
-            /* Top inner glass highlight — bright white streak */
-            'inset 0 2px 0 0 rgba(255,255,255,0.28)',
-            /* Top inner soft glow */
-            'inset 0 4px 12px 0 rgba(255,255,255,0.08)',
-            /* Bottom inner dark shadow — depth */
-            'inset 0 -2px 0 0 rgba(43,23,15,0.35)',
-            /* Bottom inner deeper shadow */
-            'inset 0 -5px 14px 0 rgba(43,23,15,0.15)',
-            /* Outer drop shadow */
-            '0 4px 24px 0 rgba(43,23,15,0.25)',
-          ].join(', '),
-        }}
-      >
-
-        {/* Top edge glass stroke highlight */}
+      {/* Crime Scene Dual Crossed Ribbons */}
+      <div className="relative w-full shrink-0 overflow-hidden py-7 sm:py-9 lg:py-10 z-20 pointer-events-auto">
+        {/* Ribbon 1: Crime Scene Caution Tape (Tilted -2deg, moving left) */}
         <div
-          className="absolute top-0 left-0 right-0 h-[1.5px] pointer-events-none z-30"
-          style={{
-            background: 'linear-gradient(90deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.65) 50%, rgba(255,255,255,0.15) 100%)',
-            boxShadow: '0 1px 3px rgba(255,255,255,0.3)',
-          }}
-        />
-
-        {/* Bottom edge subtle glass stroke highlight */}
-        <div
-          className="absolute bottom-0 left-0 right-0 h-[1px] pointer-events-none z-30"
-          style={{
-            background: 'linear-gradient(90deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.35) 50%, rgba(255,255,255,0.05) 100%)',
-          }}
-        />
-
-        {/* Left glass fade edge with vertical glass stroke */}
-        <div
-          className="absolute left-0 top-0 h-full w-24 sm:w-36 z-20 pointer-events-none flex items-center justify-end"
-          style={{
-            background: 'linear-gradient(to right, rgba(198,93,69,1) 0%, rgba(198,93,69,0.85) 40%, rgba(198,93,69,0.4) 75%, transparent 100%)',
-            backdropFilter: 'blur(2px)',
-            WebkitBackdropFilter: 'blur(2px)',
-          }}
+          className="relative w-[118%] -left-[9%] bg-[#FFE500] py-2 sm:py-2.5 border-t-2 border-b-2 border-black transform -rotate-2 sm:-rotate-[2.2deg] shadow-md z-0 select-none"
         >
-          {/* Subtle vertical glass stroke at fade boundary */}
+          {/* Top hazard micro-stripes */}
           <div
-            className="w-[1px] h-full"
+            className="absolute top-0 left-0 right-0 h-[3px] pointer-events-none"
             style={{
-              background: 'linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0.35) 30%, rgba(255,255,255,0.5) 50%, rgba(255,255,255,0.35) 70%, rgba(255,255,255,0) 100%)',
-              boxShadow: '0 0 6px rgba(255,255,255,0.25)',
+              background:
+                'repeating-linear-gradient(45deg, #000 0, #000 6px, #FFE500 6px, #FFE500 12px)',
             }}
           />
-        </div>
-
-        {/* Right glass fade edge with vertical glass stroke */}
-        <div
-          className="absolute right-0 top-0 h-full w-24 sm:w-36 z-20 pointer-events-none flex items-center justify-start"
-          style={{
-            background: 'linear-gradient(to left, rgba(198,93,69,1) 0%, rgba(198,93,69,0.85) 40%, rgba(198,93,69,0.4) 75%, transparent 100%)',
-            backdropFilter: 'blur(2px)',
-            WebkitBackdropFilter: 'blur(2px)',
-          }}
-        >
-          {/* Subtle vertical glass stroke at fade boundary */}
+          {/* Bottom hazard micro-stripes */}
           <div
-            className="w-[1px] h-full"
+            className="absolute bottom-0 left-0 right-0 h-[3px] pointer-events-none"
             style={{
-              background: 'linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0.35) 30%, rgba(255,255,255,0.5) 50%, rgba(255,255,255,0.35) 70%, rgba(255,255,255,0) 100%)',
-              boxShadow: '0 0 6px rgba(255,255,255,0.25)',
+              background:
+                'repeating-linear-gradient(45deg, #000 0, #000 6px, #FFE500 6px, #FFE500 12px)',
             }}
           />
-        </div>
 
-        <div className="animate-marquee flex items-center whitespace-nowrap">
-          <div className="flex items-center gap-8 sm:gap-12 shrink-0 pr-8 sm:pr-12">
-            {tickerItems.map((item) => (
-              <div key={`track1-${item.id}`} className="flex items-center gap-6 sm:gap-8">
-                <div className="flex items-center gap-3">
-                  {item.icon}
-                  <span className="font-sans font-bold text-xs sm:text-sm md:text-base uppercase tracking-wider text-[#2B170F]">
+          <div className="animate-marquee flex items-center whitespace-nowrap">
+            <div className="flex items-center gap-6 sm:gap-8 shrink-0 pr-6 sm:pr-8">
+              {crimeSceneTape.map((item, idx) => (
+                <div key={`cs1-${idx}`} className="flex items-center gap-4 sm:gap-6">
+                  <span className="text-black font-black text-xs sm:text-sm select-none">{item.badge}</span>
+                  <span className="font-sans font-black text-[11px] sm:text-xs md:text-sm tracking-widest text-black uppercase">
                     {item.text}
                   </span>
                 </div>
-                <span className="text-[#2B170F] text-lg sm:text-xl font-black select-none">✳</span>
-              </div>
-            ))}
+              ))}
+            </div>
+            <div className="flex items-center gap-6 sm:gap-8 shrink-0 pr-6 sm:pr-8" aria-hidden="true">
+              {crimeSceneTape.map((item, idx) => (
+                <div key={`cs2-${idx}`} className="flex items-center gap-4 sm:gap-6">
+                  <span className="text-black font-black text-xs sm:text-sm select-none">{item.badge}</span>
+                  <span className="font-sans font-black text-[11px] sm:text-xs md:text-sm tracking-widest text-black uppercase">
+                    {item.text}
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="flex items-center gap-8 sm:gap-12 shrink-0 pr-8 sm:pr-12" aria-hidden="true">
-            {tickerItems.map((item) => (
-              <div key={`track2-${item.id}`} className="flex items-center gap-6 sm:gap-8">
-                <div className="flex items-center gap-3">
-                  {item.icon}
-                  <span className="font-sans font-bold text-xs sm:text-sm md:text-base uppercase tracking-wider text-[#2B170F]">
-                    {item.text}
-                  </span>
+        </div>
+
+        {/* Ribbon 2: Software Weapons / Evidence Arsenal Tape (Tilted +2deg, moving right, crossing over Ribbon 1) */}
+        <div
+          className="relative w-[118%] -left-[9%] bg-[#FFDE00] py-2 sm:py-2.5 border-t-2 border-b-2 border-black transform rotate-2 sm:rotate-[2.2deg] -mt-5 sm:-mt-6 z-10 select-none"
+          style={{
+            boxShadow:
+              '0 12px 28px -2px rgba(0,0,0,0.5), 0 4px 10px rgba(0,0,0,0.25)',
+          }}
+        >
+          {/* Top hazard micro-stripes */}
+          <div
+            className="absolute top-0 left-0 right-0 h-[3px] pointer-events-none"
+            style={{
+              background:
+                'repeating-linear-gradient(-45deg, #000 0, #000 6px, #FFDE00 6px, #FFDE00 12px)',
+            }}
+          />
+          {/* Bottom hazard micro-stripes */}
+          <div
+            className="absolute bottom-0 left-0 right-0 h-[3px] pointer-events-none"
+            style={{
+              background:
+                'repeating-linear-gradient(-45deg, #000 0, #000 6px, #FFDE00 6px, #FFDE00 12px)',
+            }}
+          />
+
+          <div className="animate-marquee-reverse flex items-center whitespace-nowrap">
+            <div className="flex items-center gap-6 sm:gap-8 shrink-0 pr-6 sm:pr-8">
+              {[...softwareEvidenceTape, ...softwareEvidenceTape].map((item, idx) => (
+                <div key={`sw1-${item.id}-${idx}`} className="flex items-center gap-4 sm:gap-6">
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <span className="text-[10px] sm:text-xs font-mono font-black px-1.5 py-0.5 bg-black text-[#FFE500] rounded">
+                      {item.label}
+                    </span>
+                    <div className="w-6 h-6 sm:w-7 sm:h-7 shrink-0 flex items-center justify-center">
+                      <img
+                        src={item.icon}
+                        alt={item.text}
+                        className="w-full h-full object-contain drop-shadow"
+                      />
+                    </div>
+                    <span className="font-sans font-black text-[11px] sm:text-xs md:text-sm tracking-wider text-black uppercase">
+                      {item.text}
+                    </span>
+                  </div>
+                  <span className="text-black font-black text-xs sm:text-sm select-none">///</span>
                 </div>
-                <span className="text-[#2B170F] text-lg sm:text-xl font-black select-none">✳</span>
-              </div>
-            ))}
+              ))}
+            </div>
+            <div className="flex items-center gap-6 sm:gap-8 shrink-0 pr-6 sm:pr-8" aria-hidden="true">
+              {[...softwareEvidenceTape, ...softwareEvidenceTape].map((item, idx) => (
+                <div key={`sw2-${item.id}-${idx}`} className="flex items-center gap-4 sm:gap-6">
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <span className="text-[10px] sm:text-xs font-mono font-black px-1.5 py-0.5 bg-black text-[#FFE500] rounded">
+                      {item.label}
+                    </span>
+                    <div className="w-6 h-6 sm:w-7 sm:h-7 shrink-0 flex items-center justify-center">
+                      <img
+                        src={item.icon}
+                        alt={item.text}
+                        className="w-full h-full object-contain drop-shadow"
+                      />
+                    </div>
+                    <span className="font-sans font-black text-[11px] sm:text-xs md:text-sm tracking-wider text-black uppercase">
+                      {item.text}
+                    </span>
+                  </div>
+                  <span className="text-black font-black text-xs sm:text-sm select-none">///</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
