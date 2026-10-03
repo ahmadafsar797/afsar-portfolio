@@ -2449,9 +2449,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
           onClose={() => setShowreelPickerOpen(false)}
           videoUrl={settings.featured_showreel_url}
           currentPoster={settings.featured_showreel_poster}
-          onSavePoster={(url) => {
+          onSavePoster={async (url) => {
             setSettings((prev) => ({ ...prev, featured_showreel_poster: url }));
-            showNotice('Thumbnail frame selected! Click "Save Settings" below to persist.');
+            try {
+              await api.updateSettings({ ...settings, featured_showreel_poster: url });
+              showNotice('Showreel thumbnail updated and saved successfully!');
+              onDataChanged();
+            } catch {
+              showNotice('Thumbnail frame selected! Click "Save Settings" below to persist.');
+            }
           }}
           title="Master Showreel"
         />

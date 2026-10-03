@@ -163,12 +163,7 @@ export const App: React.FC = () => {
         {/* Featured Showreel */}
         <Showreel
           settings={settings}
-          isAdminLoggedIn={isAdminLoggedIn}
           onOpenLightbox={(url, title, client) => openLightbox(url, title, client, 'Master Showreel')}
-          onPosterUpdated={(newPosterUrl) => {
-            setSettings((prev) => ({ ...prev, featured_showreel_poster: newPosterUrl }));
-            loadData();
-          }}
         />
 
         {/* Reels & Short-Form Section (9:16) */}
