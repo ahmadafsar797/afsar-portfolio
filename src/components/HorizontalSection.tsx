@@ -7,13 +7,7 @@ import { VideoAutoThumbnail } from './VideoAutoThumbnail';
 
 interface HorizontalSectionProps {
   videos: HorizontalVideo[];
-  onOpenLightbox: (
-    videoUrl: string,
-    title: string,
-    client?: string,
-    category?: string,
-    poster?: string
-  ) => void;
+  onOpenLightbox: (videoUrl: string, title: string, client?: string, category?: string) => void;
 }
 
 export const HorizontalSection: React.FC<HorizontalSectionProps> = ({ videos, onOpenLightbox }) => {
@@ -95,7 +89,7 @@ const HorizontalVideoCard: React.FC<HorizontalVideoCardProps> = ({ video, index,
       {/* 16:9 Video Canvas */}
       <div
         ref={videoBoxRef}
-        onClick={() => onOpenLightbox(video.video_url, video.title, undefined, video.category, video.thumbnail_url)}
+        onClick={() => onOpenLightbox(video.video_url, video.title, undefined, video.category)}
         onMouseMove={handlePlayMagnetic}
         onMouseLeave={handlePlayLeave}
         data-cursor="play"
@@ -139,7 +133,7 @@ const HorizontalVideoCard: React.FC<HorizontalVideoCardProps> = ({ video, index,
         </div>
 
         <h3
-          onClick={() => onOpenLightbox(video.video_url, video.title, undefined, video.category, video.thumbnail_url)}
+          onClick={() => onOpenLightbox(video.video_url, video.title, undefined, video.category)}
           className="font-pogonia text-3xl sm:text-4xl lg:text-5xl font-bold text-[#2B170F] group-hover:text-[#C65D45] transition-colors leading-[1.15] cursor-pointer mb-4"
         >
           {video.title}

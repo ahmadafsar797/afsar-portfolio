@@ -21,7 +21,6 @@ interface VideoModalProps {
   title: string;
   client?: string;
   category?: string;
-  poster?: string;
 }
 
 export const VideoModal: React.FC<VideoModalProps> = ({
@@ -31,7 +30,6 @@ export const VideoModal: React.FC<VideoModalProps> = ({
   title,
   client,
   category,
-  poster,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -40,8 +38,6 @@ export const VideoModal: React.FC<VideoModalProps> = ({
   const centerControlsTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [isPlaying, setIsPlaying] = useState(true);
-  const [isBuffering, setIsBuffering] = useState(false);
-  const [bufferedProgress, setBufferedProgress] = useState(0);
   const [isMuted, setIsMuted] = useState(false);
   const [volume, setVolume] = useState(1);
   const [progress, setProgress] = useState(0);
@@ -321,25 +317,7 @@ export const VideoModal: React.FC<VideoModalProps> = ({
     };
   }, [isOpen, videoUrl, playbackSpeed, resetControlsTimeout, showCenterBriefly]);
 
-  // Video buffer & time updates
-  const updateBufferedProgress = useCallback(() => {
-    if (!videoRef.current) return;
-    const v = videoRef.current;
-    if (v.buffered && v.buffered.length > 0 && v.duration > 0) {
-      let bEnd = 0;
-      for (let i = 0; i < v.buffered.length; i++) {
-        if (v.buffered.start(i) <= v.currentTime && v.buffered.end(i) >= v.currentTime) {
-          bEnd = v.buffered.end(i);
-          break;
-        }
-      }
-      if (bEnd === 0) {
-        bEnd = v.buffered.end(v.buffered.length - 1);
-      }
-      setBufferedProgress(Math.min(100, (bEnd / v.duration) * 100));
-    }
-  }, []);
-
+  // Video time updates
   const handleTimeUpdate = () => {
     if (!videoRef.current || isDragging) return;
     const cur = videoRef.current.currentTime;
@@ -348,7 +326,6 @@ export const VideoModal: React.FC<VideoModalProps> = ({
     setProgress((cur / dur) * 100);
     setCurrentTime(formatTime(cur));
     setRemainingTime(`-${formatTime(Math.max(0, dur - cur))}`);
-    updateBufferedProgress();
   };
 
   const handleLoadedMetadata = () => {
@@ -532,32 +509,14 @@ export const VideoModal: React.FC<VideoModalProps> = ({
             <video
               ref={videoRef}
               src={videoUrl}
-              poster={poster}
-              preload="auto"
               playsInline
               loop
               muted={isMuted}
               onTimeUpdate={handleTimeUpdate}
-              onProgress={updateBufferedProgress}
               onLoadedMetadata={handleLoadedMetadata}
-              onWaiting={() => setIsBuffering(true)}
-              onPlaying={() => setIsBuffering(false)}
-              onCanPlay={() => setIsBuffering(false)}
               onClick={togglePlay}
               className="cursor-pointer transition-all duration-300 w-full h-full max-w-full max-h-[100dvh] object-contain select-none mx-auto my-auto"
             />
-
-            {/* Buffering Indicator for Slow Connections */}
-            {isBuffering && (
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-30">
-                <div className="px-4 py-2.5 rounded-2xl bg-black/80 backdrop-blur-md border border-white/15 text-white flex items-center gap-2.5 shadow-2xl animate-in fade-in duration-200">
-                  <div className="w-4 h-4 border-2 border-[#C65D45] border-t-transparent rounded-full animate-spin" />
-                  <span className="text-xs font-mono font-medium tracking-wide text-white/90">
-                    Buffering High Quality...
-                  </span>
-                </div>
-              </div>
-            )}
 
             {/* Transient Central Ripple Feedback (+10s, -10s, Play, Paused) */}
             {feedback && (
@@ -632,7 +591,7 @@ export const VideoModal: React.FC<VideoModalProps> = ({
           }`}
         >
           <div className="max-w-6xl mx-auto space-y-3">
-              {/* Interactive Duration Timeline / Scrubber */}
+            {/* Interactive Duration Timeline / Scrubber */}
             <div
               ref={progressBarRef}
               onMouseDown={handleSeekMouseDown}
@@ -641,12 +600,6 @@ export const VideoModal: React.FC<VideoModalProps> = ({
               onMouseLeave={handleProgressMouseLeave}
               className="group/bar relative w-full h-2.5 hover:h-4 bg-white/20 hover:bg-white/30 rounded-full cursor-pointer transition-all duration-150 py-1 touch-none"
             >
-              {/* Buffer Progress (indicates buffered chunk on slow networks) */}
-              <div
-                className="absolute inset-y-1 left-0 bg-white/20 rounded-full pointer-events-none transition-[width] duration-200"
-                style={{ width: `${bufferedProgress}%` }}
-              />
-
               {/* Timestamp hover tooltip */}
               {hoverTime && (
                 <div

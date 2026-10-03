@@ -53,7 +53,6 @@ export const App: React.FC = () => {
     title: string;
     client?: string;
     category?: string;
-    poster?: string;
   }>({
     isOpen: false,
     videoUrl: '',
@@ -170,20 +169,13 @@ export const App: React.FC = () => {
     settings?.nav_font_weight,
   ]);
 
-  const openLightbox = (
-    videoUrl: string,
-    title: string,
-    client?: string,
-    category?: string,
-    poster?: string
-  ) => {
+  const openLightbox = (videoUrl: string, title: string, client?: string, category?: string) => {
     setLightboxState({
       isOpen: true,
       videoUrl,
       title,
       client,
       category,
-      poster,
     });
   };
 
@@ -230,8 +222,7 @@ export const App: React.FC = () => {
                 '/uploads/Cinematic_Reel_2-1791004710300-248821251.mp4',
               'Master Cinematic Showreel',
               'Afsar Ahmad Films',
-              'Showreel',
-              settings.featured_showreel_poster
+              'Showreel'
             )
           }
         />
@@ -239,9 +230,7 @@ export const App: React.FC = () => {
         {/* Featured Showreel */}
         <Showreel
           settings={settings}
-          onOpenLightbox={(url, title, client) =>
-            openLightbox(url, title, client, 'Master Showreel', settings.featured_showreel_poster)
-          }
+          onOpenLightbox={(url, title, client) => openLightbox(url, title, client, 'Master Showreel')}
         />
 
         {/* Reels & Short-Form Section (9:16) */}
@@ -269,8 +258,7 @@ export const App: React.FC = () => {
                 '/uploads/Cinematic_Reel_2-1791004710300-248821251.mp4',
               'Master Cinematic Showreel',
               'Afsar Ahmad Films',
-              'Showreel',
-              settings.featured_showreel_poster
+              'Showreel'
             )
           }
         />
@@ -294,7 +282,6 @@ export const App: React.FC = () => {
         title={lightboxState.title}
         client={lightboxState.client}
         category={lightboxState.category}
-        poster={lightboxState.poster}
       />
 
       {/* Interactive Admin Dashboard Panel */}

@@ -9,13 +9,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 interface TestimonialsSectionProps {
   testimonials: Testimonial[];
-  onOpenLightbox: (
-    videoUrl: string,
-    title: string,
-    client?: string,
-    category?: string,
-    poster?: string
-  ) => void;
+  onOpenLightbox: (videoUrl: string, title: string, client?: string) => void;
 }
 
 export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({ testimonials, onOpenLightbox }) => {
@@ -298,13 +292,7 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({ testim
 interface HorizontalTestimonialCardProps {
   item: Testimonial;
   index: number;
-  onOpenLightbox: (
-    videoUrl: string,
-    title: string,
-    client?: string,
-    category?: string,
-    poster?: string
-  ) => void;
+  onOpenLightbox: (videoUrl: string, title: string, client?: string) => void;
 }
 
 const HorizontalTestimonialCard: React.FC<HorizontalTestimonialCardProps> = ({
@@ -338,7 +326,7 @@ const HorizontalTestimonialCard: React.FC<HorizontalTestimonialCardProps> = ({
       {/* 9:16 Video Container (Proportionally sized to fit inside screen height without clipping) */}
       <div
         onClick={() =>
-          onOpenLightbox(item.video_url, `${item.client_name} - ${item.company}`, 'Video Testimonial', undefined, item.thumbnail_url)
+          onOpenLightbox(item.video_url, `${item.client_name} - ${item.company}`, 'Video Testimonial')
         }
         data-cursor="play"
         className="relative w-full h-[240px] sm:h-[285px] md:h-[315px] overflow-hidden bg-black cursor-pointer group/video rounded-t-3xl"
@@ -393,7 +381,7 @@ const HorizontalTestimonialCard: React.FC<HorizontalTestimonialCardProps> = ({
 
         <button
           onClick={() =>
-            onOpenLightbox(item.video_url, `${item.client_name} - ${item.company}`, 'Video Testimonial', undefined, item.thumbnail_url)
+            onOpenLightbox(item.video_url, `${item.client_name} - ${item.company}`, 'Video Testimonial')
           }
           data-cursor="play"
           className="group/story relative w-full py-3 rounded-full text-xs font-sans uppercase font-black tracking-wide text-[#FFF9F2] bg-gradient-to-r from-[#C65D45] via-[#D8684F] to-[#E2725B] shadow-[0_4px_18px_rgba(198,93,69,0.45),inset_0_1px_1px_rgba(255,255,255,0.35)] hover:shadow-[0_6px_28px_rgba(198,93,69,0.65)] hover:scale-[1.02] active:scale-95 transition-all duration-300 flex items-center justify-center gap-2 border border-[#E2725B]/40 cursor-pointer"

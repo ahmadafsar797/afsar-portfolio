@@ -23,104 +23,12 @@ const uploadsDir = path.join(__dirname, '..', 'uploads');
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
-// Specialized High-Performance Streaming Route for Uploaded Videos
-// Provides HTTP 206 Partial Content byte-range streaming & chunking for fast playback on slow networks
-const VIDEO_EXTS = new Set(['.mp4', '.webm', '.mov', '.m4v', '.ogg']);
-
-app.get('/uploads/:filename', (req, res, next) => {
-  const ext = path.extname(req.params.filename).toLowerCase();
-  if (!VIDEO_EXTS.has(ext)) {
-    return next(); // Let express.static handle images/documents
-  }
-
-  const filePath = path.join(uploadsDir, req.params.filename);
-  if (!fs.existsSync(filePath)) {
-    return next();
-  }
-
-  const stat = fs.statSync(filePath);
-  const fileSize = stat.size;
-  const range = req.headers.range;
-
-  const mimeTypes = {
-    '.mp4': 'video/mp4',
-    '.webm': 'video/webm',
-    '.mov': 'video/quicktime',
-    '.m4v': 'video/mp4',
-    '.ogg': 'video/ogg',
-  };
-  const contentType = mimeTypes[ext] || 'video/mp4';
-
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
-  res.setHeader('Accept-Ranges', 'bytes');
-  res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
-
-  if (range) {
-    const parts = range.replace(/bytes=/, '').split('-');
-    const start = parseInt(parts[0], 10);
-    // Use an optimal 2MB chunk buffer for open-ended ranges so slow networks start playing in milliseconds
-    const CHUNK_SIZE = 2 * 1024 * 1024;
-    const end = parts[1] ? parseInt(parts[1], 10) : Math.min(start + CHUNK_SIZE - 1, fileSize - 1);
-
-    if (start >= fileSize) {
-      res.status(416).setHeader('Content-Range', `bytes */${fileSize}`);
-      return res.end();
-    }
-
-    const chunkSize = end - start + 1;
-    res.writeHead(206, {
-      'Content-Range': `bytes ${start}-${end}/${fileSize}`,
-      'Accept-Ranges': 'bytes',
-      'Content-Length': chunkSize,
-      'Content-Type': contentType,
-    });
-
-    const stream = fs.createReadStream(filePath, { start, end });
-    stream.on('error', (err) => {
-      console.error('Video stream error:', err);
-      if (!res.headersSent) res.status(500).end();
-    });
-    stream.pipe(res);
-  } else {
-    res.writeHead(200, {
-      'Content-Length': fileSize,
-      'Content-Type': contentType,
-      'Accept-Ranges': 'bytes',
-    });
-    fs.createReadStream(filePath).pipe(res);
-  }
-});
-
-app.head('/uploads/:filename', (req, res, next) => {
-  const filePath = path.join(uploadsDir, req.params.filename);
-  if (!fs.existsSync(filePath)) return next();
-  const ext = path.extname(req.params.filename).toLowerCase();
-  const stat = fs.statSync(filePath);
-  const mimeTypes = {
-    '.mp4': 'video/mp4',
-    '.webm': 'video/webm',
-    '.mov': 'video/quicktime',
-    '.m4v': 'video/mp4',
-    '.ogg': 'video/ogg',
-  };
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
-  res.setHeader('Accept-Ranges', 'bytes');
-  res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
-  res.setHeader('Content-Length', stat.size);
-  if (mimeTypes[ext]) res.setHeader('Content-Type', mimeTypes[ext]);
-  res.status(200).end();
-});
-
 app.use(
   '/uploads',
   express.static(uploadsDir, {
     setHeaders: (res) => {
       res.setHeader('Access-Control-Allow-Origin', '*');
       res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
-      res.setHeader('Accept-Ranges', 'bytes');
-      res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
     },
   })
 );
