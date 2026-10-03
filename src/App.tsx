@@ -102,6 +102,47 @@ export const App: React.FC = () => {
     checkAdminToken();
   }, []);
 
+  // Dynamically ensure browser tab bar favicon uses the profile picture
+  useEffect(() => {
+    const picUrl = settings?.profile_picture_url || '/profile-picture.jpg';
+    if (!picUrl) return;
+
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.src = picUrl;
+    img.onload = () => {
+      try {
+        const canvas = document.createElement('canvas');
+        canvas.width = 64;
+        canvas.height = 64;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.beginPath();
+          ctx.arc(32, 32, 31, 0, Math.PI * 2);
+          ctx.closePath();
+          ctx.clip();
+          ctx.drawImage(img, 0, 0, 64, 64);
+          const circularUrl = canvas.toDataURL('image/png');
+          let link = document.querySelector("link[rel~='icon']") as HTMLLinkElement;
+          if (!link) {
+            link = document.createElement('link');
+            link.rel = 'icon';
+            document.head.appendChild(link);
+          }
+          link.type = 'image/png';
+          link.href = circularUrl;
+        }
+      } catch {
+        let link = document.querySelector("link[rel~='icon']") as HTMLLinkElement;
+        if (link) link.href = picUrl;
+      }
+    };
+    img.onerror = () => {
+      let link = document.querySelector("link[rel~='icon']") as HTMLLinkElement;
+      if (link) link.href = '/profile-picture.jpg';
+    };
+  }, [settings?.profile_picture_url]);
+
   const openLightbox = (videoUrl: string, title: string, client?: string, category?: string) => {
     setLightboxState({
       isOpen: true,
