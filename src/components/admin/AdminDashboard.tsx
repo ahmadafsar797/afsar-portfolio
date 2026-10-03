@@ -34,7 +34,6 @@ import {
   Service,
   AboutData,
   SettingsData,
-  ContactMessage,
 } from '../../types';
 import { isYouTubeUrl, getYouTubeThumbnail } from '../../utils/videoUtils';
 
@@ -52,7 +51,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
 
   // Active Admin Tab
   const [activeTab, setActiveTab] = useState<
-    'overview' | 'reels' | 'horizontal' | 'testimonials' | 'projects' | 'services' | 'about' | 'messages' | 'settings'
+    'overview' | 'reels' | 'horizontal' | 'testimonials' | 'projects' | 'services' | 'about' | 'settings'
   >('overview');
 
   // Loaded Data
@@ -63,7 +62,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
   const [services, setServices] = useState<Service[]>([]);
   const [about, setAbout] = useState<AboutData | null>(null);
   const [settings, setSettings] = useState<SettingsData>({});
-  const [messages, setMessages] = useState<ContactMessage[]>([]);
 
   // Feedback notifications
   const [notice, setNotice] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
@@ -169,7 +167,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
 
   const loadAllAdminData = async () => {
     try {
-      const [r, h, t, p, s, a, set, m] = await Promise.all([
+      const [r, h, t, p, s, a, set] = await Promise.all([
         api.getReels(),
         api.getHorizontalVideos(),
         api.getTestimonials(),
@@ -177,7 +175,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
         api.getServices(),
         api.getAbout(),
         api.getSettings(),
-        api.getMessages(),
       ]);
       setReels(r);
       setHorizontalVideos(h);
@@ -186,7 +183,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
       setServices(s);
       setAbout(a);
       setSettings(set);
-      setMessages(m);
     } catch (err) {
       console.error('Error loading admin data:', err);
     }
@@ -451,23 +447,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
               </button>
 
               <button
-                onClick={() => setActiveTab('messages')}
-                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-montserrat uppercase tracking-wider transition-all text-left whitespace-nowrap ${
-                  activeTab === 'messages' ? 'bg-[#C65D45] text-[#2B170F] font-bold font-medium shadow-md' : 'text-white/70 hover:bg-white/5 hover:text-white'
-                }`}
-              >
-                <div className="flex items-center gap-2.5">
-                  <Inbox className="w-4 h-4" />
-                  <span>Inquiries</span>
-                </div>
-                {messages.filter((m) => m.status === 'unread').length > 0 && (
-                  <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-500 text-black font-bold font-montserrat">
-                    {messages.filter((m) => m.status === 'unread').length}
-                  </span>
-                )}
-              </button>
-
-              <button
                 onClick={() => setActiveTab('settings')}
                 className={`w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-xs font-montserrat uppercase tracking-wider transition-all text-left whitespace-nowrap ${
                   activeTab === 'settings' ? 'bg-[#C65D45] text-[#2B170F] font-bold font-medium shadow-md' : 'text-white/70 hover:bg-white/5 hover:text-white'
@@ -513,43 +492,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                       </div>
                     </div>
                     <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/10">
-                      <span className="text-xs text-white/50 font-montserrat uppercase">Client Leads</span>
+                      <span className="text-xs text-white/50 font-montserrat uppercase">Case Studies</span>
                       <div className="font-pogonia text-4xl text-[#C65D45] font-semibold mt-1">
-                        {messages.length}
+                        {projects.length}
                       </div>
-                    </div>
-                  </div>
-
-                  {/* Recent messages summary */}
-                  <div className="p-6 rounded-2xl bg-[#0f0f18] border border-white/10">
-                    <div className="flex items-center justify-between mb-4">
-                      <h4 className="font-pogonia text-xl font-normal text-white">
-                        Latest Client Inquiries
-                      </h4>
-                      <button
-                        onClick={() => setActiveTab('messages')}
-                        className="text-xs text-[#C65D45] hover:underline font-montserrat uppercase"
-                      >
-                        View All
-                      </button>
-                    </div>
-
-                    <div className="space-y-3">
-                      {messages.slice(0, 3).map((m) => (
-                        <div
-                          key={m.id}
-                          className="p-3.5 rounded-xl bg-white/5 border border-white/5 flex items-center justify-between text-xs"
-                        >
-                          <div>
-                            <div className="font-semibold text-white">{m.name} ({m.company || 'Direct'})</div>
-                            <div className="text-white/50 mt-0.5 line-clamp-1">{m.message}</div>
-                          </div>
-                          <div className="text-right">
-                            <span className="text-[#C65D45] font-montserrat">{m.project_type}</span>
-                            <div className="text-[10px] text-white/40">{m.budget}</div>
-                          </div>
-                        </div>
-                      ))}
                     </div>
                   </div>
                 </div>
@@ -1934,146 +1880,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                 </div>
               )}
 
-              {/* TAB 8: MESSAGES */}
-              {activeTab === 'messages' && (
-                <div className="space-y-6">
-                  <div>
-                    <h3 className="font-pogonia text-3xl font-normal text-white">
-                      Client Inquiries Inbox
-                    </h3>
-                    <p className="text-xs text-white/50">
-                      Messages submitted by prospective clients through the contact section.
-                    </p>
-                  </div>
-
-                  <div className="space-y-4">
-                    {messages.length === 0 ? (
-                      <p className="text-white/40 text-sm">No inquiries in inbox yet.</p>
-                    ) : (
-                      messages.map((m) => (
-                        <div
-                          key={m.id}
-                          className={`p-5 rounded-2xl border transition-all ${
-                            m.status === 'unread'
-                              ? 'bg-[#141420] border-[#C65D45]/50 shadow-lg'
-                              : 'bg-[#0e0e15] border-white/10'
-                          }`}
-                        >
-                          <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
-                            <div className="flex items-center gap-3">
-                              <span className="font-pogonia text-2xl text-white">{m.name}</span>
-                              {m.company && (
-                                <span className="text-xs font-montserrat uppercase text-[#C65D45]">
-                                  • {m.company}
-                                </span>
-                              )}
-                              <span
-                                className={`text-[10px] font-montserrat uppercase px-2.5 py-0.5 rounded-full ${
-                                  m.status === 'unread'
-                                    ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                                    : 'bg-white/10 text-white/60'
-                                }`}
-                              >
-                                {m.status}
-                              </span>
-                            </div>
-
-                            <span className="text-xs text-white/40 font-montserrat">
-                              {m.created_at ? new Date(m.created_at).toLocaleDateString() : ''}
-                            </span>
-                          </div>
-
-                          <div className="flex flex-wrap gap-4 text-xs text-white/70 mb-3">
-                            <div>
-                              <span className="text-white/40 font-montserrat uppercase mr-1">Email:</span>
-                              <a href={`mailto:${m.email}`} className="text-[#C65D45] underline">
-                                {m.email}
-                              </a>
-                            </div>
-                            <div>
-                              <span className="text-white/40 font-montserrat uppercase mr-1">Project Type:</span>
-                              <span className="text-white">{m.project_type}</span>
-                            </div>
-                            <div>
-                              <span className="text-white/40 font-montserrat uppercase mr-1">Budget:</span>
-                              <span className="text-emerald-400 font-semibold">{m.budget}</span>
-                            </div>
-                          </div>
-
-                          {m.brief_url && (
-                            <div className="mb-3 text-xs">
-                              <span className="text-white/40 font-montserrat uppercase mr-1">Brief / Footage Link:</span>
-                              <a
-                                href={m.brief_url}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="text-[#C65D45] underline inline-flex items-center gap-1"
-                              >
-                                <span>{m.brief_url}</span>
-                                <ExternalLink className="w-3 h-3" />
-                              </a>
-                            </div>
-                          )}
-
-                          <div className="p-3.5 rounded-xl bg-black/40 border border-white/5 text-sm text-white/80 font-light leading-relaxed mb-4">
-                            {m.message}
-                          </div>
-
-                          <div className="flex items-center justify-between pt-2 border-t border-white/5">
-                            <div className="flex items-center gap-2">
-                              {m.status === 'unread' ? (
-                                <button
-                                  onClick={async () => {
-                                    await api.updateMessageStatus(m.id, 'read');
-                                    showNotice('Marked as read');
-                                    loadAllAdminData();
-                                  }}
-                                  className="text-xs px-3 py-1 rounded-full bg-white/5 hover:bg-white/10 text-white/80 border border-white/10 font-montserrat uppercase"
-                                >
-                                  Mark As Read
-                                </button>
-                              ) : (
-                                <button
-                                  onClick={async () => {
-                                    await api.updateMessageStatus(m.id, 'unread');
-                                    showNotice('Marked as unread');
-                                    loadAllAdminData();
-                                  }}
-                                  className="text-xs px-3 py-1 rounded-full bg-white/5 hover:bg-white/10 text-white/60 border border-white/10 font-montserrat uppercase"
-                                >
-                                  Mark Unread
-                                </button>
-                              )}
-
-                              <a
-                                href={`mailto:${m.email}?subject=RE: Video Editing Inquiry - ${m.project_type}`}
-                                className="text-xs px-3 py-1 rounded-full bg-[#C65D45]/20 hover:bg-[#C65D45]/30 text-[#C65D45] border border-[#C65D45]/30 font-montserrat uppercase"
-                              >
-                                Reply Via Email
-                              </a>
-                            </div>
-
-                            <button
-                              onClick={async () => {
-                                if (confirm('Delete this message?')) {
-                                  await api.deleteMessage(m.id);
-                                  showNotice('Message deleted');
-                                  loadAllAdminData();
-                                }
-                              }}
-                              className="text-white/40 hover:text-red-400 p-1.5"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </div>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* TAB 9: SETTINGS */}
+              {/* TAB 8: SETTINGS */}
               {activeTab === 'settings' && (
                 <div className="space-y-6 max-w-3xl">
                   <div>
