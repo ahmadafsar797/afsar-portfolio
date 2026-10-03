@@ -206,6 +206,108 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
     }
   };
 
+  // Helper to extract a high-quality frame from a video file in the browser
+  const extractFrameFromVideoFile = (file: File): Promise<Blob | null> => {
+    return new Promise((resolve) => {
+      try {
+        const url = URL.createObjectURL(file);
+        const video = document.createElement('video');
+        video.preload = 'metadata';
+        video.muted = true;
+        video.playsInline = true;
+        video.src = url;
+
+        let done = false;
+        const cleanup = () => {
+          if (!done) {
+            done = true;
+            URL.revokeObjectURL(url);
+          }
+        };
+
+        const capture = () => {
+          if (done) return;
+          try {
+            const w = video.videoWidth || 640;
+            const h = video.videoHeight || 360;
+            const canvas = document.createElement('canvas');
+            canvas.width = Math.min(w, 720);
+            canvas.height = Math.round((canvas.width * h) / w);
+            const ctx = canvas.getContext('2d');
+            if (ctx) {
+              ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+              canvas.toBlob((blob) => {
+                cleanup();
+                resolve(blob);
+              }, 'image/jpeg', 0.85);
+              return;
+            }
+          } catch {
+            // ignore
+          }
+          cleanup();
+          resolve(null);
+        };
+
+        video.addEventListener('loadeddata', () => {
+          if (video.duration && isFinite(video.duration) && video.duration > 1) {
+            video.currentTime = Math.min(1.0, video.duration * 0.15);
+          } else {
+            capture();
+          }
+        }, { once: true });
+
+        video.addEventListener('seeked', capture, { once: true });
+        video.addEventListener('error', () => {
+          cleanup();
+          resolve(null);
+        }, { once: true });
+
+        setTimeout(() => {
+          if (!done) {
+            cleanup();
+            resolve(null);
+          }
+        }, 3500);
+
+        video.load();
+      } catch {
+        resolve(null);
+      }
+    });
+  };
+
+  // Video upload with instant auto-generated thumbnail
+  const handleVideoUploadWithAutoThumb = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+    onSuccess: (videoUrl: string, autoThumbUrl?: string) => void
+  ) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      showNotice('Uploading video & generating instant thumbnail...');
+      const videoRes = await api.uploadFile(file);
+      let autoThumbUrl: string | undefined;
+
+      try {
+        const thumbBlob = await extractFrameFromVideoFile(file);
+        if (thumbBlob) {
+          const safeName = file.name.replace(/\.[^/.]+$/, '').replace(/[^a-zA-Z0-9_-]/g, '_');
+          const thumbFile = new File([thumbBlob], `${safeName}-thumb.jpg`, { type: 'image/jpeg' });
+          const thumbRes = await api.uploadFile(thumbFile);
+          autoThumbUrl = thumbRes.url;
+        }
+      } catch {
+        // Thumbnail extraction is best-effort; video is already uploaded
+      }
+
+      onSuccess(videoRes.url, autoThumbUrl);
+      showNotice('Video and thumbnail ready!');
+    } catch (err: any) {
+      showNotice(err.message || 'Failed to upload video', 'error');
+    }
+  };
+
   const handleProfilePicUpload = async (file: File) => {
     setProfilePicUploading(true);
     // Show local preview immediately
@@ -675,7 +777,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                               accept="video/*"
                               className="hidden"
                               onChange={(e) =>
-                                handleFileUpload(e, (url) => setEditingReel({ ...editingReel, video_url: url }))
+                                handleVideoUploadWithAutoThumb(e, (videoUrl, autoThumbUrl) => {
+                                  setEditingReel((prev) =>
+                                    prev
+                                      ? {
+                                          ...prev,
+                                          video_url: videoUrl,
+                                          thumbnail_url: prev.thumbnail_url || autoThumbUrl || '',
+                                        }
+                                      : null
+                                  );
+                                })
                               }
                             />
                           </label>
@@ -940,9 +1052,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                               accept="video/*"
                               className="hidden"
                               onChange={(e) =>
-                                handleFileUpload(e, (url) =>
-                                  setEditingHorizontal({ ...editingHorizontal, video_url: url })
-                                )
+                                handleVideoUploadWithAutoThumb(e, (videoUrl, autoThumbUrl) => {
+                                  setEditingHorizontal((prev) =>
+                                    prev
+                                      ? {
+                                          ...prev,
+                                          video_url: videoUrl,
+                                          thumbnail_url: prev.thumbnail_url || autoThumbUrl || '',
+                                        }
+                                      : null
+                                  );
+                                })
                               }
                             />
                           </label>
