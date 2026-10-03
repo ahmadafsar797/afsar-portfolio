@@ -417,7 +417,8 @@ export const VideoModal: React.FC<VideoModalProps> = ({
       ref={containerRef}
       onMouseMove={handleMouseMove}
       onClick={resetControlsTimeout}
-      className="fixed inset-0 z-[99999] w-screen h-screen bg-black overflow-hidden select-none font-montserrat animate-in fade-in duration-200"
+      className="fixed inset-0 z-[99999] w-full h-[100dvh] max-h-[100dvh] bg-black overflow-hidden select-none font-montserrat animate-in fade-in duration-200"
+      style={{ height: '100dvh' }}
     >
       {/* Ambient background glow matching the video */}
       <div className="absolute inset-0 pointer-events-none opacity-20 overflow-hidden blur-3xl scale-125">
@@ -439,7 +440,7 @@ export const VideoModal: React.FC<VideoModalProps> = ({
 
       {/* ── TOP HEADER BAR: TITLE, METADATA & CUT / CLOSE BUTTON (Overlay) ────────────── */}
       <header
-        className={`absolute top-0 inset-x-0 z-50 w-full px-4 sm:px-8 py-3.5 sm:py-5 flex items-center justify-between bg-gradient-to-b from-black/90 via-black/40 to-transparent transition-opacity duration-300 ${
+        className={`absolute top-0 inset-x-0 z-50 w-full px-4 sm:px-8 py-3.5 sm:py-5 pt-[max(0.875rem,env(safe-area-inset-top))] flex items-center justify-between bg-gradient-to-b from-black/90 via-black/40 to-transparent transition-opacity duration-300 ${
           showControls || isYt ? 'opacity-100' : 'opacity-0 pointer-events-none'
         }`}
       >
@@ -485,27 +486,31 @@ export const VideoModal: React.FC<VideoModalProps> = ({
         </div>
       </header>
 
-      {/* ── CENTRAL FULLSCREEN VIDEO STAGE (Full Viewport Edge-to-Edge) ─────────── */}
+      {/* ── CENTRAL FULLSCREEN VIDEO STAGE (Full Viewport Auto-Adjusted) ─────────── */}
       <main className="absolute inset-0 w-full h-full flex items-center justify-center overflow-hidden">
         {isYt ? (
           <div
-            className={`relative flex items-center justify-center w-full h-full ${
-              isShortOrVertical ? 'max-w-none sm:max-w-[440px] h-full sm:h-auto' : 'max-w-6xl'
-            }`}
+            className="relative flex items-center justify-center w-full h-full p-2 sm:p-4"
           >
-            <iframe
-              src={getYouTubeEmbedUrl(videoUrl, true) || ''}
-              title={title || 'YouTube Video'}
-              className={`w-full ${
-                isShortOrVertical ? 'h-full sm:h-auto sm:aspect-9-16 sm:max-h-[95vh]' : 'aspect-16-9 max-h-[88vh]'
-              } sm:rounded-2xl shadow-2xl border-0 sm:border sm:border-white/15 bg-black`}
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              allowFullScreen
-            />
+            <div
+              className={`relative w-full flex items-center justify-center ${
+                isShortOrVertical
+                  ? 'max-w-[420px] aspect-[9/16] max-h-[85dvh]'
+                  : 'max-w-5xl aspect-video max-h-[85dvh]'
+              }`}
+            >
+              <iframe
+                src={getYouTubeEmbedUrl(videoUrl, true) || ''}
+                title={title || 'YouTube Video'}
+                className="w-full h-full rounded-xl sm:rounded-2xl shadow-2xl border-0 sm:border sm:border-white/15 bg-black"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+              />
+            </div>
           </div>
         ) : (
           <>
-            {/* True Fullscreen Video Canvas */}
+            {/* Auto-Adjusted Responsive Video Canvas (Fits mobile Chrome & all screen aspect ratios) */}
             <video
               ref={videoRef}
               src={videoUrl}
@@ -515,11 +520,7 @@ export const VideoModal: React.FC<VideoModalProps> = ({
               onTimeUpdate={handleTimeUpdate}
               onLoadedMetadata={handleLoadedMetadata}
               onClick={togglePlay}
-              className={`cursor-pointer transition-all duration-300 ${
-                isShortOrVertical
-                  ? 'w-full h-full object-cover sm:object-contain sm:h-full sm:w-auto sm:max-h-screen sm:aspect-9-16'
-                  : 'w-full h-full max-w-7xl max-h-screen object-contain'
-              }`}
+              className="cursor-pointer transition-all duration-300 w-full h-full max-w-full max-h-[100dvh] object-contain select-none mx-auto my-auto"
             />
 
             {/* Transient Central Ripple Feedback (+10s, -10s, Play, Paused) */}
@@ -588,7 +589,7 @@ export const VideoModal: React.FC<VideoModalProps> = ({
       {/* ── BOTTOM DURATION & CONTROL DECK (HTML5 Videos only - Floating Overlay) ─────────── */}
       {!isYt && (
         <footer
-          className={`absolute bottom-0 inset-x-0 z-50 w-full px-4 sm:px-8 pb-4 pt-12 sm:pb-6 bg-gradient-to-t from-black/95 via-black/60 to-transparent transition-opacity duration-300 ${
+          className={`absolute bottom-0 inset-x-0 z-50 w-full px-4 sm:px-8 pb-4 sm:pb-6 pb-[max(1rem,env(safe-area-inset-bottom))] pt-12 bg-gradient-to-t from-black/95 via-black/60 to-transparent transition-opacity duration-300 ${
             showControls || !isPlaying
               ? 'opacity-100'
               : 'opacity-0 pointer-events-none'
@@ -741,7 +742,7 @@ export const VideoModal: React.FC<VideoModalProps> = ({
 
                 {/* Bottom Back Button for Quick Access */}
                 <button
-                  onClick={onClose}
+                  onClick={handleManualClose}
                   className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-500/20 hover:bg-red-500 text-red-200 hover:text-white transition-all text-xs font-bold cursor-pointer border border-red-500/30"
                   title="Back / Exit Video (Esc)"
                 >
