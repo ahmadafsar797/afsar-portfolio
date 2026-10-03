@@ -102,12 +102,19 @@ export interface SettingsData {
   twitter_url?: string;
   profile_picture_url?: string;
   heading_font?: string;
+  heading_font_weight?: string;
   body_font?: string;
+  body_font_weight?: string;
   hero_title_font?: string;
+  hero_title_font_weight?: string;
   section_title_font?: string;
+  section_title_font_weight?: string;
   cta_font?: string;
+  cta_font_weight?: string;
   badge_font?: string;
+  badge_font_weight?: string;
   nav_font?: string;
+  nav_font_weight?: string;
 }
 
 export interface ContactMessage {

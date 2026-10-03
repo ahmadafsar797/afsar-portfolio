@@ -31,7 +31,7 @@ import {
 } from 'lucide-react';
 import { VideoFramePickerModal } from '../VideoFramePickerModal';
 import { api } from '../../services/api';
-import { FONT_FAMILIES, applyDynamicFonts } from '../../utils/fontLoader';
+import { FONT_FAMILIES, FONT_WEIGHT_OPTIONS, applyDynamicFonts } from '../../utils/fontLoader';
 import {
   Reel,
   HorizontalVideo,
@@ -234,7 +234,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-xl p-3 sm:p-6 animate-in fade-in duration-200">
+    <div data-font-ignore="true" className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-xl p-3 sm:p-6 animate-in fade-in duration-200">
       <div className="relative w-full max-w-6xl h-[90vh] bg-[#0c0c12] border border-white/15 rounded-3xl shadow-2xl flex flex-col overflow-hidden text-white">
         {/* Top Title Bar */}
         <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between bg-[#0e0e16]">
@@ -1754,16 +1754,23 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                             const updated = {
                               ...settings,
                               heading_font: 'Pogonia',
+                              heading_font_weight: '700',
                               body_font: 'Montserrat',
+                              body_font_weight: '400',
                               hero_title_font: '',
+                              hero_title_font_weight: '',
                               section_title_font: '',
+                              section_title_font_weight: '',
                               cta_font: '',
+                              cta_font_weight: '',
                               badge_font: '',
+                              badge_font_weight: '',
                               nav_font: '',
+                              nav_font_weight: '',
                             };
                             setSettings(updated);
                             applyDynamicFonts(updated);
-                            showNotice('Reset all fonts to default (Pogonia & Montserrat)');
+                            showNotice('Reset all fonts and weights to default (Pogonia Bold & Montserrat Regular)');
                           }}
                           className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-xs text-white/70 hover:text-[#C65D45] transition-all flex items-center gap-1.5 cursor-pointer"
                         >
@@ -1778,25 +1785,32 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                       <div className="flex items-center gap-2 text-xs text-white/70">
                         <Sparkles className="w-4 h-4 text-[#C65D45]" />
                         <span className="font-semibold text-white">Quick Actions:</span>
-                        <span className="text-white/40 hidden sm:inline">Apply one unified font across all elements with one click</span>
+                        <span className="text-white/40 hidden sm:inline">Apply unified font style across all elements</span>
                       </div>
                       <div className="flex flex-wrap items-center gap-2">
                         <button
                           type="button"
                           onClick={() => {
                             const font = settings.heading_font || 'Pogonia';
+                            const weight = settings.heading_font_weight || '700';
                             const updated = {
                               ...settings,
                               body_font: font,
+                              body_font_weight: weight,
                               hero_title_font: font,
+                              hero_title_font_weight: weight,
                               section_title_font: font,
+                              section_title_font_weight: weight,
                               cta_font: font,
+                              cta_font_weight: weight,
                               badge_font: font,
+                              badge_font_weight: weight,
                               nav_font: font,
+                              nav_font_weight: weight,
                             };
                             setSettings(updated);
                             applyDynamicFonts(updated);
-                            showNotice(`Applied "${font}" to EVERY element on website!`);
+                            showNotice(`Applied "${font} (${weight})" to EVERY element on website!`);
                           }}
                           className="px-3 py-1 rounded-lg bg-white/5 hover:bg-[#C65D45]/20 hover:border-[#C65D45]/40 border border-white/10 text-[11px] text-white/80 hover:text-white transition-all cursor-pointer"
                         >
@@ -1806,18 +1820,25 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                           type="button"
                           onClick={() => {
                             const font = settings.body_font || 'Montserrat';
+                            const weight = settings.body_font_weight || '400';
                             const updated = {
                               ...settings,
                               heading_font: font,
+                              heading_font_weight: weight,
                               hero_title_font: font,
+                              hero_title_font_weight: weight,
                               section_title_font: font,
+                              section_title_font_weight: weight,
                               cta_font: font,
+                              cta_font_weight: weight,
                               badge_font: font,
+                              badge_font_weight: weight,
                               nav_font: font,
+                              nav_font_weight: weight,
                             };
                             setSettings(updated);
                             applyDynamicFonts(updated);
-                            showNotice(`Applied "${font}" to EVERY element on website!`);
+                            showNotice(`Applied "${font} (${weight})" to EVERY element on website!`);
                           }}
                           className="px-3 py-1 rounded-lg bg-white/5 hover:bg-[#C65D45]/20 hover:border-[#C65D45]/40 border border-white/10 text-[11px] text-white/80 hover:text-white transition-all cursor-pointer"
                         >
@@ -1829,14 +1850,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                             const updated = {
                               ...settings,
                               hero_title_font: '',
+                              hero_title_font_weight: '',
                               section_title_font: '',
+                              section_title_font_weight: '',
                               cta_font: '',
+                              cta_font_weight: '',
                               badge_font: '',
+                              badge_font_weight: '',
                               nav_font: '',
+                              nav_font_weight: '',
                             };
                             setSettings(updated);
                             applyDynamicFonts(updated);
-                            showNotice('Cleared all specific overrides. All elements now inherit global fonts.');
+                            showNotice('Cleared all specific overrides. All elements now inherit global fonts & weights.');
                           }}
                           className="px-3 py-1 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-[11px] text-white/50 hover:text-white transition-all cursor-pointer"
                         >
@@ -1850,7 +1876,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                       <div className="flex items-center gap-2">
                         <span className="w-2 h-2 rounded-full bg-[#C65D45]" />
                         <h5 className="text-xs font-montserrat uppercase font-bold tracking-wider text-white">
-                          Part 1: Global Base Fonts (Defaults)
+                          Part 1: Global Base Fonts & Weights (Defaults)
                         </h5>
                       </div>
 
@@ -1867,12 +1893,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                                 <span className="text-[10px] text-white/40 block">Default for all H1, H2, H3</span>
                               </div>
                             </div>
-                            <span className="text-[10px] text-[#C65D45] font-mono px-2 py-0.5 rounded bg-[#C65D45]/10 border border-[#C65D45]/20">
-                              {settings.heading_font || 'Pogonia (Default)'}
-                            </span>
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-[10px] text-[#C65D45] font-mono px-2 py-0.5 rounded bg-[#C65D45]/10 border border-[#C65D45]/20">
+                                {settings.heading_font || 'Pogonia'}
+                              </span>
+                              <span className="text-[10px] text-white/70 font-mono px-1.5 py-0.5 rounded bg-white/5 border border-white/10">
+                                {settings.heading_font_weight || '700'}
+                              </span>
+                            </div>
                           </div>
 
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                             <div>
                               <label className="block text-[10px] text-white/50 mb-1 font-mono uppercase">Font Family:</label>
                               <select
@@ -1897,7 +1928,26 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                               </select>
                             </div>
                             <div>
-                              <label className="block text-[10px] text-white/50 mb-1 font-mono uppercase">Or Type Any Font:</label>
+                              <label className="block text-[10px] text-white/50 mb-1 font-mono uppercase">Font Weight:</label>
+                              <select
+                                value={settings.heading_font_weight || '700'}
+                                onChange={(e) => {
+                                  const val = e.target.value;
+                                  const updated = { ...settings, heading_font_weight: val };
+                                  setSettings(updated);
+                                  applyDynamicFonts(updated);
+                                }}
+                                className="w-full px-2.5 py-1.5 rounded-lg bg-[#181822] border border-white/15 text-xs text-white cursor-pointer focus:border-[#C65D45] outline-none"
+                              >
+                                {FONT_WEIGHT_OPTIONS.map((w) => (
+                                  <option key={w.value} value={w.value}>
+                                    {w.label}
+                                  </option>
+                                ))}
+                              </select>
+                            </div>
+                            <div>
+                              <label className="block text-[10px] text-white/50 mb-1 font-mono uppercase">Or Custom Font:</label>
                               <input
                                 type="text"
                                 value={settings.heading_font || ''}
@@ -1907,15 +1957,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                                   setSettings(updated);
                                   applyDynamicFonts(updated);
                                 }}
-                                placeholder="e.g. Syne, Cinzel, Space Grotesk"
+                                placeholder="e.g. Syne, Cinzel..."
                                 className="w-full px-2.5 py-1.5 rounded-lg bg-black border border-white/15 text-xs text-white focus:border-[#C65D45] outline-none"
                               />
                             </div>
                           </div>
 
                           <div
-                            className="pt-2 border-t border-white/5 text-lg font-bold text-white truncate"
-                            style={{ fontFamily: `'${settings.heading_font || 'Pogonia'}', 'Pogonia', serif` }}
+                            className="pt-2 border-t border-white/5 text-lg text-white truncate"
+                            style={{
+                              fontFamily: `'${settings.heading_font || 'Pogonia'}', 'Pogonia', serif`,
+                              fontWeight: Number(settings.heading_font_weight) || 700,
+                            }}
                           >
                             Cinematic Storytelling & Visual Pace
                           </div>
@@ -1933,12 +1986,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                                 <span className="text-[10px] text-white/40 block">Default for paragraphs & descriptions</span>
                               </div>
                             </div>
-                            <span className="text-[10px] text-[#C65D45] font-mono px-2 py-0.5 rounded bg-[#C65D45]/10 border border-[#C65D45]/20">
-                              {settings.body_font || 'Montserrat (Default)'}
-                            </span>
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-[10px] text-[#C65D45] font-mono px-2 py-0.5 rounded bg-[#C65D45]/10 border border-[#C65D45]/20">
+                                {settings.body_font || 'Montserrat'}
+                              </span>
+                              <span className="text-[10px] text-white/70 font-mono px-1.5 py-0.5 rounded bg-white/5 border border-white/10">
+                                {settings.body_font_weight || '400'}
+                              </span>
+                            </div>
                           </div>
 
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                             <div>
                               <label className="block text-[10px] text-white/50 mb-1 font-mono uppercase">Font Family:</label>
                               <select
@@ -1963,7 +2021,26 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                               </select>
                             </div>
                             <div>
-                              <label className="block text-[10px] text-white/50 mb-1 font-mono uppercase">Or Type Any Font:</label>
+                              <label className="block text-[10px] text-white/50 mb-1 font-mono uppercase">Font Weight:</label>
+                              <select
+                                value={settings.body_font_weight || '400'}
+                                onChange={(e) => {
+                                  const val = e.target.value;
+                                  const updated = { ...settings, body_font_weight: val };
+                                  setSettings(updated);
+                                  applyDynamicFonts(updated);
+                                }}
+                                className="w-full px-2.5 py-1.5 rounded-lg bg-[#181822] border border-white/15 text-xs text-white cursor-pointer focus:border-[#C65D45] outline-none"
+                              >
+                                {FONT_WEIGHT_OPTIONS.map((w) => (
+                                  <option key={w.value} value={w.value}>
+                                    {w.label}
+                                  </option>
+                                ))}
+                              </select>
+                            </div>
+                            <div>
+                              <label className="block text-[10px] text-white/50 mb-1 font-mono uppercase">Or Custom Font:</label>
                               <input
                                 type="text"
                                 value={settings.body_font || ''}
@@ -1973,7 +2050,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                                   setSettings(updated);
                                   applyDynamicFonts(updated);
                                 }}
-                                placeholder="e.g. Inter, Poppins, Plus Jakarta Sans"
+                                placeholder="e.g. Inter, Poppins..."
                                 className="w-full px-2.5 py-1.5 rounded-lg bg-black border border-white/15 text-xs text-white focus:border-[#C65D45] outline-none"
                               />
                             </div>
@@ -1981,7 +2058,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
 
                           <div
                             className="pt-2 border-t border-white/5 text-xs text-white/70 line-clamp-1"
-                            style={{ fontFamily: `'${settings.body_font || 'Montserrat'}', 'Montserrat', sans-serif` }}
+                            style={{
+                              fontFamily: `'${settings.body_font || 'Montserrat'}', 'Montserrat', sans-serif`,
+                              fontWeight: Number(settings.body_font_weight) || 400,
+                            }}
                           >
                             Pacing, rhythm, and color science that elevate raw footage into a compelling narrative world.
                           </div>
@@ -1995,11 +2075,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                         <div className="flex items-center gap-2">
                           <span className="w-2 h-2 rounded-full bg-[#ffba3b]" />
                           <h5 className="text-xs font-montserrat uppercase font-bold tracking-wider text-white">
-                            Part 2: Specific Element Overrides
+                            Part 2: Specific Element Overrides (Fonts & Weights)
                           </h5>
                         </div>
                         <span className="text-[11px] text-white/40">
-                          Leave on "Inherit" to use default font
+                          Leave on "Inherit" to use global default
                         </span>
                       </div>
 
@@ -2016,30 +2096,60 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                                 <span className="text-[10px] text-white/40 block">Big headline in top banner</span>
                               </div>
                             </div>
-                            <span className="text-[10px] text-white/60 font-mono px-1.5 py-0.5 rounded bg-white/5">
-                              {settings.hero_title_font || 'Inherit'}
-                            </span>
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-[10px] text-white/60 font-mono px-1.5 py-0.5 rounded bg-white/5">
+                                {settings.hero_title_font || 'Inherit'}
+                              </span>
+                              {settings.hero_title_font_weight && (
+                                <span className="text-[10px] text-[#ffba3b] font-mono px-1.5 py-0.5 rounded bg-white/5">
+                                  {settings.hero_title_font_weight}
+                                </span>
+                              )}
+                            </div>
                           </div>
 
-                          <select
-                            value={settings.hero_title_font || 'inherit'}
-                            onChange={(e) => {
-                              const val = e.target.value === 'inherit' ? '' : e.target.value;
-                              const updated = { ...settings, hero_title_font: val };
-                              setSettings(updated);
-                              applyDynamicFonts(updated);
-                            }}
-                            className="w-full px-2.5 py-1.5 rounded-lg bg-[#181822] border border-white/15 text-xs text-white cursor-pointer focus:border-[#C65D45] outline-none"
-                          >
-                            <option value="inherit">↳ Inherit ({settings.heading_font || 'Pogonia'})</option>
-                            {FONT_FAMILIES.map((cat) => (
-                              <optgroup key={cat.family} label={`── ${cat.family} ──`}>
-                                {cat.fonts.map((f) => (
-                                  <option key={f.name} value={f.name}>{f.name}</option>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <div>
+                              <label className="block text-[10px] text-white/50 mb-1 font-mono uppercase">Font Family:</label>
+                              <select
+                                value={settings.hero_title_font || 'inherit'}
+                                onChange={(e) => {
+                                  const val = e.target.value === 'inherit' ? '' : e.target.value;
+                                  const updated = { ...settings, hero_title_font: val };
+                                  setSettings(updated);
+                                  applyDynamicFonts(updated);
+                                }}
+                                className="w-full px-2.5 py-1.5 rounded-lg bg-[#181822] border border-white/15 text-xs text-white cursor-pointer focus:border-[#C65D45] outline-none"
+                              >
+                                <option value="inherit">↳ Inherit ({settings.heading_font || 'Pogonia'})</option>
+                                {FONT_FAMILIES.map((cat) => (
+                                  <optgroup key={cat.family} label={`── ${cat.family} ──`}>
+                                    {cat.fonts.map((f) => (
+                                      <option key={f.name} value={f.name}>{f.name}</option>
+                                    ))}
+                                  </optgroup>
                                 ))}
-                              </optgroup>
-                            ))}
-                          </select>
+                              </select>
+                            </div>
+                            <div>
+                              <label className="block text-[10px] text-white/50 mb-1 font-mono uppercase">Font Weight:</label>
+                              <select
+                                value={settings.hero_title_font_weight || 'inherit'}
+                                onChange={(e) => {
+                                  const val = e.target.value === 'inherit' ? '' : e.target.value;
+                                  const updated = { ...settings, hero_title_font_weight: val };
+                                  setSettings(updated);
+                                  applyDynamicFonts(updated);
+                                }}
+                                className="w-full px-2.5 py-1.5 rounded-lg bg-[#181822] border border-white/15 text-xs text-white cursor-pointer focus:border-[#C65D45] outline-none"
+                              >
+                                <option value="inherit">↳ Inherit ({settings.heading_font_weight || '700'})</option>
+                                {FONT_WEIGHT_OPTIONS.map((w) => (
+                                  <option key={w.value} value={w.value}>{w.label}</option>
+                                ))}
+                              </select>
+                            </div>
+                          </div>
 
                           <input
                             type="text"
@@ -2054,8 +2164,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                           />
 
                           <div
-                            className="text-base font-bold text-white truncate"
-                            style={{ fontFamily: `'${settings.hero_title_font || settings.heading_font || 'Pogonia'}', serif` }}
+                            className="text-base text-white truncate"
+                            style={{
+                              fontFamily: `'${settings.hero_title_font || settings.heading_font || 'Pogonia'}', serif`,
+                              fontWeight: Number(settings.hero_title_font_weight || settings.heading_font_weight) || 700,
+                            }}
                           >
                             I'm Afsar Ahmad, Video Editor.
                           </div>
@@ -2073,30 +2186,60 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                                 <span className="text-[10px] text-white/40 block">H2 headings across all sections</span>
                               </div>
                             </div>
-                            <span className="text-[10px] text-white/60 font-mono px-1.5 py-0.5 rounded bg-white/5">
-                              {settings.section_title_font || 'Inherit'}
-                            </span>
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-[10px] text-white/60 font-mono px-1.5 py-0.5 rounded bg-white/5">
+                                {settings.section_title_font || 'Inherit'}
+                              </span>
+                              {settings.section_title_font_weight && (
+                                <span className="text-[10px] text-[#ffba3b] font-mono px-1.5 py-0.5 rounded bg-white/5">
+                                  {settings.section_title_font_weight}
+                                </span>
+                              )}
+                            </div>
                           </div>
 
-                          <select
-                            value={settings.section_title_font || 'inherit'}
-                            onChange={(e) => {
-                              const val = e.target.value === 'inherit' ? '' : e.target.value;
-                              const updated = { ...settings, section_title_font: val };
-                              setSettings(updated);
-                              applyDynamicFonts(updated);
-                            }}
-                            className="w-full px-2.5 py-1.5 rounded-lg bg-[#181822] border border-white/15 text-xs text-white cursor-pointer focus:border-[#C65D45] outline-none"
-                          >
-                            <option value="inherit">↳ Inherit ({settings.heading_font || 'Pogonia'})</option>
-                            {FONT_FAMILIES.map((cat) => (
-                              <optgroup key={cat.family} label={`── ${cat.family} ──`}>
-                                {cat.fonts.map((f) => (
-                                  <option key={f.name} value={f.name}>{f.name}</option>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <div>
+                              <label className="block text-[10px] text-white/50 mb-1 font-mono uppercase">Font Family:</label>
+                              <select
+                                value={settings.section_title_font || 'inherit'}
+                                onChange={(e) => {
+                                  const val = e.target.value === 'inherit' ? '' : e.target.value;
+                                  const updated = { ...settings, section_title_font: val };
+                                  setSettings(updated);
+                                  applyDynamicFonts(updated);
+                                }}
+                                className="w-full px-2.5 py-1.5 rounded-lg bg-[#181822] border border-white/15 text-xs text-white cursor-pointer focus:border-[#C65D45] outline-none"
+                              >
+                                <option value="inherit">↳ Inherit ({settings.heading_font || 'Pogonia'})</option>
+                                {FONT_FAMILIES.map((cat) => (
+                                  <optgroup key={cat.family} label={`── ${cat.family} ──`}>
+                                    {cat.fonts.map((f) => (
+                                      <option key={f.name} value={f.name}>{f.name}</option>
+                                    ))}
+                                  </optgroup>
                                 ))}
-                              </optgroup>
-                            ))}
-                          </select>
+                              </select>
+                            </div>
+                            <div>
+                              <label className="block text-[10px] text-white/50 mb-1 font-mono uppercase">Font Weight:</label>
+                              <select
+                                value={settings.section_title_font_weight || 'inherit'}
+                                onChange={(e) => {
+                                  const val = e.target.value === 'inherit' ? '' : e.target.value;
+                                  const updated = { ...settings, section_title_font_weight: val };
+                                  setSettings(updated);
+                                  applyDynamicFonts(updated);
+                                }}
+                                className="w-full px-2.5 py-1.5 rounded-lg bg-[#181822] border border-white/15 text-xs text-white cursor-pointer focus:border-[#C65D45] outline-none"
+                              >
+                                <option value="inherit">↳ Inherit ({settings.heading_font_weight || '700'})</option>
+                                {FONT_WEIGHT_OPTIONS.map((w) => (
+                                  <option key={w.value} value={w.value}>{w.label}</option>
+                                ))}
+                              </select>
+                            </div>
+                          </div>
 
                           <input
                             type="text"
@@ -2111,8 +2254,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                           />
 
                           <div
-                            className="text-base font-bold text-white truncate"
-                            style={{ fontFamily: `'${settings.section_title_font || settings.heading_font || 'Pogonia'}', serif` }}
+                            className="text-base text-white truncate"
+                            style={{
+                              fontFamily: `'${settings.section_title_font || settings.heading_font || 'Pogonia'}', serif`,
+                              fontWeight: Number(settings.section_title_font_weight || settings.heading_font_weight) || 700,
+                            }}
                           >
                             Master Showreel • Services
                           </div>
@@ -2130,30 +2276,60 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                                 <span className="text-[10px] text-white/40 block">Explore, Hire Me, WhatsApp, etc.</span>
                               </div>
                             </div>
-                            <span className="text-[10px] text-white/60 font-mono px-1.5 py-0.5 rounded bg-white/5">
-                              {settings.cta_font || 'Inherit'}
-                            </span>
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-[10px] text-white/60 font-mono px-1.5 py-0.5 rounded bg-white/5">
+                                {settings.cta_font || 'Inherit'}
+                              </span>
+                              {settings.cta_font_weight && (
+                                <span className="text-[10px] text-[#ffba3b] font-mono px-1.5 py-0.5 rounded bg-white/5">
+                                  {settings.cta_font_weight}
+                                </span>
+                              )}
+                            </div>
                           </div>
 
-                          <select
-                            value={settings.cta_font || 'inherit'}
-                            onChange={(e) => {
-                              const val = e.target.value === 'inherit' ? '' : e.target.value;
-                              const updated = { ...settings, cta_font: val };
-                              setSettings(updated);
-                              applyDynamicFonts(updated);
-                            }}
-                            className="w-full px-2.5 py-1.5 rounded-lg bg-[#181822] border border-white/15 text-xs text-white cursor-pointer focus:border-[#C65D45] outline-none"
-                          >
-                            <option value="inherit">↳ Inherit ({settings.body_font || 'Montserrat'})</option>
-                            {FONT_FAMILIES.map((cat) => (
-                              <optgroup key={cat.family} label={`── ${cat.family} ──`}>
-                                {cat.fonts.map((f) => (
-                                  <option key={f.name} value={f.name}>{f.name}</option>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <div>
+                              <label className="block text-[10px] text-white/50 mb-1 font-mono uppercase">Font Family:</label>
+                              <select
+                                value={settings.cta_font || 'inherit'}
+                                onChange={(e) => {
+                                  const val = e.target.value === 'inherit' ? '' : e.target.value;
+                                  const updated = { ...settings, cta_font: val };
+                                  setSettings(updated);
+                                  applyDynamicFonts(updated);
+                                }}
+                                className="w-full px-2.5 py-1.5 rounded-lg bg-[#181822] border border-white/15 text-xs text-white cursor-pointer focus:border-[#C65D45] outline-none"
+                              >
+                                <option value="inherit">↳ Inherit ({settings.body_font || 'Montserrat'})</option>
+                                {FONT_FAMILIES.map((cat) => (
+                                  <optgroup key={cat.family} label={`── ${cat.family} ──`}>
+                                    {cat.fonts.map((f) => (
+                                      <option key={f.name} value={f.name}>{f.name}</option>
+                                    ))}
+                                  </optgroup>
                                 ))}
-                              </optgroup>
-                            ))}
-                          </select>
+                              </select>
+                            </div>
+                            <div>
+                              <label className="block text-[10px] text-white/50 mb-1 font-mono uppercase">Font Weight:</label>
+                              <select
+                                value={settings.cta_font_weight || 'inherit'}
+                                onChange={(e) => {
+                                  const val = e.target.value === 'inherit' ? '' : e.target.value;
+                                  const updated = { ...settings, cta_font_weight: val };
+                                  setSettings(updated);
+                                  applyDynamicFonts(updated);
+                                }}
+                                className="w-full px-2.5 py-1.5 rounded-lg bg-[#181822] border border-white/15 text-xs text-white cursor-pointer focus:border-[#C65D45] outline-none"
+                              >
+                                <option value="inherit">↳ Inherit ({settings.body_font_weight || '700'})</option>
+                                {FONT_WEIGHT_OPTIONS.map((w) => (
+                                  <option key={w.value} value={w.value}>{w.label}</option>
+                                ))}
+                              </select>
+                            </div>
+                          </div>
 
                           <input
                             type="text"
@@ -2169,14 +2345,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
 
                           <div className="flex items-center gap-2">
                             <span
-                              className="px-3 py-1 rounded-full text-xs font-bold uppercase text-white bg-[#C65D45]"
-                              style={{ fontFamily: `'${settings.cta_font || settings.body_font || 'Montserrat'}', sans-serif` }}
+                              className="px-3 py-1 rounded-full text-xs uppercase text-white bg-[#C65D45]"
+                              style={{
+                                fontFamily: `'${settings.cta_font || settings.body_font || 'Montserrat'}', sans-serif`,
+                                fontWeight: Number(settings.cta_font_weight || settings.body_font_weight) || 700,
+                              }}
                             >
                               Explore Portfolio
                             </span>
                             <span
-                              className="px-3 py-1 rounded-full text-xs font-bold uppercase text-white bg-black border border-white/20"
-                              style={{ fontFamily: `'${settings.cta_font || settings.body_font || 'Montserrat'}', sans-serif` }}
+                              className="px-3 py-1 rounded-full text-xs uppercase text-white bg-black border border-white/20"
+                              style={{
+                                fontFamily: `'${settings.cta_font || settings.body_font || 'Montserrat'}', sans-serif`,
+                                fontWeight: Number(settings.cta_font_weight || settings.body_font_weight) || 700,
+                              }}
                             >
                               Hire Me
                             </span>
@@ -2195,30 +2377,60 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                                 <span className="text-[10px] text-white/40 block">Category pills, counters, labels</span>
                               </div>
                             </div>
-                            <span className="text-[10px] text-white/60 font-mono px-1.5 py-0.5 rounded bg-white/5">
-                              {settings.badge_font || 'Inherit'}
-                            </span>
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-[10px] text-white/60 font-mono px-1.5 py-0.5 rounded bg-white/5">
+                                {settings.badge_font || 'Inherit'}
+                              </span>
+                              {settings.badge_font_weight && (
+                                <span className="text-[10px] text-[#ffba3b] font-mono px-1.5 py-0.5 rounded bg-white/5">
+                                  {settings.badge_font_weight}
+                                </span>
+                              )}
+                            </div>
                           </div>
 
-                          <select
-                            value={settings.badge_font || 'inherit'}
-                            onChange={(e) => {
-                              const val = e.target.value === 'inherit' ? '' : e.target.value;
-                              const updated = { ...settings, badge_font: val };
-                              setSettings(updated);
-                              applyDynamicFonts(updated);
-                            }}
-                            className="w-full px-2.5 py-1.5 rounded-lg bg-[#181822] border border-white/15 text-xs text-white cursor-pointer focus:border-[#C65D45] outline-none"
-                          >
-                            <option value="inherit">↳ Inherit ({settings.body_font || 'Montserrat'})</option>
-                            {FONT_FAMILIES.map((cat) => (
-                              <optgroup key={cat.family} label={`── ${cat.family} ──`}>
-                                {cat.fonts.map((f) => (
-                                  <option key={f.name} value={f.name}>{f.name}</option>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <div>
+                              <label className="block text-[10px] text-white/50 mb-1 font-mono uppercase">Font Family:</label>
+                              <select
+                                value={settings.badge_font || 'inherit'}
+                                onChange={(e) => {
+                                  const val = e.target.value === 'inherit' ? '' : e.target.value;
+                                  const updated = { ...settings, badge_font: val };
+                                  setSettings(updated);
+                                  applyDynamicFonts(updated);
+                                }}
+                                className="w-full px-2.5 py-1.5 rounded-lg bg-[#181822] border border-white/15 text-xs text-white cursor-pointer focus:border-[#C65D45] outline-none"
+                              >
+                                <option value="inherit">↳ Inherit ({settings.body_font || 'Montserrat'})</option>
+                                {FONT_FAMILIES.map((cat) => (
+                                  <optgroup key={cat.family} label={`── ${cat.family} ──`}>
+                                    {cat.fonts.map((f) => (
+                                      <option key={f.name} value={f.name}>{f.name}</option>
+                                    ))}
+                                  </optgroup>
                                 ))}
-                              </optgroup>
-                            ))}
-                          </select>
+                              </select>
+                            </div>
+                            <div>
+                              <label className="block text-[10px] text-white/50 mb-1 font-mono uppercase">Font Weight:</label>
+                              <select
+                                value={settings.badge_font_weight || 'inherit'}
+                                onChange={(e) => {
+                                  const val = e.target.value === 'inherit' ? '' : e.target.value;
+                                  const updated = { ...settings, badge_font_weight: val };
+                                  setSettings(updated);
+                                  applyDynamicFonts(updated);
+                                }}
+                                className="w-full px-2.5 py-1.5 rounded-lg bg-[#181822] border border-white/15 text-xs text-white cursor-pointer focus:border-[#C65D45] outline-none"
+                              >
+                                <option value="inherit">↳ Inherit ({settings.body_font_weight || '600'})</option>
+                                {FONT_WEIGHT_OPTIONS.map((w) => (
+                                  <option key={w.value} value={w.value}>{w.label}</option>
+                                ))}
+                              </select>
+                            </div>
+                          </div>
 
                           <input
                             type="text"
@@ -2234,14 +2446,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
 
                           <div className="flex items-center gap-2">
                             <span
-                              className="px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider text-[#C65D45] bg-[#C65D45]/15 border border-[#C65D45]/30"
-                              style={{ fontFamily: `'${settings.badge_font || settings.body_font || 'Montserrat'}', sans-serif` }}
+                              className="px-2.5 py-0.5 rounded-full text-[11px] uppercase tracking-wider text-[#C65D45] bg-[#C65D45]/15 border border-[#C65D45]/30"
+                              style={{
+                                fontFamily: `'${settings.badge_font || settings.body_font || 'Montserrat'}', sans-serif`,
+                                fontWeight: Number(settings.badge_font_weight || settings.body_font_weight) || 600,
+                              }}
                             >
                               Cinematic 16:9
                             </span>
                             <span
-                              className="text-[11px] font-bold uppercase text-white/70"
-                              style={{ fontFamily: `'${settings.badge_font || settings.body_font || 'Montserrat'}', sans-serif` }}
+                              className="text-[11px] uppercase text-white/70"
+                              style={{
+                                fontFamily: `'${settings.badge_font || settings.body_font || 'Montserrat'}', sans-serif`,
+                                fontWeight: Number(settings.badge_font_weight || settings.body_font_weight) || 600,
+                              }}
                             >
                               2.4M Views
                             </span>
@@ -2260,30 +2478,60 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                                 <span className="text-[10px] text-white/40 block">Logo text and menu navigation</span>
                               </div>
                             </div>
-                            <span className="text-[10px] text-white/60 font-mono px-1.5 py-0.5 rounded bg-white/5">
-                              {settings.nav_font || 'Inherit'}
-                            </span>
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-[10px] text-white/60 font-mono px-1.5 py-0.5 rounded bg-white/5">
+                                {settings.nav_font || 'Inherit'}
+                              </span>
+                              {settings.nav_font_weight && (
+                                <span className="text-[10px] text-[#ffba3b] font-mono px-1.5 py-0.5 rounded bg-white/5">
+                                  {settings.nav_font_weight}
+                                </span>
+                              )}
+                            </div>
                           </div>
 
-                          <select
-                            value={settings.nav_font || 'inherit'}
-                            onChange={(e) => {
-                              const val = e.target.value === 'inherit' ? '' : e.target.value;
-                              const updated = { ...settings, nav_font: val };
-                              setSettings(updated);
-                              applyDynamicFonts(updated);
-                            }}
-                            className="w-full px-2.5 py-1.5 rounded-lg bg-[#181822] border border-white/15 text-xs text-white cursor-pointer focus:border-[#C65D45] outline-none"
-                          >
-                            <option value="inherit">↳ Inherit ({settings.body_font || 'Montserrat'})</option>
-                            {FONT_FAMILIES.map((cat) => (
-                              <optgroup key={cat.family} label={`── ${cat.family} ──`}>
-                                {cat.fonts.map((f) => (
-                                  <option key={f.name} value={f.name}>{f.name}</option>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <div>
+                              <label className="block text-[10px] text-white/50 mb-1 font-mono uppercase">Font Family:</label>
+                              <select
+                                value={settings.nav_font || 'inherit'}
+                                onChange={(e) => {
+                                  const val = e.target.value === 'inherit' ? '' : e.target.value;
+                                  const updated = { ...settings, nav_font: val };
+                                  setSettings(updated);
+                                  applyDynamicFonts(updated);
+                                }}
+                                className="w-full px-2.5 py-1.5 rounded-lg bg-[#181822] border border-white/15 text-xs text-white cursor-pointer focus:border-[#C65D45] outline-none"
+                              >
+                                <option value="inherit">↳ Inherit ({settings.body_font || 'Montserrat'})</option>
+                                {FONT_FAMILIES.map((cat) => (
+                                  <optgroup key={cat.family} label={`── ${cat.family} ──`}>
+                                    {cat.fonts.map((f) => (
+                                      <option key={f.name} value={f.name}>{f.name}</option>
+                                    ))}
+                                  </optgroup>
                                 ))}
-                              </optgroup>
-                            ))}
-                          </select>
+                              </select>
+                            </div>
+                            <div>
+                              <label className="block text-[10px] text-white/50 mb-1 font-mono uppercase">Font Weight:</label>
+                              <select
+                                value={settings.nav_font_weight || 'inherit'}
+                                onChange={(e) => {
+                                  const val = e.target.value === 'inherit' ? '' : e.target.value;
+                                  const updated = { ...settings, nav_font_weight: val };
+                                  setSettings(updated);
+                                  applyDynamicFonts(updated);
+                                }}
+                                className="w-full px-2.5 py-1.5 rounded-lg bg-[#181822] border border-white/15 text-xs text-white cursor-pointer focus:border-[#C65D45] outline-none"
+                              >
+                                <option value="inherit">↳ Inherit ({settings.body_font_weight || '600'})</option>
+                                {FONT_WEIGHT_OPTIONS.map((w) => (
+                                  <option key={w.value} value={w.value}>{w.label}</option>
+                                ))}
+                              </select>
+                            </div>
+                          </div>
 
                           <input
                             type="text"
@@ -2298,8 +2546,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                           />
 
                           <div
-                            className="text-sm font-bold text-white tracking-wide truncate"
-                            style={{ fontFamily: `'${settings.nav_font || settings.body_font || 'Montserrat'}', sans-serif` }}
+                            className="text-sm text-white tracking-wide truncate"
+                            style={{
+                              fontFamily: `'${settings.nav_font || settings.body_font || 'Montserrat'}', sans-serif`,
+                              fontWeight: Number(settings.nav_font_weight || settings.body_font_weight) || 600,
+                            }}
                           >
                             Afsar Ahmad • Showreel • Reels • Contact
                           </div>
@@ -2317,7 +2568,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                           </span>
                         </div>
                         <span className="text-[11px] text-white/40">
-                          Updates instantly as you adjust any font
+                          Updates instantly as you adjust any font or weight
                         </span>
                       </div>
 
@@ -2326,14 +2577,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                         {/* Mock Navbar */}
                         <div className="flex items-center justify-between text-xs pb-3 border-b border-white/5">
                           <span
-                            className="font-bold text-white text-sm"
-                            style={{ fontFamily: `'${settings.nav_font || settings.body_font || 'Montserrat'}', sans-serif` }}
+                            className="text-white text-sm"
+                            style={{
+                              fontFamily: `'${settings.nav_font || settings.body_font || 'Montserrat'}', sans-serif`,
+                              fontWeight: Number(settings.nav_font_weight || settings.body_font_weight) || 700,
+                            }}
                           >
                             AFSAR AHMAD
                           </span>
                           <div
                             className="flex items-center gap-4 text-white/70"
-                            style={{ fontFamily: `'${settings.nav_font || settings.body_font || 'Montserrat'}', sans-serif` }}
+                            style={{
+                              fontFamily: `'${settings.nav_font || settings.body_font || 'Montserrat'}', sans-serif`,
+                              fontWeight: Number(settings.nav_font_weight || settings.body_font_weight) || 500,
+                            }}
                           >
                             <span>Showreel</span>
                             <span>Reels</span>
@@ -2345,8 +2602,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                         {/* Mock Category Badge */}
                         <div>
                           <span
-                            className="inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider text-[#C65D45] bg-[#C65D45]/15 border border-[#C65D45]/30"
-                            style={{ fontFamily: `'${settings.badge_font || settings.body_font || 'Montserrat'}', sans-serif` }}
+                            className="inline-block px-3 py-1 rounded-full text-xs uppercase tracking-wider text-[#C65D45] bg-[#C65D45]/15 border border-[#C65D45]/30"
+                            style={{
+                              fontFamily: `'${settings.badge_font || settings.body_font || 'Montserrat'}', sans-serif`,
+                              fontWeight: Number(settings.badge_font_weight || settings.body_font_weight) || 600,
+                            }}
                           >
                             Direct Collaboration • Fast Response
                           </span>
@@ -2354,16 +2614,22 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
 
                         {/* Mock Hero Headline */}
                         <div
-                          className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white leading-tight"
-                          style={{ fontFamily: `'${settings.hero_title_font || settings.heading_font || 'Pogonia'}', serif` }}
+                          className="text-2xl sm:text-3xl lg:text-4xl text-white leading-tight"
+                          style={{
+                            fontFamily: `'${settings.hero_title_font || settings.heading_font || 'Pogonia'}', serif`,
+                            fontWeight: Number(settings.hero_title_font_weight || settings.heading_font_weight) || 700,
+                          }}
                         >
                           I'm Afsar Ahmad, Video Editor & Motion Designer.
                         </div>
 
                         {/* Mock Section Title */}
                         <div
-                          className="text-xl sm:text-2xl font-bold text-[#C65D45]"
-                          style={{ fontFamily: `'${settings.section_title_font || settings.heading_font || 'Pogonia'}', serif` }}
+                          className="text-xl sm:text-2xl text-[#C65D45]"
+                          style={{
+                            fontFamily: `'${settings.section_title_font || settings.heading_font || 'Pogonia'}', serif`,
+                            fontWeight: Number(settings.section_title_font_weight || settings.heading_font_weight) || 700,
+                          }}
                         >
                           Horizontal & Long-Form Work
                         </div>
@@ -2371,7 +2637,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                         {/* Mock Body Paragraph */}
                         <p
                           className="text-xs sm:text-sm text-white/75 leading-relaxed max-w-xl"
-                          style={{ fontFamily: `'${settings.body_font || 'Montserrat'}', sans-serif` }}
+                          style={{
+                            fontFamily: `'${settings.body_font || 'Montserrat'}', sans-serif`,
+                            fontWeight: Number(settings.body_font_weight) || 400,
+                          }}
                         >
                           Commercial campaigns, YouTube documentaries, and narrative brand films calibrated for widescreen visual storytelling and sustained audience immersion.
                         </p>
@@ -2380,15 +2649,21 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                         <div className="flex items-center gap-3 pt-2">
                           <button
                             type="button"
-                            className="px-5 py-2.5 rounded-full text-xs font-black uppercase tracking-wide text-white bg-[#C65D45]"
-                            style={{ fontFamily: `'${settings.cta_font || settings.body_font || 'Montserrat'}', sans-serif` }}
+                            className="px-5 py-2.5 rounded-full text-xs uppercase tracking-wide text-white bg-[#C65D45]"
+                            style={{
+                              fontFamily: `'${settings.cta_font || settings.body_font || 'Montserrat'}', sans-serif`,
+                              fontWeight: Number(settings.cta_font_weight || '700') || 700,
+                            }}
                           >
                             Explore Portfolio
                           </button>
                           <button
                             type="button"
-                            className="px-5 py-2.5 rounded-full text-xs font-black uppercase tracking-wide text-white bg-black border border-white/20"
-                            style={{ fontFamily: `'${settings.cta_font || settings.body_font || 'Montserrat'}', sans-serif` }}
+                            className="px-5 py-2.5 rounded-full text-xs uppercase tracking-wide text-white bg-black border border-white/20"
+                            style={{
+                              fontFamily: `'${settings.cta_font || settings.body_font || 'Montserrat'}', sans-serif`,
+                              fontWeight: Number(settings.cta_font_weight || '700') || 700,
+                            }}
                           >
                             Hire Me
                           </button>
@@ -2399,14 +2674,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                     {/* Bottom Save Action */}
                     <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                       <p className="text-xs text-white/50">
-                        Changes preview immediately on the page. Click Save to persist all font settings.
+                        Changes preview immediately on the page. Click Save to persist all font & weight settings.
                       </p>
                       <button
                         type="button"
                         onClick={async () => {
                           try {
                             await api.updateSettings(settings);
-                            showNotice('All typography settings saved and published successfully!');
+                            showNotice('All typography and font weight settings saved successfully!');
                             onDataChanged();
                           } catch (err: any) {
                             showNotice(err.message || 'Error saving typography', 'error');

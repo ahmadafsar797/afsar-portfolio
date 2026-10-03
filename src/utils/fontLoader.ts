@@ -59,14 +59,36 @@ export const FONT_FAMILIES: FontCategory[] = [
 // Flat list for quick lookups
 export const ALL_PRESET_FONTS = FONT_FAMILIES.flatMap((cat) => cat.fonts);
 
+export interface FontWeightOption {
+  value: string;
+  label: string;
+}
+
+export const FONT_WEIGHT_OPTIONS: FontWeightOption[] = [
+  { value: '300', label: '300 — Light' },
+  { value: '400', label: '400 — Regular' },
+  { value: '500', label: '500 — Medium' },
+  { value: '600', label: '600 — Semi-Bold' },
+  { value: '700', label: '700 — Bold' },
+  { value: '800', label: '800 — Extra Bold' },
+  { value: '900', label: '900 — Black / Heavy' },
+];
+
 export interface TypographySettings {
   heading_font?: string;
+  heading_font_weight?: string;
   body_font?: string;
+  body_font_weight?: string;
   hero_title_font?: string;
+  hero_title_font_weight?: string;
   section_title_font?: string;
+  section_title_font_weight?: string;
   cta_font?: string;
+  cta_font_weight?: string;
   badge_font?: string;
+  badge_font_weight?: string;
   nav_font?: string;
+  nav_font_weight?: string;
 }
 
 /**
@@ -105,6 +127,16 @@ function resolveFont(font?: string, fallback: string = 'Montserrat') {
 }
 
 /**
+ * Resolves a font weight with fallback
+ */
+function resolveWeight(weight?: string, fallback: string = '400') {
+  if (!weight || weight.trim().toLowerCase() === 'inherit' || weight.trim() === '') {
+    return fallback;
+  }
+  return weight.trim();
+}
+
+/**
  * Applies typography settings across the entire website
  */
 export function applyDynamicFonts(
@@ -130,6 +162,15 @@ export function applyDynamicFonts(
   const badgeFont = resolveFont(settings.badge_font, bFont);
   const navFont = resolveFont(settings.nav_font, bFont);
 
+  // Weights
+  const hWeight = resolveWeight(settings.heading_font_weight, '700');
+  const bWeight = resolveWeight(settings.body_font_weight, '400');
+  const heroWeight = resolveWeight(settings.hero_title_font_weight, hWeight);
+  const secWeight = resolveWeight(settings.section_title_font_weight, hWeight);
+  const ctaWeight = resolveWeight(settings.cta_font_weight, '700');
+  const badgeWeight = resolveWeight(settings.badge_font_weight, '600');
+  const navWeight = resolveWeight(settings.nav_font_weight, '600');
+
   // Load all selected Google fonts
   [hFont, bFont, heroFont, secFont, ctaFont, badgeFont, navFont].forEach(loadGoogleFont);
 
@@ -143,8 +184,17 @@ export function applyDynamicFonts(
   root.style.setProperty('--font-custom-badge', `'${badgeFont}', '${bFont}', 'Montserrat', sans-serif`);
   root.style.setProperty('--font-custom-nav', `'${navFont}', '${bFont}', 'Montserrat', sans-serif`);
 
+  root.style.setProperty('--font-weight-custom-heading', hWeight);
+  root.style.setProperty('--font-weight-custom-body', bWeight);
+  root.style.setProperty('--font-weight-custom-hero-title', heroWeight);
+  root.style.setProperty('--font-weight-custom-section-title', secWeight);
+  root.style.setProperty('--font-weight-custom-cta', ctaWeight);
+  root.style.setProperty('--font-weight-custom-badge', badgeWeight);
+  root.style.setProperty('--font-weight-custom-nav', navWeight);
+
   // Direct body style
   document.body.style.fontFamily = `'${bFont}', 'Montserrat', system-ui, sans-serif`;
+  document.body.style.fontWeight = bWeight;
 
   // Inject or update global style override element
   let styleEl = document.getElementById('dynamic-font-styles') as HTMLStyleElement;
@@ -166,39 +216,59 @@ export function applyDynamicFonts(
       --font-custom-cta: '${ctaFont}', '${bFont}', 'Montserrat', sans-serif !important;
       --font-custom-badge: '${badgeFont}', '${bFont}', 'Montserrat', sans-serif !important;
       --font-custom-nav: '${navFont}', '${bFont}', 'Montserrat', sans-serif !important;
+
+      --font-weight-custom-heading: ${hWeight} !important;
+      --font-weight-custom-body: ${bWeight} !important;
+      --font-weight-custom-hero-title: ${heroWeight} !important;
+      --font-weight-custom-section-title: ${secWeight} !important;
+      --font-weight-custom-cta: ${ctaWeight} !important;
+      --font-weight-custom-badge: ${badgeWeight} !important;
+      --font-weight-custom-nav: ${navWeight} !important;
     }
 
     /* Global Headings & Body Defaults */
     .font-pogonia, .font-editorial, .font-serif, h1, h2, h3, h4, h5, h6 {
       font-family: var(--font-custom-heading) !important;
+      font-weight: var(--font-weight-custom-heading) !important;
     }
     .font-montserrat, .font-sans, .font-ui, body, p, blockquote, label {
       font-family: var(--font-custom-body) !important;
+      font-weight: var(--font-weight-custom-body) !important;
     }
 
     /* Specific: Hero Main Title (Highest Specificity for Hero) */
     .font-hero-title, [data-font="hero-title"], #hero h1, #hero h1.font-pogonia, #hero .hero-headline {
       font-family: var(--font-custom-hero-title) !important;
+      font-weight: var(--font-weight-custom-hero-title) !important;
     }
 
     /* Specific: Section Titles (Overrides global .font-pogonia on section headings) */
     .font-section-title, [data-font="section-title"], section h2, section h2.font-pogonia, section div h2, main h2 {
       font-family: var(--font-custom-section-title) !important;
+      font-weight: var(--font-weight-custom-section-title) !important;
     }
 
     /* Specific: CTA Buttons & Action Triggers */
     .font-cta, [data-font="cta"], button:not([data-font-ignore]), button.font-montserrat, a[data-cursor="open"], a[data-cursor="play"], .group\\/explore, .group\\/hire, .group\\/story, .group\\/play {
       font-family: var(--font-custom-cta) !important;
+      font-weight: var(--font-weight-custom-cta) !important;
     }
 
     /* Specific: Badges, View Counters & Category Tags */
     .font-badge, [data-font="badge"], .badge-pill, span[class*="tracking-wider"], span[class*="tracking-widest"] {
       font-family: var(--font-custom-badge) !important;
+      font-weight: var(--font-weight-custom-badge) !important;
     }
 
     /* Specific: Navbar & Brand Name */
     .font-nav, [data-font="nav"], nav, nav a, nav span, header a, header span, nav .font-pogonia, nav .font-montserrat {
       font-family: var(--font-custom-nav) !important;
+      font-weight: var(--font-weight-custom-nav) !important;
+    }
+
+    /* Keep Admin Dashboard controls unaffected */
+    [data-font-ignore], [data-font-ignore] button, [data-font-ignore] input, [data-font-ignore] select, [data-font-ignore] textarea {
+      font-family: Montserrat, system-ui, sans-serif !important;
     }
   `;
 }

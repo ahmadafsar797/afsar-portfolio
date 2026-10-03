@@ -149,17 +149,24 @@ export const App: React.FC = () => {
     document.title = settings?.site_name || 'AFSAR AHMAD | Video Editor & Motion Designer';
   }, [settings?.site_name]);
 
-  // Dynamically apply selected website fonts across all components
+  // Dynamically apply selected website fonts and weights across all components
   useEffect(() => {
     applyDynamicFonts(settings);
   }, [
     settings?.heading_font,
+    settings?.heading_font_weight,
     settings?.body_font,
+    settings?.body_font_weight,
     settings?.hero_title_font,
+    settings?.hero_title_font_weight,
     settings?.section_title_font,
+    settings?.section_title_font_weight,
     settings?.cta_font,
+    settings?.cta_font_weight,
     settings?.badge_font,
+    settings?.badge_font_weight,
     settings?.nav_font,
+    settings?.nav_font_weight,
   ]);
 
   const openLightbox = (videoUrl: string, title: string, client?: string, category?: string) => {
