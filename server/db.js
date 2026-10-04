@@ -1,4 +1,4 @@
-﻿/**
+/**
  * db.js — Pure JavaScript SQLite using sql.js (WebAssembly)
  * No native binaries. Works on every platform including Render free tier.
  */
@@ -319,6 +319,7 @@ function seedDefaultData() {
       ['Ek__agga Sandal Ads Video', 'Product Reels', 'Ek__agga', '/uploads/Sandle_Product_3-1790973901599-518600078.mp4', '/uploads/Sandle_Product_3-1790973901599-518600078-cover.jpg', '3.1M Views', '0:35', 1, 4],
       ['Trending Reel', 'Instagram Reels', 'Creator Velocity', '/uploads/Priyanka_Video-1790974050192-460800610.mp4', '/uploads/Priyanka_Video-1790974050192-460800610-cover.jpg', '1.2M Views', '0:58', 0, 5],
       ['Reyan Sunglasses Ai Cgi Video', 'Product Reels', 'Fjord Coffee Labs', '/uploads/Sunglasses_Video-1790974206869-652475516.mp4', '/uploads/Sunglasses_Video-1790974206869-652475516-cover.jpg', '640K Views', '0:30', 0, 6],
+      ['Look at me owner video', 'Talking Head Edits', '', '/uploads/Sadab_Video-1790872056616-348273760.mp4', '/uploads/Sadab_Video-1790872056616-348273760-cover.jpg', '1.2M Views', '0:30', 0, 7],
     ];
     for (const r of sampleReels) insertReel.run(...r);
   }
