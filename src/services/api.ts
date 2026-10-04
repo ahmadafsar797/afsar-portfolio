@@ -400,4 +400,16 @@ export const api = {
     }
     return res.json();
   },
+
+  async publishLive(): Promise<{ success: boolean; committed: boolean; pushed: boolean; openedDesktop: boolean; message: string }> {
+    const res = await fetch(`${API_BASE}/admin/publish-live`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error || 'Failed to publish to live website');
+    }
+    return res.json();
+  },
 };

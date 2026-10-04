@@ -31,6 +31,7 @@ import {
   Download,
   FileUp,
   HelpCircle,
+  UploadCloud,
 } from 'lucide-react';
 import { VideoFramePickerModal } from '../VideoFramePickerModal';
 import { api } from '../../services/api';
@@ -85,7 +86,23 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
   const [notice, setNotice] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const showNotice = (text: string, type: 'success' | 'error' = 'success') => {
     setNotice({ type, text });
-    setTimeout(() => setNotice(null), 4000);
+    setTimeout(() => setNotice(null), 6000);
+  };
+
+  const isLocalhost = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+  const [isPublishing, setIsPublishing] = useState(false);
+
+  const handlePublishLive = async () => {
+    setIsPublishing(true);
+    try {
+      const res = await api.publishLive();
+      showNotice(res.message, 'success');
+      onDataChanged();
+    } catch (err: any) {
+      showNotice(err.message || 'Failed to publish to live website', 'error');
+    } finally {
+      setIsPublishing(false);
+    }
   };
 
   // Editing state trackers
@@ -651,20 +668,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
             {isAuthenticated && (
               <>
                 <button
-                  onClick={async () => {
-                    try {
-                      await api.syncSeedCode();
-                      showNotice('Saved to data/default_content.json! Commit to Git to push to Render.');
-                    } catch (e: any) {
-                      showNotice(e.message || 'Sync failed', 'error');
-                    }
-                  }}
-                  className="p-2 px-3 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 hover:text-emerald-300 text-xs flex items-center gap-1.5 transition-colors border border-emerald-500/30"
-                  title="Saves current database state into data/default_content.json for Git deployment."
+                  onClick={handlePublishLive}
+                  disabled={isPublishing}
+                  className={`p-2 px-3.5 rounded-xl text-xs flex items-center gap-1.5 transition-all shadow-lg font-montserrat uppercase font-bold cursor-pointer ${
+                    isPublishing
+                      ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 cursor-wait'
+                      : 'bg-gradient-to-r from-[#C65D45] to-[#E2725B] hover:brightness-110 text-white border border-[#E2725B]/40 active:scale-95 shadow-[0_0_15px_rgba(198,93,69,0.35)]'
+                  }`}
+                  title="Permanently commits all uploaded videos, thumbnails, and changes to Git and deploys to Render."
                 >
-                  <CheckCircle className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline font-montserrat text-[11px] uppercase font-semibold">
-                    Permanent Sync
+                  <UploadCloud className={`w-4 h-4 ${isPublishing ? 'animate-bounce' : ''}`} />
+                  <span className="inline font-montserrat text-[11px] uppercase font-bold tracking-wider">
+                    {isPublishing ? 'Publishing...' : '🚀 Push to Live Site'}
                   </span>
                 </button>
 
@@ -723,6 +738,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
             </button>
           </div>
         </div>
+
+        {/* Live Cloud vs Localhost Notice Bar */}
+        {!isLocalhost && (
+          <div className="bg-amber-500/10 border-b border-amber-500/20 px-6 py-2.5 flex items-center justify-between text-xs text-amber-200">
+            <div className="flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 text-amber-400 shrink-0" />
+              <span>
+                <strong>Live Cloud Notice:</strong> Video files uploaded directly on Render reset when deploying. To upload videos permanently, run <strong>Run Portfolio Admin.bat</strong> on your laptop!
+              </span>
+            </div>
+          </div>
+        )}
 
         {/* Unauthenticated View: Secure Login Form */}
         {!isAuthenticated ? (
@@ -938,6 +965,54 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                       <div className="font-pogonia text-4xl text-[#C65D45] font-semibold mt-1">
                         {services.length}
                       </div>
+                    </div>
+                  </div>
+
+                  {/* Permanent Deployment Center Card */}
+                  <div className="p-6 rounded-3xl bg-gradient-to-br from-[#1C120C] to-[#120B07] border border-[#C65D45]/30 space-y-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                      <div>
+                        <div className="flex items-center gap-2 text-[#C65D45] text-xs font-bold uppercase tracking-wider">
+                          <Sparkles className="w-4 h-4" />
+                          <span>1-Click Permanent Deployment Center</span>
+                        </div>
+                        <h4 className="font-pogonia text-xl text-white mt-1">
+                          {isLocalhost ? '💻 Master Workstation (Localhost Mode)' : '☁️ Live Cloud Demo Mode'}
+                        </h4>
+                        <p className="text-xs text-white/60 mt-1 max-w-xl">
+                          {isLocalhost
+                            ? 'Every video, thumbnail, and title you add here is saved to your laptop hard drive. Click below to automatically commit and push to live Render with 1 click!'
+                            : 'Uploads made directly here will reset when deploying. To keep new videos permanently, launch Run Portfolio Admin.bat on your laptop.'}
+                        </p>
+                      </div>
+
+                      <button
+                        onClick={handlePublishLive}
+                        disabled={isPublishing}
+                        className={`px-6 py-3.5 rounded-2xl text-xs font-montserrat uppercase font-bold tracking-wider transition-all duration-300 flex items-center gap-2.5 shadow-xl cursor-pointer shrink-0 ${
+                          isPublishing
+                            ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 cursor-wait'
+                            : 'bg-gradient-to-r from-[#C65D45] to-[#E2725B] hover:brightness-110 text-white shadow-[0_0_20px_rgba(198,93,69,0.4)] active:scale-95'
+                        }`}
+                      >
+                        <UploadCloud className={`w-4 h-4 ${isPublishing ? 'animate-bounce' : ''}`} />
+                        <span>{isPublishing ? 'Publishing Updates...' : '🚀 Push to Live Website'}</span>
+                      </button>
+                    </div>
+
+                    <div className="pt-3 border-t border-white/10 flex flex-wrap items-center gap-4 text-[11px] text-white/50">
+                      <span className="flex items-center gap-1.5">
+                        <CheckCircle className="w-3.5 h-3.5 text-emerald-400" />
+                        <span>Permanent Seed Tracking</span>
+                      </span>
+                      <span className="flex items-center gap-1.5">
+                        <CheckCircle className="w-3.5 h-3.5 text-emerald-400" />
+                        <span>Automatic Git Commit</span>
+                      </span>
+                      <span className="flex items-center gap-1.5">
+                        <CheckCircle className="w-3.5 h-3.5 text-emerald-400" />
+                        <span>Zero Data Loss on Render</span>
+                      </span>
                     </div>
                   </div>
                 </div>

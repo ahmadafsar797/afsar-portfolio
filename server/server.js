@@ -19,6 +19,11 @@ app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
+// Health check / Anti-sleep keep-alive ping endpoint (uses 0 bandwidth)
+app.get(['/health', '/api/health', '/api/ping'], (req, res) => {
+  res.status(200).json({ status: 'ok', uptime: process.uptime() });
+});
+
 // Auto-Sync Middleware: Automatically writes any admin Add/Edit/Delete/Settings change to permanent code seed
 app.use((req, res, next) => {
   if (
@@ -189,6 +194,108 @@ app.post('/api/admin/import-content', verifyToken, (req, res) => {
     res.status(500).json({ error: err.message || 'Import failed' });
   }
 });
+
+app.post('/api/admin/publish-live', verifyToken, (req, res) => {
+  try {
+    const { syncPermanentSeedCode } = require('./seedSync');
+    syncPermanentSeedCode(db);
+
+    const { execSync, spawn } = require('child_process');
+    const projectDir = path.join(__dirname, '..');
+
+    // Locate git binary
+    let gitBin = 'git';
+    const ghDesktopGit = path.join(
+      process.env.LOCALAPPDATA || 'C:\\Users\\asus\\AppData\\Local',
+      'GitHubDesktop\\app-3.6.6\\resources\\app\\git\\cmd\\git.exe'
+    );
+    if (fs.existsSync(ghDesktopGit)) {
+      gitBin = `"${ghDesktopGit}"`;
+    }
+
+    // Git add
+    try {
+      execSync(`${gitBin} add uploads/ data/default_content.json data/portfolio.db`, {
+        cwd: projectDir,
+        stdio: 'pipe'
+      });
+    } catch (addErr) {
+      console.warn('Git add warning:', addErr.message);
+    }
+
+    // Check status
+    let committed = false;
+    try {
+      const status = execSync(`${gitBin} status --porcelain`, {
+        cwd: projectDir,
+        encoding: 'utf8'
+      });
+
+      if (status.trim().length > 0) {
+        execSync(`${gitBin} commit -m "Auto-publish portfolio updates from Admin Dashboard"`, {
+          cwd: projectDir,
+          stdio: 'pipe'
+        });
+        committed = true;
+      }
+    } catch (cErr) {
+      console.warn('Git commit notice:', cErr.message);
+    }
+
+    // Check if GitHub token is provided in environment or settings for silent push
+    let token = process.env.GITHUB_TOKEN;
+    if (!token) {
+      try {
+        const row = db.prepare("SELECT value FROM settings WHERE key = 'github_token'").get();
+        if (row && row.value) token = row.value.trim();
+      } catch (e) {}
+    }
+
+    let pushed = false;
+    if (token) {
+      try {
+        const repoUrl = `https://${token}@github.com/ahmadafsar797/afsar-portfolio.git`;
+        execSync(`${gitBin} push ${repoUrl} main`, {
+          cwd: projectDir,
+          timeout: 45000,
+          stdio: 'pipe'
+        });
+        pushed = true;
+      } catch (pushErr) {
+        console.warn('Silent push with token failed:', pushErr.message);
+      }
+    }
+
+    // If not pushed directly with token, open GitHub Desktop
+    let openedDesktop = false;
+    if (!pushed) {
+      const ghDesktopExe = path.join(
+        process.env.LOCALAPPDATA || 'C:\\Users\\asus\\AppData\\Local',
+        'GitHubDesktop\\GitHubDesktop.exe'
+      );
+      if (fs.existsSync(ghDesktopExe)) {
+        try {
+          spawn(ghDesktopExe, [projectDir], { detached: true, stdio: 'ignore' }).unref();
+          openedDesktop = true;
+        } catch (e) {}
+      }
+    }
+
+    res.json({
+      success: true,
+      committed,
+      pushed,
+      openedDesktop,
+      message: pushed
+        ? 'All files permanently saved & pushed to GitHub! Render is deploying your update now.'
+        : 'All files permanently saved to git! GitHub Desktop has opened — click "Push origin" to publish to Render.'
+    });
+  } catch (err) {
+    console.error('Publish-live error:', err);
+    res.status(500).json({ error: 'Failed to publish: ' + err.message });
+  }
+});
+
 
 /* ==========================================================================
    SETTINGS ROUTES
