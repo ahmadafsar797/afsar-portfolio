@@ -9,6 +9,7 @@ require('dotenv').config();
 
 const db = require('./db');
 const { verifyToken, JWT_SECRET } = require('./middleware/auth');
+const { syncPermanentSeedCode } = require('./seedSync');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -17,6 +18,27 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+
+// Auto-Sync Middleware: Automatically writes any admin Add/Edit/Delete/Settings change to permanent code seed
+app.use((req, res, next) => {
+  if (
+    req.method !== 'GET' &&
+    req.path.startsWith('/api/') &&
+    !req.path.startsWith('/api/auth') &&
+    !req.path.startsWith('/api/contact')
+  ) {
+    res.on('finish', () => {
+      if (res.statusCode >= 200 && res.statusCode < 300) {
+        try {
+          syncPermanentSeedCode(db);
+        } catch (err) {
+          console.error('[Auto-Sync Error]', err.message);
+        }
+      }
+    });
+  }
+  next();
+});
 
 // Static uploads folder
 const uploadsDir = path.join(__dirname, '..', 'uploads');
@@ -127,6 +149,19 @@ app.post('/api/auth/change-password', verifyToken, (req, res) => {
     res.json({ message: 'Password updated successfully' });
   } catch (err) {
     res.status(500).json({ error: 'Failed to update password' });
+  }
+});
+
+app.post('/api/admin/sync-seed', verifyToken, (req, res) => {
+  try {
+    const success = syncPermanentSeedCode(db);
+    if (success) {
+      res.json({ message: 'All content permanently synchronized to code seed.' });
+    } else {
+      res.status(500).json({ error: 'Failed to synchronize seed.' });
+    }
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 

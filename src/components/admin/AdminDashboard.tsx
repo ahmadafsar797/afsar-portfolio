@@ -423,14 +423,34 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
             )}
 
             {isAuthenticated && (
-              <button
-                onClick={handleLogout}
-                className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-white/70 hover:text-red-400 text-xs flex items-center gap-1.5 transition-colors border border-white/10"
-                title="Log Out"
-              >
-                <LogOut className="w-4 h-4" />
-                <span className="hidden sm:inline font-montserrat text-[11px] uppercase">Logout</span>
-              </button>
+              <>
+                <button
+                  onClick={async () => {
+                    try {
+                      await api.syncSeedCode();
+                      showNotice('All content saved to permanent code!');
+                    } catch (e: any) {
+                      showNotice(e.message || 'Sync failed', 'error');
+                    }
+                  }}
+                  className="p-2 px-3 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 hover:text-emerald-300 text-xs flex items-center gap-1.5 transition-colors border border-emerald-500/30"
+                  title="Auto-Sync is active on all changes. Click to manually save current state to permanent code now."
+                >
+                  <CheckCircle className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline font-montserrat text-[11px] uppercase font-semibold">
+                    Permanent Sync
+                  </span>
+                </button>
+
+                <button
+                  onClick={handleLogout}
+                  className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-white/70 hover:text-red-400 text-xs flex items-center gap-1.5 transition-colors border border-white/10"
+                  title="Log Out"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span className="hidden sm:inline font-montserrat text-[11px] uppercase">Logout</span>
+                </button>
+              </>
             )}
 
             <button

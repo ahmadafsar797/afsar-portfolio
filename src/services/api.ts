@@ -370,4 +370,13 @@ export const api = {
     });
     if (!res.ok) throw new Error('Failed to remove profile picture');
   },
+
+  async syncSeedCode(): Promise<{ message: string }> {
+    const res = await fetch(`${API_BASE}/admin/sync-seed`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+    });
+    if (!res.ok) throw new Error('Failed to synchronize permanent code');
+    return res.json();
+  },
 };
