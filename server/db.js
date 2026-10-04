@@ -1,4 +1,4 @@
-/**
+﻿/**
  * db.js — Pure JavaScript SQLite using sql.js (WebAssembly)
  * No native binaries. Works on every platform including Render free tier.
  */
@@ -285,6 +285,7 @@ function seedDefaultData() {
       ['linkedin_url', 'https://linkedin.com/in/afsar-ahmad'],
       ['youtube_url', 'https://youtube.com/@afsaredits'],
       ['twitter_url', 'https://x.com/afsar_edits'],
+      ['profile_picture_url', '/uploads/profile-picture.jpg'],
     ];
     const insertSetting = _db.prepare('INSERT INTO settings (key, value) VALUES (?, ?)');
     for (const [key, value] of defaultSettings) insertSetting.run(key, value);
@@ -299,10 +300,10 @@ function seedDefaultData() {
     `).run(
       1,
       'Story first. Pacing second. Effects serve the narrative.',
-      "I'm Afsar Ahmad, a freelance video editor and motion designer with over 2 years of dedicated post-production experience. I partner with ambitious creators, modern brands, and growing channels worldwide to craft videos that capture attention within the first 1.5 seconds and retain it through emotional rhythm, dynamic soundscapes, and flawless pacing.",
+      "I am Afsar Ahmad, a dedicated video editor and motion designer with 2+ years of hands-on post-production experience. I partner with ambitious creators, modern brands, and fast-growing channels worldwide to craft videos that capture attention within the first 1.5 seconds and retain it through emotional rhythm, dynamic soundscapes, and tight pacing.",
       'In a feed saturated with derivative templates, true engagement comes from intentional narrative tension, hyper-calibrated audio design, and color grading that elevates raw footage into a cinematic world.',
       '2+', '65M+', '180+', '99.4%',
-      'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80',
+      '/uploads/ChatGPT_Image_Aug_7__2026__09_21_02_AM-1790874754492-683229882.jpg',
       'https://assets.mixkit.co/videos/preview/mixkit-cinematographer-filming-with-a-professional-camera-42861-large.mp4'
     );
   }
@@ -340,9 +341,10 @@ function seedDefaultData() {
   if (testCount.count === 0) {
     const insertT = _db.prepare(`INSERT INTO testimonials (client_name, client_title, company, avatar_url, video_url, thumbnail_url, quote, rating, order_index) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`);
     const sampleTestimonials = [
-      ['Marcus Sterling','Head of Growth','Apex Media Group','https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80','https://assets.mixkit.co/videos/preview/mixkit-young-man-recording-himself-with-his-phone-42982-large.mp4','https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80','Afsar completely transformed our channel retention. Our average view duration skyrocketed by 42% within just 30 days of working together.',5,1],
+      ['Marcus Sterling','Head of Growth','Apex Media Group','https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80','/uploads/Air_Spinnner_Second_Video-1790887275260-999210913.mp4','/uploads/Firefly__4_-1790887321364-905892598.jpg','Afsar completely transformed our channel retention. Our average view duration skyrocketed by 42% within just 30 days of working together.',5,1],
       ['Elena Rostova','Creative Director','Lumina Cosmetics','https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80','https://assets.mixkit.co/videos/preview/mixkit-fashion-model-posing-in-a-studio-42978-large.mp4','https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80','Finding an editor who understands color grading and luxury commercial rhythm this deeply is nearly impossible. Afsar delivers master-grade edits every single round.',5,2],
       ['David Thorne','YouTuber (1.4M Subs)','Thorne Tech Odyssey','https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80','https://assets.mixkit.co/videos/preview/mixkit-man-working-on-his-laptop-at-home-43282-large.mp4','https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=600&q=80',"He doesn't just cut video—he engineers visual stories that retain viewers until the final second. Best editing partner I have ever hired in 6 years.",5,3],
+      ['Tanaya Rane','Marketing Director','Tyra Studio','','/uploads/Ladder_1-1790890639399-513834551.mp4','/uploads/TYR07962-1790890643327-775290409.JPG','This Video is very good',5,4],
     ];
     for (const t of sampleTestimonials) insertT.run(...t);
   }
