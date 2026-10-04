@@ -9,7 +9,7 @@ require('dotenv').config();
 
 const db = require('./db');
 const { verifyToken, JWT_SECRET } = require('./middleware/auth');
-const { syncPermanentSeedCode } = require('./seedSync');
+const { syncPermanentSeedCode, importContentIntoDb, seedJsonPath } = require('./seedSync');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -162,6 +162,31 @@ app.post('/api/admin/sync-seed', verifyToken, (req, res) => {
     }
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/admin/export-content', verifyToken, (req, res) => {
+  try {
+    syncPermanentSeedCode(db);
+    if (fs.existsSync(seedJsonPath)) {
+      const data = fs.readFileSync(seedJsonPath, 'utf8');
+      res.setHeader('Content-Disposition', 'attachment; filename=afsar_portfolio_backup.json');
+      res.setHeader('Content-Type', 'application/json');
+      return res.send(data);
+    }
+    res.status(404).json({ error: 'Backup seed file not found' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/admin/import-content', verifyToken, (req, res) => {
+  try {
+    const content = req.body;
+    importContentIntoDb(db, content);
+    res.json({ message: 'Content restored and synchronized successfully!' });
+  } catch (err) {
+    res.status(500).json({ error: err.message || 'Import failed' });
   }
 });
 

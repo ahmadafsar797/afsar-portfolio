@@ -9,7 +9,7 @@ const bcrypt = require('bcryptjs');
 const dataDir   = path.join(__dirname, '..', 'data');
 const uploadsDir = path.join(__dirname, '..', 'uploads');
 const dbPath    = path.join(dataDir, 'portfolio.db');
-const { syncPermanentSeedCode, seedJsonPath } = require('./seedSync');
+const { syncPermanentSeedCode, importContentIntoDb, seedJsonPath } = require('./seedSync');
 
 // ─── Compatibility wrapper: makes sql.js look like better-sqlite3 ─────────────
 // All operations are synchronous once the db is initialized.
@@ -278,6 +278,21 @@ function seedDefaultData() {
     const hash = bcrypt.hashSync('editor2026!', salt);
     _db.prepare('INSERT INTO admins (username, password_hash, email) VALUES (?, ?, ?)').run('admin', hash, 'contact@afsaredits.com');
     console.log('Seeded default admin: admin / editor2026!');
+  }
+
+  // Check if database needs to sync from a newer default_content.json (from git commit or fresh deploy)
+  const reelsCheck = _db.prepare('SELECT COUNT(*) as count FROM reels').get();
+  if (reelsCheck.count > 0 && seedJson && seedJson.syncedAt) {
+    try {
+      const dbSyncedAt = _db.prepare("SELECT value FROM settings WHERE key = 'last_seed_synced_at'").get();
+      if (!dbSyncedAt || seedJson.syncedAt > dbSyncedAt.value) {
+        console.log(`[Auto-Sync] Found newer default_content.json (${seedJson.syncedAt}) from Git deployment. Syncing database tables...`);
+        importContentIntoDb(_db, seedJson);
+        return;
+      }
+    } catch (e) {
+      console.warn('[Auto-Sync] Sync check error:', e.message);
+    }
   }
 
   // 2. Settings

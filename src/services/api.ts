@@ -379,4 +379,25 @@ export const api = {
     if (!res.ok) throw new Error('Failed to synchronize permanent code');
     return res.json();
   },
+
+  async exportBackup(): Promise<Blob> {
+    const res = await fetch(`${API_BASE}/admin/export-content`, {
+      headers: getAuthHeaders(),
+    });
+    if (!res.ok) throw new Error('Failed to export content backup');
+    return res.blob();
+  },
+
+  async importBackup(content: any): Promise<{ message: string }> {
+    const res = await fetch(`${API_BASE}/admin/import-content`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(content),
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error || 'Failed to import backup');
+    }
+    return res.json();
+  },
 };
