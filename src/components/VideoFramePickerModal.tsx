@@ -27,6 +27,7 @@ interface VideoFramePickerModalProps {
   currentPoster?: string | null;
   onSavePoster: (posterUrl: string) => Promise<void> | void;
   title?: string;
+  aspectRatio?: '16:9' | '9:16';
 }
 
 export const VideoFramePickerModal: React.FC<VideoFramePickerModalProps> = ({
@@ -36,6 +37,7 @@ export const VideoFramePickerModal: React.FC<VideoFramePickerModalProps> = ({
   currentPoster,
   onSavePoster,
   title = 'Master Showreel',
+  aspectRatio = '16:9',
 }) => {
   const [candidateFrames, setCandidateFrames] = useState<CandidateFrame[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -109,8 +111,9 @@ export const VideoFramePickerModal: React.FC<VideoFramePickerModalProps> = ({
     const handleSeeked = () => {
       if (!isMounted) return;
       try {
-        canvas.width = video.videoWidth || 1280;
-        canvas.height = video.videoHeight || 720;
+        const isVertical = aspectRatio === '9:16';
+        canvas.width = video.videoWidth || (isVertical ? 540 : 1280);
+        canvas.height = video.videoHeight || (isVertical ? 960 : 720);
         if (ctx) {
           ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
           const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
@@ -337,53 +340,58 @@ export const VideoFramePickerModal: React.FC<VideoFramePickerModalProps> = ({
                 </div>
 
                 {/* Candidate Frames Grid */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3.5">
-                  {candidateFrames.map((frame, idx) => {
-                    const isSelected = selectedFrame === frame.dataUrl;
-                    return (
-                      <div
-                        key={idx}
-                        onClick={() => {
-                          setSelectedFrame(frame.dataUrl);
-                          setScrubberTime(frame.time);
-                          if (previewVideoRef.current) {
-                            previewVideoRef.current.currentTime = frame.time;
-                          }
-                        }}
-                        className={`group relative aspect-16-9 rounded-xl overflow-hidden cursor-pointer border-2 transition-all duration-200 bg-black ${
-                          isSelected
-                            ? 'border-[#C65D45] shadow-[0_0_16px_rgba(198,93,69,0.5)] scale-[1.02]'
-                            : 'border-white/15 hover:border-white/40 opacity-75 hover:opacity-100'
-                        }`}
-                      >
-                        <img
-                          src={frame.dataUrl}
-                          alt={`Frame at ${frame.formattedTime}`}
-                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                        />
+                {(() => {
+                  const isVertical = aspectRatio === '9:16';
+                  return (
+                    <div className={`grid ${isVertical ? 'grid-cols-2 sm:grid-cols-4 md:grid-cols-8' : 'grid-cols-2 sm:grid-cols-4'} gap-2.5 sm:gap-3.5`}>
+                      {candidateFrames.map((frame, idx) => {
+                        const isSelected = selectedFrame === frame.dataUrl;
+                        return (
+                          <div
+                            key={idx}
+                            onClick={() => {
+                              setSelectedFrame(frame.dataUrl);
+                              setScrubberTime(frame.time);
+                              if (previewVideoRef.current) {
+                                previewVideoRef.current.currentTime = frame.time;
+                              }
+                            }}
+                            className={`group relative ${isVertical ? 'aspect-[9/16]' : 'aspect-16-9'} rounded-xl overflow-hidden cursor-pointer border-2 transition-all duration-200 bg-black ${
+                              isSelected
+                                ? 'border-[#C65D45] shadow-[0_0_16px_rgba(198,93,69,0.5)] scale-[1.02]'
+                                : 'border-white/15 hover:border-white/40 opacity-75 hover:opacity-100'
+                            }`}
+                          >
+                            <img
+                              src={frame.dataUrl}
+                              alt={`Frame at ${frame.formattedTime}`}
+                              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                            />
 
-                        {/* Timestamp Pill */}
-                        <div className="absolute bottom-1.5 left-1.5 px-2 py-0.5 rounded-md bg-black/80 backdrop-blur-sm text-[10px] font-mono font-bold text-white/90">
-                          {frame.formattedTime}
-                        </div>
+                            {/* Timestamp Pill */}
+                            <div className="absolute bottom-1.5 left-1.5 px-2 py-0.5 rounded-md bg-black/80 backdrop-blur-sm text-[10px] font-mono font-bold text-white/90">
+                              {frame.formattedTime}
+                            </div>
 
-                        {/* Selected Indicator */}
-                        {isSelected && (
-                          <div className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-[#C65D45] text-white flex items-center justify-center shadow-lg">
-                            <Check className="w-3.5 h-3.5 stroke-[3]" />
+                            {/* Selected Indicator */}
+                            {isSelected && (
+                              <div className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-[#C65D45] text-white flex items-center justify-center shadow-lg">
+                                <Check className="w-3.5 h-3.5 stroke-[3]" />
+                              </div>
+                            )}
                           </div>
-                        )}
-                      </div>
-                    );
-                  })}
+                        );
+                      })}
 
-                  {candidateFrames.length === 0 && isGenerating && (
-                    <div className="col-span-2 sm:col-span-4 h-28 flex items-center justify-center gap-2 rounded-xl bg-black/40 border border-white/10 text-xs text-white/50">
-                      <RefreshCw className="w-4 h-4 animate-spin text-[#C65D45]" />
-                      <span>Scanning video for optimal frames...</span>
+                      {candidateFrames.length === 0 && isGenerating && (
+                        <div className="col-span-2 sm:col-span-4 h-28 flex items-center justify-center gap-2 rounded-xl bg-black/40 border border-white/10 text-xs text-white/50">
+                          <RefreshCw className="w-4 h-4 animate-spin text-[#C65D45]" />
+                          <span>Scanning video for optimal frames...</span>
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
+                  );
+                })()}
               </div>
 
               {/* ── SECTION 2: INTERACTIVE FRAME SCRUBBER & LIVE PREVIEW ────────────── */}
@@ -399,7 +407,7 @@ export const VideoFramePickerModal: React.FC<VideoFramePickerModalProps> = ({
                 </div>
 
                 {/* Scrubber Video Preview Box */}
-                <div className="relative w-full aspect-16-9 max-h-64 sm:max-h-72 rounded-xl overflow-hidden bg-black border border-white/20 mx-auto flex items-center justify-center">
+                <div className={`relative w-full ${aspectRatio === '9:16' ? 'aspect-[9/16] max-h-80 max-w-xs' : 'aspect-16-9 max-h-64 sm:max-h-72'} rounded-xl overflow-hidden bg-black border border-white/20 mx-auto flex items-center justify-center`}>
                   <video
                     ref={previewVideoRef}
                     src={videoUrl}

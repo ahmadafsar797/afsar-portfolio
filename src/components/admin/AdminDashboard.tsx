@@ -42,6 +42,14 @@ import {
 } from '../../types';
 import { isYouTubeUrl, getYouTubeThumbnail } from '../../utils/videoUtils';
 
+export interface ExtractedVideoFrame {
+  id: number;
+  time: number;
+  label: string;
+  dataUrl: string;
+  blob: Blob;
+}
+
 interface AdminDashboardProps {
   isOpen: boolean;
   onClose: () => void;
@@ -89,6 +97,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
 
   // Showreel frame picker modal
   const [showreelPickerOpen, setShowreelPickerOpen] = useState(false);
+
+  // 5-Frame Candidate Thumbnail states for Reels & Horizontal Videos
+  const [reelCandidateFrames, setReelCandidateFrames] = useState<ExtractedVideoFrame[]>([]);
+  const [extractingReelFrames, setExtractingReelFrames] = useState<boolean>(false);
+  const [selectedReelFrameId, setSelectedReelFrameId] = useState<number | null>(null);
+  const [reelFramePickerOpen, setReelFramePickerOpen] = useState<boolean>(false);
+
+  const [horizontalCandidateFrames, setHorizontalCandidateFrames] = useState<ExtractedVideoFrame[]>([]);
+  const [extractingHorizontalFrames, setExtractingHorizontalFrames] = useState<boolean>(false);
+  const [selectedHorizontalFrameId, setSelectedHorizontalFrameId] = useState<number | null>(null);
+  const [horizontalFramePickerOpen, setHorizontalFramePickerOpen] = useState<boolean>(false);
 
   // Password change state
   const [passwordForm, setPasswordForm] = useState({
@@ -206,106 +225,271 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
     }
   };
 
-  // Helper to extract a high-quality frame from a video file in the browser
-  const extractFrameFromVideoFile = (file: File): Promise<Blob | null> => {
+  // Helper to extract 5 candidate frames across a video with true unzoomed aspect ratio
+  const extractMultipleVideoFrames = (
+    source: File | string,
+    isVertical: boolean = true
+  ): Promise<ExtractedVideoFrame[]> => {
     return new Promise((resolve) => {
       try {
-        const url = URL.createObjectURL(file);
+        const isFile = typeof source !== 'string';
+        const url = isFile ? URL.createObjectURL(source) : source;
         const video = document.createElement('video');
-        video.preload = 'metadata';
+        video.crossOrigin = 'anonymous';
+        video.preload = 'auto';
         video.muted = true;
         video.playsInline = true;
         video.src = url;
 
-        let done = false;
+        let isFinished = false;
         const cleanup = () => {
-          if (!done) {
-            done = true;
-            URL.revokeObjectURL(url);
+          if (!isFinished) {
+            isFinished = true;
+            if (isFile) URL.revokeObjectURL(url);
           }
         };
 
-        const capture = () => {
-          if (done) return;
-          try {
-            const w = video.videoWidth || 640;
-            const h = video.videoHeight || 360;
-            const canvas = document.createElement('canvas');
-            canvas.width = Math.min(w, 720);
-            canvas.height = Math.round((canvas.width * h) / w);
-            const ctx = canvas.getContext('2d');
-            if (ctx) {
-              ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-              canvas.toBlob((blob) => {
-                cleanup();
-                resolve(blob);
-              }, 'image/jpeg', 0.85);
-              return;
-            }
-          } catch {
-            // ignore
-          }
+        const timeout = setTimeout(() => {
           cleanup();
-          resolve(null);
-        };
+          resolve([]);
+        }, 12000);
 
-        video.addEventListener('loadeddata', () => {
-          if (video.duration && isFinite(video.duration) && video.duration > 1) {
-            video.currentTime = Math.min(1.0, video.duration * 0.15);
-          } else {
-            capture();
-          }
-        }, { once: true });
-
-        video.addEventListener('seeked', capture, { once: true });
-        video.addEventListener('error', () => {
-          cleanup();
-          resolve(null);
-        }, { once: true });
-
-        setTimeout(() => {
-          if (!done) {
+        video.addEventListener('loadedmetadata', async () => {
+          const duration = video.duration;
+          if (!duration || !isFinite(duration) || duration <= 0) {
+            clearTimeout(timeout);
             cleanup();
-            resolve(null);
+            resolve([]);
+            return;
           }
-        }, 3500);
+
+          // 5 distributed timestamps across video: 10%, 25%, 50%, 75%, 90%
+          const percentages = [0.10, 0.25, 0.50, 0.75, 0.90];
+          const timestamps = percentages.map((p) => {
+            const t = duration * p;
+            return Math.min(Math.max(0.1, t), Math.max(0.1, duration - 0.2));
+          });
+
+          const vW = video.videoWidth || (isVertical ? 540 : 960);
+          const vH = video.videoHeight || (isVertical ? 960 : 540);
+          const targetW = isVertical ? 540 : 960;
+          const targetH = Math.round((targetW * vH) / vW);
+
+          const canvas = document.createElement('canvas');
+          canvas.width = targetW;
+          canvas.height = targetH;
+          const ctx = canvas.getContext('2d');
+
+          const frames: ExtractedVideoFrame[] = [];
+
+          for (let i = 0; i < timestamps.length; i++) {
+            if (isFinished) break;
+            const time = timestamps[i];
+            const pct = Math.round(percentages[i] * 100);
+
+            try {
+              await new Promise<void>((resSeek) => {
+                let seekTimer: any = null;
+                const onSeeked = () => {
+                  clearTimeout(seekTimer);
+                  video.removeEventListener('seeked', onSeeked);
+                  resSeek();
+                };
+                seekTimer = setTimeout(() => {
+                  video.removeEventListener('seeked', onSeeked);
+                  resSeek();
+                }, 2000);
+                video.addEventListener('seeked', onSeeked, { once: true });
+                video.currentTime = time;
+              });
+
+              if (ctx) {
+                ctx.drawImage(video, 0, 0, targetW, targetH);
+                const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+
+                await new Promise<void>((resBlob) => {
+                  canvas.toBlob((blob) => {
+                    if (blob) {
+                      const minutes = Math.floor(time / 60);
+                      const seconds = Math.floor(time % 60);
+                      const timeFormatted = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+                      frames.push({
+                        id: i + 1,
+                        time,
+                        label: `${pct}% (${timeFormatted})`,
+                        dataUrl,
+                        blob,
+                      });
+                    }
+                    resBlob();
+                  }, 'image/jpeg', 0.85);
+                });
+              }
+            } catch {
+              // Continue to next frame
+            }
+          }
+
+          clearTimeout(timeout);
+          cleanup();
+          resolve(frames);
+        }, { once: true });
+
+        video.addEventListener('error', () => {
+          clearTimeout(timeout);
+          cleanup();
+          resolve([]);
+        }, { once: true });
 
         video.load();
       } catch {
-        resolve(null);
+        resolve([]);
       }
     });
   };
 
-  // Video upload with instant auto-generated thumbnail
-  const handleVideoUploadWithAutoThumb = async (
-    e: React.ChangeEvent<HTMLInputElement>,
-    onSuccess: (videoUrl: string, autoThumbUrl?: string) => void
-  ) => {
+  // ── Reel Frame Selection & Upload Handlers ──
+  const handleSelectReelFrame = async (frame: ExtractedVideoFrame) => {
+    try {
+      setSelectedReelFrameId(frame.id);
+      showNotice(`Applying frame at ${frame.label} as thumbnail...`);
+      const safeName = (editingReel?.title || 'reel').replace(/[^a-zA-Z0-9_-]/g, '_');
+      const filename = `${safeName}-${Date.now()}-cover.jpg`;
+      const file = new File([frame.blob], filename, { type: 'image/jpeg' });
+      const res = await api.uploadFile(file);
+      setEditingReel((prev) => (prev ? { ...prev, thumbnail_url: res.url } : null));
+      showNotice(`Thumbnail set to frame at ${frame.label}!`);
+    } catch (err: any) {
+      showNotice(err.message || 'Failed to apply thumbnail frame', 'error');
+    }
+  };
+
+  const handleExtractFramesForCurrentReel = async () => {
+    if (!editingReel?.video_url) return;
+    try {
+      setExtractingReelFrames(true);
+      showNotice('Extracting 5 frames from reel video...');
+      const frames = await extractMultipleVideoFrames(editingReel.video_url, true);
+      setReelCandidateFrames(frames);
+      setExtractingReelFrames(false);
+      if (frames.length > 0) {
+        showNotice('5 frames ready! Click any frame to set as thumbnail.');
+      } else {
+        showNotice('Could not extract frames from this video URL', 'error');
+      }
+    } catch (err: any) {
+      setExtractingReelFrames(false);
+      showNotice(err.message || 'Failed to extract frames', 'error');
+    }
+  };
+
+  const handleReelVideoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     try {
-      showNotice('Uploading video & generating instant thumbnail...');
+      showNotice('Uploading reel video...');
       const videoRes = await api.uploadFile(file);
-      let autoThumbUrl: string | undefined;
+      setEditingReel((prev) => (prev ? { ...prev, video_url: videoRes.url } : null));
 
-      try {
-        const thumbBlob = await extractFrameFromVideoFile(file);
-        if (thumbBlob) {
-          const safeName = file.name.replace(/\.[^/.]+$/, '').replace(/[^a-zA-Z0-9_-]/g, '_');
-          const thumbFile = new File([thumbBlob], `${safeName}-cover.jpg`, { type: 'image/jpeg' });
-          const thumbRes = await api.uploadFile(thumbFile);
-          autoThumbUrl = thumbRes.url;
-        }
-      } catch {
-        // Thumbnail extraction is best-effort; video is already uploaded
+      setExtractingReelFrames(true);
+      showNotice('Extracting 5 candidate thumbnail frames from video...');
+      const frames = await extractMultipleVideoFrames(file, true);
+      setReelCandidateFrames(frames);
+      setExtractingReelFrames(false);
+
+      if (frames.length > 0) {
+        const defaultFrame = frames[0];
+        setSelectedReelFrameId(defaultFrame.id);
+        const safeName = file.name.replace(/\.[^/.]+$/, '').replace(/[^a-zA-Z0-9_-]/g, '_');
+        const thumbFile = new File([defaultFrame.blob], `${safeName}-cover.jpg`, { type: 'image/jpeg' });
+        const thumbRes = await api.uploadFile(thumbFile);
+        setEditingReel((prev) => (prev ? { ...prev, thumbnail_url: thumbRes.url } : null));
+        showNotice('Video uploaded & 5 thumbnail frames ready! Click any frame to choose.');
+      } else {
+        showNotice('Video uploaded successfully!');
       }
-
-      onSuccess(videoRes.url, autoThumbUrl);
-      showNotice('Video and thumbnail ready!');
     } catch (err: any) {
+      setExtractingReelFrames(false);
       showNotice(err.message || 'Failed to upload video', 'error');
     }
+  };
+
+  // ── Horizontal Video Frame Selection & Upload Handlers ──
+  const handleSelectHorizontalFrame = async (frame: ExtractedVideoFrame) => {
+    try {
+      setSelectedHorizontalFrameId(frame.id);
+      showNotice(`Applying frame at ${frame.label} as thumbnail...`);
+      const safeName = (editingHorizontal?.title || 'film').replace(/[^a-zA-Z0-9_-]/g, '_');
+      const filename = `${safeName}-${Date.now()}-cover.jpg`;
+      const file = new File([frame.blob], filename, { type: 'image/jpeg' });
+      const res = await api.uploadFile(file);
+      setEditingHorizontal((prev) => (prev ? { ...prev, thumbnail_url: res.url } : null));
+      showNotice(`Thumbnail set to frame at ${frame.label}!`);
+    } catch (err: any) {
+      showNotice(err.message || 'Failed to apply thumbnail frame', 'error');
+    }
+  };
+
+  const handleExtractFramesForCurrentHorizontal = async () => {
+    if (!editingHorizontal?.video_url) return;
+    try {
+      setExtractingHorizontalFrames(true);
+      showNotice('Extracting 5 frames from film video...');
+      const frames = await extractMultipleVideoFrames(editingHorizontal.video_url, false);
+      setHorizontalCandidateFrames(frames);
+      setExtractingHorizontalFrames(false);
+      if (frames.length > 0) {
+        showNotice('5 frames ready! Click any frame to set as thumbnail.');
+      } else {
+        showNotice('Could not extract frames from this video URL', 'error');
+      }
+    } catch (err: any) {
+      setExtractingHorizontalFrames(false);
+      showNotice(err.message || 'Failed to extract frames', 'error');
+    }
+  };
+
+  const handleHorizontalVideoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      showNotice('Uploading film video...');
+      const videoRes = await api.uploadFile(file);
+      setEditingHorizontal((prev) => (prev ? { ...prev, video_url: videoRes.url } : null));
+
+      setExtractingHorizontalFrames(true);
+      showNotice('Extracting 5 candidate thumbnail frames from video...');
+      const frames = await extractMultipleVideoFrames(file, false);
+      setHorizontalCandidateFrames(frames);
+      setExtractingHorizontalFrames(false);
+
+      if (frames.length > 0) {
+        const defaultFrame = frames[0];
+        setSelectedHorizontalFrameId(defaultFrame.id);
+        const safeName = file.name.replace(/\.[^/.]+$/, '').replace(/[^a-zA-Z0-9_-]/g, '_');
+        const thumbFile = new File([defaultFrame.blob], `${safeName}-cover.jpg`, { type: 'image/jpeg' });
+        const thumbRes = await api.uploadFile(thumbFile);
+        setEditingHorizontal((prev) => (prev ? { ...prev, thumbnail_url: thumbRes.url } : null));
+        showNotice('Video uploaded & 5 thumbnail frames ready! Click any frame to choose.');
+      } else {
+        showNotice('Video uploaded successfully!');
+      }
+    } catch (err: any) {
+      setExtractingHorizontalFrames(false);
+      showNotice(err.message || 'Failed to upload video', 'error');
+    }
+  };
+
+  const closeReelModal = () => {
+    setEditingReel(null);
+    setReelCandidateFrames([]);
+    setSelectedReelFrameId(null);
+  };
+
+  const closeHorizontalModal = () => {
+    setEditingHorizontal(null);
+    setHorizontalCandidateFrames([]);
+    setSelectedHorizontalFrameId(null);
   };
 
   const handleProfilePicUpload = async (file: File) => {
@@ -695,7 +879,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                     </div>
 
                     <button
-                      onClick={() =>
+                      onClick={() => {
                         setEditingReel({
                           title: '',
                           category: 'Instagram Reels',
@@ -705,8 +889,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                           views_count: '1.2M Views',
                           duration: '0:30',
                           is_featured: 1,
-                        })
-                      }
+                        });
+                        setReelCandidateFrames([]);
+                        setSelectedReelFrameId(null);
+                      }}
                       className="px-4 py-2 rounded-full text-xs font-montserrat uppercase tracking-wider text-white bg-[#C65D45] font-semibold flex items-center gap-1.5"
                     >
                       <Plus className="w-4 h-4" />
@@ -721,7 +907,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                         <h4 className="font-pogonia text-xl text-white">
                           {editingReel.id ? 'Edit Reel' : 'Add New Reel'}
                         </h4>
-                        <button onClick={() => setEditingReel(null)} className="text-white/50 hover:text-white">
+                        <button onClick={closeReelModal} className="text-white/50 hover:text-white">
                           <X className="w-4 h-4" />
                         </button>
                       </div>
@@ -795,19 +981,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                               type="file"
                               accept="video/*"
                               className="hidden"
-                              onChange={(e) =>
-                                handleVideoUploadWithAutoThumb(e, (videoUrl, autoThumbUrl) => {
-                                  setEditingReel((prev) =>
-                                    prev
-                                      ? {
-                                          ...prev,
-                                          video_url: videoUrl,
-                                          thumbnail_url: prev.thumbnail_url || autoThumbUrl || '',
-                                        }
-                                      : null
-                                  );
-                                })
-                              }
+                              onChange={handleReelVideoUpload}
                             />
                           </label>
                         </div>
@@ -849,9 +1023,97 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                         </div>
                       </div>
 
+                      {/* 5-Candidate Thumbnail Frame Selector for Reels */}
+                      {editingReel.video_url && !isYouTubeUrl(editingReel.video_url) && (
+                        <div className="p-4 rounded-xl bg-black/40 border border-[#C65D45]/30 space-y-3">
+                          <div className="flex flex-wrap items-center justify-between gap-2">
+                            <div className="flex items-center gap-2">
+                              <Camera className="w-4 h-4 text-[#C65D45]" />
+                              <span className="text-xs font-montserrat uppercase font-semibold text-white tracking-wider">
+                                Choose Thumbnail from 5 Video Frames (9:16)
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <button
+                                type="button"
+                                disabled={extractingReelFrames}
+                                onClick={handleExtractFramesForCurrentReel}
+                                className="px-2.5 py-1 rounded bg-white/5 hover:bg-white/10 text-[11px] text-white/80 flex items-center gap-1.5 border border-white/10 transition-colors"
+                              >
+                                <RefreshCw className={`w-3 h-3 ${extractingReelFrames ? 'animate-spin' : ''}`} />
+                                <span>{reelCandidateFrames.length > 0 ? 'Re-extract 5 Frames' : 'Extract 5 Frames'}</span>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setReelFramePickerOpen(true)}
+                                className="px-2.5 py-1 rounded bg-[#C65D45]/20 hover:bg-[#C65D45]/30 text-[11px] text-[#C65D45] flex items-center gap-1.5 border border-[#C65D45]/40 transition-colors"
+                              >
+                                <Film className="w-3 h-3" />
+                                <span>Scrub Timeline</span>
+                              </button>
+                            </div>
+                          </div>
+
+                          {extractingReelFrames ? (
+                            <div className="flex items-center justify-center py-6 gap-2 text-xs text-white/60">
+                              <RefreshCw className="w-4 h-4 animate-spin text-[#C65D45]" />
+                              <span>Extracting 5 candidate frames across the video...</span>
+                            </div>
+                          ) : reelCandidateFrames.length > 0 ? (
+                            <>
+                              <div className="grid grid-cols-5 gap-2.5">
+                                {reelCandidateFrames.map((frame) => {
+                                  const isSelected = selectedReelFrameId === frame.id;
+                                  return (
+                                    <button
+                                      key={frame.id}
+                                      type="button"
+                                      onClick={() => handleSelectReelFrame(frame)}
+                                      className={`group relative aspect-[9/16] rounded-lg overflow-hidden cursor-pointer border-2 transition-all text-left ${
+                                        isSelected
+                                          ? 'border-[#C65D45] shadow-lg shadow-[#C65D45]/20 ring-2 ring-[#C65D45]/50 scale-[1.03]'
+                                          : 'border-white/10 hover:border-white/40 hover:scale-[1.01]'
+                                      }`}
+                                    >
+                                      <img
+                                        src={frame.dataUrl}
+                                        alt={`Reel frame at ${frame.label}`}
+                                        className="w-full h-full object-cover"
+                                      />
+                                      <div className="absolute inset-x-0 bottom-0 p-1 bg-gradient-to-t from-black/90 via-black/50 to-transparent flex items-center justify-between text-[10px]">
+                                        <span className="font-mono text-white/90 bg-black/60 px-1 py-0.5 rounded text-[10px]">
+                                          {frame.label}
+                                        </span>
+                                        {isSelected && (
+                                          <span className="text-[#C65D45] font-semibold text-[9px] bg-black/80 px-1 py-0.5 rounded border border-[#C65D45]/40">
+                                            Selected
+                                          </span>
+                                        )}
+                                      </div>
+                                      {isSelected && (
+                                        <div className="absolute top-1.5 right-1.5 bg-[#C65D45] text-white rounded-full p-0.5 shadow-md">
+                                          <CheckCircle className="w-3.5 h-3.5" />
+                                        </div>
+                                      )}
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                              <p className="text-[11px] text-white/50">
+                                Select any frame above to set as the reel cover. Unzoomed, native 9:16 vertical proportion.
+                              </p>
+                            </>
+                          ) : (
+                            <p className="text-[11px] text-white/40 italic">
+                              Click "Extract 5 Frames" above to automatically pull 5 scene snapshots from this video.
+                            </p>
+                          )}
+                        </div>
+                      )}
+
                       <div className="flex justify-end gap-3 pt-3 border-t border-white/10">
                         <button
-                          onClick={() => setEditingReel(null)}
+                          onClick={closeReelModal}
                           className="px-4 py-2 rounded-full text-xs text-white/70 hover:text-white"
                         >
                           Cancel
@@ -870,7 +1132,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                                 await api.createReel(editingReel);
                                 showNotice('New reel created successfully!');
                               }
-                              setEditingReel(null);
+                              closeReelModal();
                               loadAllAdminData();
                               onDataChanged();
                             } catch (err: any) {
@@ -913,7 +1175,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                             <td className="p-3 text-right">
                               <div className="flex items-center justify-end gap-2">
                                 <button
-                                  onClick={() => setEditingReel(r)}
+                                  onClick={() => {
+                                    setEditingReel(r);
+                                    setReelCandidateFrames([]);
+                                    setSelectedReelFrameId(null);
+                                  }}
                                   className="p-1.5 rounded-lg bg-white/5 hover:bg-white/15 text-white/70 hover:text-white"
                                   title="Edit"
                                 >
@@ -957,7 +1223,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                     </div>
 
                     <button
-                      onClick={() =>
+                      onClick={() => {
                         setEditingHorizontal({
                           title: '',
                           category: 'Commercials',
@@ -968,8 +1234,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                           duration: '02:30',
                           year: '2026',
                           is_featured: 1,
-                        })
-                      }
+                        });
+                        setHorizontalCandidateFrames([]);
+                        setSelectedHorizontalFrameId(null);
+                      }}
                       className="px-4 py-2 rounded-full text-xs font-montserrat uppercase tracking-wider text-white bg-[#C65D45] font-semibold flex items-center gap-1.5"
                     >
                       <Plus className="w-4 h-4" />
@@ -983,7 +1251,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                         <h4 className="font-pogonia text-xl text-white">
                           {editingHorizontal.id ? 'Edit Horizontal Film' : 'Add New Horizontal Film'}
                         </h4>
-                        <button onClick={() => setEditingHorizontal(null)} className="text-white/50 hover:text-white">
+                        <button onClick={closeHorizontalModal} className="text-white/50 hover:text-white">
                           <X className="w-4 h-4" />
                         </button>
                       </div>
@@ -1070,19 +1338,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                               type="file"
                               accept="video/*"
                               className="hidden"
-                              onChange={(e) =>
-                                handleVideoUploadWithAutoThumb(e, (videoUrl, autoThumbUrl) => {
-                                  setEditingHorizontal((prev) =>
-                                    prev
-                                      ? {
-                                          ...prev,
-                                          video_url: videoUrl,
-                                          thumbnail_url: prev.thumbnail_url || autoThumbUrl || '',
-                                        }
-                                      : null
-                                  );
-                                })
-                              }
+                              onChange={handleHorizontalVideoUpload}
                             />
                           </label>
                         </div>
@@ -1137,9 +1393,97 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                         />
                       </div>
 
+                      {/* 5-Candidate Thumbnail Frame Selector for Horizontal Videos */}
+                      {editingHorizontal.video_url && !isYouTubeUrl(editingHorizontal.video_url) && (
+                        <div className="p-4 rounded-xl bg-black/40 border border-[#C65D45]/30 space-y-3">
+                          <div className="flex flex-wrap items-center justify-between gap-2">
+                            <div className="flex items-center gap-2">
+                              <Camera className="w-4 h-4 text-[#C65D45]" />
+                              <span className="text-xs font-montserrat uppercase font-semibold text-white tracking-wider">
+                                Choose Thumbnail from 5 Video Frames (16:9)
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <button
+                                type="button"
+                                disabled={extractingHorizontalFrames}
+                                onClick={handleExtractFramesForCurrentHorizontal}
+                                className="px-2.5 py-1 rounded bg-white/5 hover:bg-white/10 text-[11px] text-white/80 flex items-center gap-1.5 border border-white/10 transition-colors"
+                              >
+                                <RefreshCw className={`w-3 h-3 ${extractingHorizontalFrames ? 'animate-spin' : ''}`} />
+                                <span>{horizontalCandidateFrames.length > 0 ? 'Re-extract 5 Frames' : 'Extract 5 Frames'}</span>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setHorizontalFramePickerOpen(true)}
+                                className="px-2.5 py-1 rounded bg-[#C65D45]/20 hover:bg-[#C65D45]/30 text-[11px] text-[#C65D45] flex items-center gap-1.5 border border-[#C65D45]/40 transition-colors"
+                              >
+                                <Film className="w-3 h-3" />
+                                <span>Scrub Timeline</span>
+                              </button>
+                            </div>
+                          </div>
+
+                          {extractingHorizontalFrames ? (
+                            <div className="flex items-center justify-center py-6 gap-2 text-xs text-white/60">
+                              <RefreshCw className="w-4 h-4 animate-spin text-[#C65D45]" />
+                              <span>Extracting 5 candidate frames across the video...</span>
+                            </div>
+                          ) : horizontalCandidateFrames.length > 0 ? (
+                            <>
+                              <div className="grid grid-cols-5 gap-2.5">
+                                {horizontalCandidateFrames.map((frame) => {
+                                  const isSelected = selectedHorizontalFrameId === frame.id;
+                                  return (
+                                    <button
+                                      key={frame.id}
+                                      type="button"
+                                      onClick={() => handleSelectHorizontalFrame(frame)}
+                                      className={`group relative aspect-video rounded-lg overflow-hidden cursor-pointer border-2 transition-all text-left ${
+                                        isSelected
+                                          ? 'border-[#C65D45] shadow-lg shadow-[#C65D45]/20 ring-2 ring-[#C65D45]/50 scale-[1.03]'
+                                          : 'border-white/10 hover:border-white/40 hover:scale-[1.01]'
+                                      }`}
+                                    >
+                                      <img
+                                        src={frame.dataUrl}
+                                        alt={`Film frame at ${frame.label}`}
+                                        className="w-full h-full object-cover"
+                                      />
+                                      <div className="absolute inset-x-0 bottom-0 p-1 bg-gradient-to-t from-black/90 via-black/50 to-transparent flex items-center justify-between text-[10px]">
+                                        <span className="font-mono text-white/90 bg-black/60 px-1 py-0.5 rounded text-[10px]">
+                                          {frame.label}
+                                        </span>
+                                        {isSelected && (
+                                          <span className="text-[#C65D45] font-semibold text-[9px] bg-black/80 px-1 py-0.5 rounded border border-[#C65D45]/40">
+                                            Selected
+                                          </span>
+                                        )}
+                                      </div>
+                                      {isSelected && (
+                                        <div className="absolute top-1.5 right-1.5 bg-[#C65D45] text-white rounded-full p-0.5 shadow-md">
+                                          <CheckCircle className="w-3.5 h-3.5" />
+                                        </div>
+                                      )}
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                              <p className="text-[11px] text-white/50">
+                                Select any frame above to set as the film cover. Unzoomed, native 16:9 widescreen proportion.
+                              </p>
+                            </>
+                          ) : (
+                            <p className="text-[11px] text-white/40 italic">
+                              Click "Extract 5 Frames" above to automatically pull 5 scene snapshots from this video.
+                            </p>
+                          )}
+                        </div>
+                      )}
+
                       <div className="flex justify-end gap-3 pt-3 border-t border-white/10">
                         <button
-                          onClick={() => setEditingHorizontal(null)}
+                          onClick={closeHorizontalModal}
                           className="px-4 py-2 rounded-full text-xs text-white/70 hover:text-white"
                         >
                           Cancel
@@ -1158,7 +1502,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                                 await api.createHorizontalVideo(editingHorizontal);
                                 showNotice('New horizontal film created!');
                               }
-                              setEditingHorizontal(null);
+                              closeHorizontalModal();
                               loadAllAdminData();
                               onDataChanged();
                             } catch (err: any) {
@@ -1201,7 +1545,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                             <td className="p-3 text-right">
                               <div className="flex items-center justify-end gap-2">
                                 <button
-                                  onClick={() => setEditingHorizontal(v)}
+                                  onClick={() => {
+                                    setEditingHorizontal(v);
+                                    setHorizontalCandidateFrames([]);
+                                    setSelectedHorizontalFrameId(null);
+                                  }}
                                   className="p-1.5 rounded-lg bg-white/5 hover:bg-white/15 text-white/70 hover:text-white"
                                 >
                                   <Edit className="w-3.5 h-3.5" />
@@ -3643,6 +3991,38 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
             }
           }}
           title="Master Showreel"
+        />
+      )}
+
+      {/* Reel Frame Picker Modal (9:16) */}
+      {editingReel?.video_url && (
+        <VideoFramePickerModal
+          isOpen={reelFramePickerOpen}
+          onClose={() => setReelFramePickerOpen(false)}
+          videoUrl={editingReel.video_url}
+          currentPoster={editingReel.thumbnail_url}
+          aspectRatio="9:16"
+          onSavePoster={(url) => {
+            setEditingReel((prev) => (prev ? { ...prev, thumbnail_url: url } : null));
+            showNotice('Reel thumbnail updated from scrubber!');
+          }}
+          title={editingReel.title ? `Reel: ${editingReel.title}` : 'Reel Frame Picker'}
+        />
+      )}
+
+      {/* Horizontal Video Frame Picker Modal (16:9) */}
+      {editingHorizontal?.video_url && (
+        <VideoFramePickerModal
+          isOpen={horizontalFramePickerOpen}
+          onClose={() => setHorizontalFramePickerOpen(false)}
+          videoUrl={editingHorizontal.video_url}
+          currentPoster={editingHorizontal.thumbnail_url}
+          aspectRatio="16:9"
+          onSavePoster={(url) => {
+            setEditingHorizontal((prev) => (prev ? { ...prev, thumbnail_url: url } : null));
+            showNotice('Film thumbnail updated from scrubber!');
+          }}
+          title={editingHorizontal.title ? `Film: ${editingHorizontal.title}` : 'Film Frame Picker'}
         />
       )}
     </div>
