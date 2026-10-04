@@ -730,7 +730,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                             className="w-full px-3 py-2 rounded-lg bg-black border border-white/15 text-sm text-white"
                           >
                             <option value="Instagram Reels">Instagram Reels</option>
-                            <option value="YouTube Shorts">YouTube Shorts</option>
                             <option value="Social Media Ads">Social Media Ads</option>
                             <option value="Talking Head Edits">Talking Head Edits</option>
                             <option value="Product Reels">Product Reels</option>

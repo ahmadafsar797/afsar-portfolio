@@ -26,7 +26,6 @@ export const ReelsSection: React.FC<ReelsSectionProps> = ({ reels, onOpenLightbo
   const categories = [
     'All',
     'Instagram Reels',
-    'YouTube Shorts',
     'Social Media Ads',
     'Talking Head Edits',
     'Product Reels',
