@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "syncedAt": "2026-10-04T09:00:14.852Z",
+  "syncedAt": "2026-10-04T09:25:07.525Z",
   "settings": {
     "site_name": "AFSAR AHMAD | Video Editor & Motion Designer",
     "hero_headline": "I Edit Stories That Make People Stop Scrolling.",
@@ -16,7 +16,7 @@
     "youtube_url": "https://youtube.com/@afsaredits",
     "twitter_url": "https://x.com/afsar_edits",
     "profile_picture_url": "/uploads/profile-picture.jpg?v=1790886537679",
-    "last_seed_synced_at": "2026-10-04T09:00:14.847Z"
+    "last_seed_synced_at": "2026-10-04T09:25:07.506Z"
   },
   "about": {
     "headline": "Story first. Pacing second. Effects serve the narrative.",
@@ -113,6 +113,18 @@
       "aspect_ratio": "9:16",
       "is_featured": 0,
       "order_index": 7
+    },
+    {
+      "title": "Dairy Milk Ai Video",
+      "category": "Instagram Reels",
+      "client": "Cadbury",
+      "video_url": "/uploads/Dairy_Milk_Ai_Video-1791105246007.mp4",
+      "thumbnail_url": "/uploads/Dairy_Milk_Ai_Video-1791105246007-cover.jpg",
+      "views_count": "1.8M Views",
+      "duration": "0:30",
+      "aspect_ratio": "9:16",
+      "is_featured": 1,
+      "order_index": 8
     }
   ],
   "horizontal_videos": [
