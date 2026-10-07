@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "syncedAt": "2026-10-07T12:54:47.347Z",
+  "syncedAt": "2026-10-07T13:04:13.519Z",
   "settings": {
     "site_name": "AFSAR AHMAD | Video Editor & Motion Designer",
     "hero_headline": "I Edit Stories That Make People Stop Scrolling.",
@@ -16,7 +16,7 @@
     "youtube_url": "https://youtube.com/@afsaredits",
     "twitter_url": "https://x.com/afsar_edits",
     "profile_picture_url": "/uploads/profile-picture.jpg?v=1790886537679",
-    "last_seed_synced_at": "2026-10-07T12:54:46.863Z"
+    "last_seed_synced_at": "2026-10-07T13:03:38.740Z"
   },
   "about": {
     "headline": "Story first. Pacing second. Effects serve the narrative.",
@@ -224,45 +224,6 @@
       "aspect_ratio": "16:9",
       "is_featured": 1,
       "order_index": 1
-    },
-    {
-      "title": "Why 99% Of Startups Fail At Video",
-      "category": "YouTube videos",
-      "client": "The Venture Narrative (850K Subs)",
-      "video_url": "https://assets.mixkit.co/videos/preview/mixkit-hands-typing-on-a-laptop-42867-large.mp4",
-      "thumbnail_url": "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=1200&q=80",
-      "description": "Deep-dive video essay analyzing the retention curves of modern tech storytelling. Optimized for an astonishing 68% average watch duration with dynamic infographics and sound sculpting.",
-      "duration": "21:45",
-      "year": "2025",
-      "aspect_ratio": "16:9",
-      "is_featured": 1,
-      "order_index": 2
-    },
-    {
-      "title": "NEO VELOCE: Electric Supercar Reveal",
-      "category": "Commercials",
-      "client": "Apex Motors Worldwide",
-      "video_url": "https://assets.mixkit.co/videos/preview/mixkit-car-driving-through-the-city-at-night-42864-large.mp4",
-      "thumbnail_url": "https://images.unsplash.com/photo-1544829099-b9a0c07fad1a?auto=format&fit=crop&w=1200&q=80",
-      "description": "High-octane commercial campaign broadcasted across international streaming platforms. Fast-paced beat editing, 3D title tracking, and visceral sound synthesis.",
-      "duration": "01:30",
-      "year": "2026",
-      "aspect_ratio": "16:9",
-      "is_featured": 1,
-      "order_index": 3
-    },
-    {
-      "title": "The Architecture of Thought: Studio Visit",
-      "category": "Corporate videos",
-      "client": "Foster & Partners Architecture",
-      "video_url": "https://assets.mixkit.co/videos/preview/mixkit-modern-building-with-many-windows-41847-large.mp4",
-      "thumbnail_url": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80",
-      "description": "Editorial brand showcase examining minimalist structural geometry. Gentle pacing, classical string balance, and natural warm color grading.",
-      "duration": "06:12",
-      "year": "2025",
-      "aspect_ratio": "16:9",
-      "is_featured": 0,
-      "order_index": 4
     }
   ],
   "testimonials": [
