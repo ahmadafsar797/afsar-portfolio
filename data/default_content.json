@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "syncedAt": "2026-10-04T18:31:34.268Z",
+  "syncedAt": "2026-10-07T12:54:46.863Z",
   "settings": {
     "site_name": "AFSAR AHMAD | Video Editor & Motion Designer",
     "hero_headline": "I Edit Stories That Make People Stop Scrolling.",
@@ -16,7 +16,7 @@
     "youtube_url": "https://youtube.com/@afsaredits",
     "twitter_url": "https://x.com/afsar_edits",
     "profile_picture_url": "/uploads/profile-picture.jpg?v=1790886537679",
-    "last_seed_synced_at": "2026-10-04T18:31:33.954Z"
+    "last_seed_synced_at": "2026-10-07T12:54:00.918Z"
   },
   "about": {
     "headline": "Story first. Pacing second. Effects serve the narrative.",
@@ -43,7 +43,7 @@
       "order_index": 1
     },
     {
-      "title": "Nescafe Coffee matchcut video",
+      "title": "Nescafe Coffee Match cut video",
       "category": "Product Reels",
       "client": "Devin K. (Tech Founder)",
       "video_url": "/uploads/Imported_Coffee_Video-1790973678658-120191219.mp4",
@@ -115,7 +115,7 @@
       "order_index": 8
     },
     {
-      "title": "Jadhav optical store video",
+      "title": "Jadhav Optical Store Video",
       "category": "Instagram Reels",
       "client": "",
       "video_url": "/uploads/VID-20260612-WA0014.mp4",
@@ -127,7 +127,7 @@
       "order_index": 9
     },
     {
-      "title": "Classic chashma store video",
+      "title": "Classic Chashma Store Video",
       "category": "Instagram Reels",
       "client": "",
       "video_url": "/uploads/VID-20260616-WA0004.mp4",
@@ -139,7 +139,7 @@
       "order_index": 10
     },
     {
-      "title": "Chandwadkar optical store video",
+      "title": "Chandwadkar Optical Store Video",
       "category": "Instagram Reels",
       "client": "",
       "video_url": "https://res.cloudinary.com/nem8to4j/video/upload/v1791136518/CHANDWADKAR_1.mp4",
@@ -149,6 +149,66 @@
       "aspect_ratio": "9:16",
       "is_featured": 1,
       "order_index": 11
+    },
+    {
+      "title": "Look Optical Owner Video",
+      "category": "Talking Head Edits",
+      "client": "",
+      "video_url": "https://res.cloudinary.com/nem8to4j/video/upload/v1791377310/Look_Optics_Owner_Reel_Video.mp4",
+      "thumbnail_url": "/uploads/Look_Optical_Owner_Video-1791377400342-cover-1791377400350-790943099.jpg",
+      "views_count": "1.2M Views",
+      "duration": "0:30",
+      "aspect_ratio": "9:16",
+      "is_featured": 1,
+      "order_index": 12
+    },
+    {
+      "title": "Sandle Product Reel",
+      "category": "Product Reels",
+      "client": "",
+      "video_url": "https://res.cloudinary.com/nem8to4j/video/upload/v1791377283/3rd_Sandle_Product.mp4",
+      "thumbnail_url": "/uploads/Sandle_Product_Reel-1791377454651-cover-1791377454655-507410543.jpg",
+      "views_count": "1.2M Views",
+      "duration": "0:30",
+      "aspect_ratio": "9:16",
+      "is_featured": 1,
+      "order_index": 13
+    },
+    {
+      "title": "Eagle & Kyte Match Cut Reel",
+      "category": "Instagram Reels",
+      "client": "",
+      "video_url": "https://res.cloudinary.com/nem8to4j/video/upload/v1791377272/Eagle_Kyte_Logo_Matchcut.mp4",
+      "thumbnail_url": "/uploads/Eagle___Kyte_Match_Cut_Reel-1791377529167-cover-1791377529170-108849847.jpg",
+      "views_count": "1.2M Views",
+      "duration": "0:30",
+      "aspect_ratio": "9:16",
+      "is_featured": 1,
+      "order_index": 14
+    },
+    {
+      "title": "Toblerone Ai Ads Reel",
+      "category": "Product Reels",
+      "client": "",
+      "video_url": "https://res.cloudinary.com/nem8to4j/video/upload/v1791377263/Toblerone_Ai_With_Clearity.mp4",
+      "thumbnail_url": "/uploads/Toblerone_Ai_Ads_Reel-1791377573174-cover-1791377573178-634677955.jpg",
+      "views_count": "1.2M Views",
+      "duration": "0:30",
+      "aspect_ratio": "9:16",
+      "is_featured": 1,
+      "order_index": 15
+    },
+    {
+      "title": "Deshpande Optical Store Video",
+      "category": "Instagram Reels",
+      "client": "",
+      "video_url": "https://res.cloudinary.com/nem8to4j/video/upload/v1791377236/SALECHA_LIFESTYLE.mov",
+      "thumbnail_url": "/uploads/Deshpande_Optical_Store_Video-1791377626912-cover-1791377626916-264626262.jpg",
+      "views_count": "1.2M Views",
+      "duration": "0:30",
+      "aspect_ratio": "9:16",
+      "is_featured": 1,
+      "order_index": 16
     }
   ],
   "horizontal_videos": [
