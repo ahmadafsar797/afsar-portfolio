@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "syncedAt": "2026-10-07T13:04:13.860Z",
+  "syncedAt": "2026-10-07T13:14:05.639Z",
   "settings": {
     "site_name": "AFSAR AHMAD | Video Editor & Motion Designer",
     "hero_headline": "I Edit Stories That Make People Stop Scrolling.",
@@ -16,7 +16,7 @@
     "youtube_url": "https://youtube.com/@afsaredits",
     "twitter_url": "https://x.com/afsar_edits",
     "profile_picture_url": "/uploads/profile-picture.jpg?v=1790886537679",
-    "last_seed_synced_at": "2026-10-07T13:04:13.519Z"
+    "last_seed_synced_at": "2026-10-07T13:13:58.413Z"
   },
   "about": {
     "headline": "Story first. Pacing second. Effects serve the narrative.",
@@ -209,6 +209,18 @@
       "aspect_ratio": "9:16",
       "is_featured": 1,
       "order_index": 16
+    },
+    {
+      "title": "Sunayan Eyecare Video",
+      "category": "Instagram Reels",
+      "client": "",
+      "video_url": "https://res.cloudinary.com/nem8to4j/video/upload/v1791378667/Sunayan_Reel.mp4",
+      "thumbnail_url": "/uploads/Sunayan_Eyecare_Video-1791378836559-cover-1791378836563-897336366.jpg",
+      "views_count": "1.2M Views",
+      "duration": "0:30",
+      "aspect_ratio": "9:16",
+      "is_featured": 1,
+      "order_index": 17
     }
   ],
   "horizontal_videos": [
