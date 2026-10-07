@@ -405,13 +405,13 @@ app.get('/api/reels', (req, res) => {
 
 app.post('/api/reels', verifyToken, (req, res) => {
   try {
-    const { title, category, client, video_url, thumbnail_url, views_count, duration, is_featured } = req.body;
+    const { title, category, client, video_url, thumbnail_url, views_count, duration, is_featured, order_index } = req.body;
     if (!title || !video_url) {
       return res.status(400).json({ error: 'Title and video URL are required' });
     }
 
     const maxOrder = db.prepare('SELECT COALESCE(MAX(order_index), 0) as maxOrder FROM reels').get();
-    const newOrder = (maxOrder.maxOrder || 0) + 1;
+    const newOrder = (order_index !== undefined && order_index !== null && order_index !== '') ? Number(order_index) : ((maxOrder.maxOrder || 0) + 1);
 
     const result = db.prepare(`
       INSERT INTO reels (title, category, client, video_url, thumbnail_url, views_count, duration, is_featured, order_index)
@@ -439,7 +439,11 @@ app.post('/api/reels', verifyToken, (req, res) => {
 app.put('/api/reels/:id', verifyToken, (req, res) => {
   try {
     const { id } = req.params;
-    const { title, category, client, video_url, thumbnail_url, views_count, duration, is_featured } = req.body;
+    const { title, category, client, video_url, thumbnail_url, views_count, duration, is_featured, order_index } = req.body;
+
+    const existing = db.prepare('SELECT * FROM reels WHERE id = ?').get(id);
+    if (!existing) return res.status(404).json({ error: 'Reel not found' });
+    const finalOrder = (order_index !== undefined && order_index !== null && order_index !== '') ? Number(order_index) : (existing.order_index ?? 0);
 
     db.prepare(`
       UPDATE reels SET
@@ -450,7 +454,8 @@ app.put('/api/reels/:id', verifyToken, (req, res) => {
         thumbnail_url = ?,
         views_count = ?,
         duration = ?,
-        is_featured = ?
+        is_featured = ?,
+        order_index = ?
       WHERE id = ?
     `).run(
       title,
@@ -461,6 +466,7 @@ app.put('/api/reels/:id', verifyToken, (req, res) => {
       views_count,
       duration,
       is_featured ? 1 : 0,
+      finalOrder,
       id
     );
 
@@ -508,13 +514,13 @@ app.get('/api/horizontal-videos', (req, res) => {
 
 app.post('/api/horizontal-videos', verifyToken, (req, res) => {
   try {
-    const { title, category, client, video_url, thumbnail_url, description, duration, year, is_featured } = req.body;
+    const { title, category, client, video_url, thumbnail_url, description, duration, year, is_featured, order_index } = req.body;
     if (!title || !video_url) {
       return res.status(400).json({ error: 'Title and video URL are required' });
     }
 
     const maxOrder = db.prepare('SELECT COALESCE(MAX(order_index), 0) as maxOrder FROM horizontal_videos').get();
-    const newOrder = (maxOrder.maxOrder || 0) + 1;
+    const newOrder = (order_index !== undefined && order_index !== null && order_index !== '') ? Number(order_index) : ((maxOrder.maxOrder || 0) + 1);
 
     const result = db.prepare(`
       INSERT INTO horizontal_videos (title, category, client, video_url, thumbnail_url, description, duration, year, is_featured, order_index)
@@ -543,7 +549,11 @@ app.post('/api/horizontal-videos', verifyToken, (req, res) => {
 app.put('/api/horizontal-videos/:id', verifyToken, (req, res) => {
   try {
     const { id } = req.params;
-    const { title, category, client, video_url, thumbnail_url, description, duration, year, is_featured } = req.body;
+    const { title, category, client, video_url, thumbnail_url, description, duration, year, is_featured, order_index } = req.body;
+
+    const existing = db.prepare('SELECT * FROM horizontal_videos WHERE id = ?').get(id);
+    if (!existing) return res.status(404).json({ error: 'Horizontal video not found' });
+    const finalOrder = (order_index !== undefined && order_index !== null && order_index !== '') ? Number(order_index) : (existing.order_index ?? 0);
 
     db.prepare(`
       UPDATE horizontal_videos SET
@@ -555,7 +565,8 @@ app.put('/api/horizontal-videos/:id', verifyToken, (req, res) => {
         description = ?,
         duration = ?,
         year = ?,
-        is_featured = ?
+        is_featured = ?,
+        order_index = ?
       WHERE id = ?
     `).run(
       title,
@@ -567,6 +578,7 @@ app.put('/api/horizontal-videos/:id', verifyToken, (req, res) => {
       duration,
       year,
       is_featured ? 1 : 0,
+      finalOrder,
       id
     );
 
@@ -586,6 +598,19 @@ app.delete('/api/horizontal-videos/:id', verifyToken, (req, res) => {
   }
 });
 
+app.put('/api/horizontal-videos-reorder', verifyToken, (req, res) => {
+  try {
+    const { items } = req.body; // array of { id, order_index }
+    const updateStmt = db.prepare('UPDATE horizontal_videos SET order_index = ? WHERE id = ?');
+    for (const item of items) {
+      updateStmt.run(item.order_index, item.id);
+    }
+    res.json({ message: 'Horizontal videos reordered successfully' });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to reorder horizontal videos' });
+  }
+});
+
 /* ==========================================================================
    CLIENT TESTIMONIALS (9:16 VERTICAL)
    ========================================================================== */
@@ -601,13 +626,13 @@ app.get('/api/testimonials', (req, res) => {
 
 app.post('/api/testimonials', verifyToken, (req, res) => {
   try {
-    const { client_name, client_title, company, avatar_url, video_url, thumbnail_url, quote, rating } = req.body;
+    const { client_name, client_title, company, avatar_url, video_url, thumbnail_url, quote, rating, order_index } = req.body;
     if (!client_name || !video_url) {
       return res.status(400).json({ error: 'Client name and video URL are required' });
     }
 
     const maxOrder = db.prepare('SELECT COALESCE(MAX(order_index), 0) as maxOrder FROM testimonials').get();
-    const newOrder = (maxOrder.maxOrder || 0) + 1;
+    const newOrder = (order_index !== undefined && order_index !== null && order_index !== '') ? Number(order_index) : ((maxOrder.maxOrder || 0) + 1);
 
     const result = db.prepare(`
       INSERT INTO testimonials (client_name, client_title, company, avatar_url, video_url, thumbnail_url, quote, rating, order_index)
@@ -635,7 +660,11 @@ app.post('/api/testimonials', verifyToken, (req, res) => {
 app.put('/api/testimonials/:id', verifyToken, (req, res) => {
   try {
     const { id } = req.params;
-    const { client_name, client_title, company, avatar_url, video_url, thumbnail_url, quote, rating } = req.body;
+    const { client_name, client_title, company, avatar_url, video_url, thumbnail_url, quote, rating, order_index } = req.body;
+
+    const existing = db.prepare('SELECT * FROM testimonials WHERE id = ?').get(id);
+    if (!existing) return res.status(404).json({ error: 'Testimonial not found' });
+    const finalOrder = (order_index !== undefined && order_index !== null && order_index !== '') ? Number(order_index) : (existing.order_index ?? 0);
 
     db.prepare(`
       UPDATE testimonials SET
@@ -646,7 +675,8 @@ app.put('/api/testimonials/:id', verifyToken, (req, res) => {
         video_url = ?,
         thumbnail_url = ?,
         quote = ?,
-        rating = ?
+        rating = ?,
+        order_index = ?
       WHERE id = ?
     `).run(
       client_name,
@@ -657,6 +687,7 @@ app.put('/api/testimonials/:id', verifyToken, (req, res) => {
       thumbnail_url,
       quote,
       rating,
+      finalOrder,
       id
     );
 
@@ -673,6 +704,19 @@ app.delete('/api/testimonials/:id', verifyToken, (req, res) => {
     res.json({ message: 'Testimonial deleted successfully' });
   } catch (err) {
     res.status(500).json({ error: 'Failed to delete testimonial' });
+  }
+});
+
+app.put('/api/testimonials-reorder', verifyToken, (req, res) => {
+  try {
+    const { items } = req.body; // array of { id, order_index }
+    const updateStmt = db.prepare('UPDATE testimonials SET order_index = ? WHERE id = ?');
+    for (const item of items) {
+      updateStmt.run(item.order_index, item.id);
+    }
+    res.json({ message: 'Testimonials reordered successfully' });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to reorder testimonials' });
   }
 });
 

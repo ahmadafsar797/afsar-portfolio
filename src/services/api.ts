@@ -175,6 +175,16 @@ export const api = {
     return res.json();
   },
 
+  async reorderReels(items: { id: number; order_index: number }[]) {
+    const res = await fetch(`${API_BASE}/reels-reorder`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ items }),
+    });
+    if (!res.ok) throw new Error('Failed to reorder reels');
+    return res.json();
+  },
+
   // Horizontal Admin
   async createHorizontalVideo(data: Partial<HorizontalVideo>) {
     const res = await fetch(`${API_BASE}/horizontal-videos`, {
@@ -205,6 +215,16 @@ export const api = {
     return res.json();
   },
 
+  async reorderHorizontalVideos(items: { id: number; order_index: number }[]) {
+    const res = await fetch(`${API_BASE}/horizontal-videos-reorder`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ items }),
+    });
+    if (!res.ok) throw new Error('Failed to reorder horizontal videos');
+    return res.json();
+  },
+
   // Testimonials Admin
   async createTestimonial(data: Partial<Testimonial>) {
     const res = await fetch(`${API_BASE}/testimonials`, {
@@ -232,6 +252,16 @@ export const api = {
       headers: getAuthHeaders(),
     });
     if (!res.ok) throw new Error('Failed to delete testimonial');
+    return res.json();
+  },
+
+  async reorderTestimonials(items: { id: number; order_index: number }[]) {
+    const res = await fetch(`${API_BASE}/testimonials-reorder`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ items }),
+    });
+    if (!res.ok) throw new Error('Failed to reorder testimonials');
     return res.json();
   },
 

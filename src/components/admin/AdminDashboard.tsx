@@ -32,6 +32,10 @@ import {
   FileUp,
   HelpCircle,
   UploadCloud,
+  ChevronUp,
+  ChevronDown,
+  ArrowUpDown,
+  Hash,
 } from 'lucide-react';
 import { VideoFramePickerModal } from '../VideoFramePickerModal';
 import { api } from '../../services/api';
@@ -549,6 +553,160 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
     setEditingHorizontal(null);
     setHorizontalCandidateFrames([]);
     setSelectedHorizontalFrameId(null);
+  };
+
+  // Reordering helpers for Reels, Horizontal Videos, and Testimonials
+  const handleMoveReel = async (currentIndex: number, direction: 'up' | 'down') => {
+    const targetIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
+    if (targetIndex < 0 || targetIndex >= reels.length) return;
+
+    const newReels = [...reels];
+    const temp = newReels[currentIndex];
+    newReels[currentIndex] = newReels[targetIndex];
+    newReels[targetIndex] = temp;
+
+    const reorderedItems = newReels.map((item, idx) => ({
+      ...item,
+      order_index: idx + 1,
+    }));
+
+    setReels(reorderedItems);
+
+    try {
+      await api.reorderReels(reorderedItems.map((item) => ({ id: item.id, order_index: item.order_index! })));
+      showNotice(`Moved "${temp.title}" ${direction === 'up' ? 'up' : 'down'} to serial #${targetIndex + 1}!`);
+      onDataChanged();
+    } catch (err: any) {
+      showNotice(err.message || 'Failed to reorder reels', 'error');
+      loadAllAdminData();
+    }
+  };
+
+  const handleChangeReelPosition = async (reelId: number, newPositionIndex: number) => {
+    const currentIndex = reels.findIndex((r) => r.id === reelId);
+    if (currentIndex === -1 || currentIndex === newPositionIndex) return;
+
+    const newReels = [...reels];
+    const [movedItem] = newReels.splice(currentIndex, 1);
+    newReels.splice(newPositionIndex, 0, movedItem);
+
+    const reorderedItems = newReels.map((item, idx) => ({
+      ...item,
+      order_index: idx + 1,
+    }));
+
+    setReels(reorderedItems);
+
+    try {
+      await api.reorderReels(reorderedItems.map((item) => ({ id: item.id, order_index: item.order_index! })));
+      showNotice(`"${movedItem.title}" moved to serial position #${newPositionIndex + 1}!`);
+      onDataChanged();
+    } catch (err: any) {
+      showNotice(err.message || 'Failed to reorder reels', 'error');
+      loadAllAdminData();
+    }
+  };
+
+  const handleMoveHorizontal = async (currentIndex: number, direction: 'up' | 'down') => {
+    const targetIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
+    if (targetIndex < 0 || targetIndex >= horizontalVideos.length) return;
+
+    const newVideos = [...horizontalVideos];
+    const temp = newVideos[currentIndex];
+    newVideos[currentIndex] = newVideos[targetIndex];
+    newVideos[targetIndex] = temp;
+
+    const reorderedItems = newVideos.map((item, idx) => ({
+      ...item,
+      order_index: idx + 1,
+    }));
+
+    setHorizontalVideos(reorderedItems);
+
+    try {
+      await api.reorderHorizontalVideos(reorderedItems.map((item) => ({ id: item.id, order_index: item.order_index! })));
+      showNotice(`Moved "${temp.title}" ${direction === 'up' ? 'up' : 'down'} to serial #${targetIndex + 1}!`);
+      onDataChanged();
+    } catch (err: any) {
+      showNotice(err.message || 'Failed to reorder horizontal videos', 'error');
+      loadAllAdminData();
+    }
+  };
+
+  const handleChangeHorizontalPosition = async (videoId: number, newPositionIndex: number) => {
+    const currentIndex = horizontalVideos.findIndex((v) => v.id === videoId);
+    if (currentIndex === -1 || currentIndex === newPositionIndex) return;
+
+    const newVideos = [...horizontalVideos];
+    const [movedItem] = newVideos.splice(currentIndex, 1);
+    newVideos.splice(newPositionIndex, 0, movedItem);
+
+    const reorderedItems = newVideos.map((item, idx) => ({
+      ...item,
+      order_index: idx + 1,
+    }));
+
+    setHorizontalVideos(reorderedItems);
+
+    try {
+      await api.reorderHorizontalVideos(reorderedItems.map((item) => ({ id: item.id, order_index: item.order_index! })));
+      showNotice(`"${movedItem.title}" moved to serial position #${newPositionIndex + 1}!`);
+      onDataChanged();
+    } catch (err: any) {
+      showNotice(err.message || 'Failed to reorder horizontal videos', 'error');
+      loadAllAdminData();
+    }
+  };
+
+  const handleMoveTestimonial = async (currentIndex: number, direction: 'up' | 'down') => {
+    const targetIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
+    if (targetIndex < 0 || targetIndex >= testimonials.length) return;
+
+    const newTestimonials = [...testimonials];
+    const temp = newTestimonials[currentIndex];
+    newTestimonials[currentIndex] = newTestimonials[targetIndex];
+    newTestimonials[targetIndex] = temp;
+
+    const reorderedItems = newTestimonials.map((item, idx) => ({
+      ...item,
+      order_index: idx + 1,
+    }));
+
+    setTestimonials(reorderedItems);
+
+    try {
+      await api.reorderTestimonials(reorderedItems.map((item) => ({ id: item.id, order_index: item.order_index! })));
+      showNotice(`Moved testimonial from "${temp.client_name}" to serial #${targetIndex + 1}!`);
+      onDataChanged();
+    } catch (err: any) {
+      showNotice(err.message || 'Failed to reorder testimonials', 'error');
+      loadAllAdminData();
+    }
+  };
+
+  const handleChangeTestimonialPosition = async (testimonialId: number, newPositionIndex: number) => {
+    const currentIndex = testimonials.findIndex((t) => t.id === testimonialId);
+    if (currentIndex === -1 || currentIndex === newPositionIndex) return;
+
+    const newTestimonials = [...testimonials];
+    const [movedItem] = newTestimonials.splice(currentIndex, 1);
+    newTestimonials.splice(newPositionIndex, 0, movedItem);
+
+    const reorderedItems = newTestimonials.map((item, idx) => ({
+      ...item,
+      order_index: idx + 1,
+    }));
+
+    setTestimonials(reorderedItems);
+
+    try {
+      await api.reorderTestimonials(reorderedItems.map((item) => ({ id: item.id, order_index: item.order_index! })));
+      showNotice(`Testimonial from "${movedItem.client_name}" moved to serial #${newPositionIndex + 1}!`);
+      onDataChanged();
+    } catch (err: any) {
+      showNotice(err.message || 'Failed to reorder testimonials', 'error');
+      loadAllAdminData();
+    }
   };
 
   const handleProfilePicUpload = async (file: File) => {
@@ -1109,6 +1267,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                           />
                         </div>
 
+                        <div>
+                          <label className="block text-xs font-montserrat uppercase text-white/60 mb-1">
+                            Display Position (Serial #)
+                          </label>
+                          <input
+                            type="number"
+                            min="1"
+                            value={editingReel.order_index ?? ''}
+                            onChange={(e) => setEditingReel({ ...editingReel, order_index: e.target.value ? Number(e.target.value) : undefined })}
+                            className="w-full px-3 py-2 rounded-lg bg-black border border-white/15 text-sm text-white"
+                            placeholder={editingReel.id ? `Current: #${reels.findIndex(r => r.id === editingReel.id) + 1}` : `Default: #${reels.length + 1}`}
+                          />
+                        </div>
+
                         {/* Video URL & File Upload */}
                         <div>
                           <label className="block text-xs font-montserrat uppercase text-white/60 mb-1">
@@ -1305,6 +1477,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                     <table className="w-full text-left text-xs">
                       <thead className="bg-white/5 border-b border-white/10 text-white/50 uppercase font-montserrat">
                         <tr>
+                          <th className="p-3 text-center w-36">Order / Place</th>
                           <th className="p-3">Preview</th>
                           <th className="p-3">Title</th>
                           <th className="p-3">Category</th>
@@ -1313,8 +1486,55 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-white/5">
-                        {reels.map((r) => (
+                        {reels.map((r, index) => (
                           <tr key={r.id} className="hover:bg-white/[0.02]">
+                            <td className="p-3 text-center">
+                              <div className="flex items-center justify-center gap-1.5">
+                                {/* Serial Badge */}
+                                <span
+                                  className="w-7 h-7 rounded-md bg-[#C65D45]/15 text-[#C65D45] border border-[#C65D45]/30 font-mono font-bold text-xs flex items-center justify-center shrink-0"
+                                  title={`Current place on website: #${index + 1}`}
+                                >
+                                  #{index + 1}
+                                </span>
+
+                                {/* Quick Up / Down Buttons */}
+                                <div className="flex flex-col gap-0.5">
+                                  <button
+                                    type="button"
+                                    disabled={index === 0}
+                                    onClick={() => handleMoveReel(index, 'up')}
+                                    className="p-1 rounded bg-white/5 hover:bg-white/20 text-white/70 hover:text-white disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
+                                    title="Move Up 1 Place"
+                                  >
+                                    <ChevronUp className="w-3 h-3" />
+                                  </button>
+                                  <button
+                                    type="button"
+                                    disabled={index === reels.length - 1}
+                                    onClick={() => handleMoveReel(index, 'down')}
+                                    className="p-1 rounded bg-white/5 hover:bg-white/20 text-white/70 hover:text-white disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
+                                    title="Move Down 1 Place"
+                                  >
+                                    <ChevronDown className="w-3 h-3" />
+                                  </button>
+                                </div>
+
+                                {/* Direct Position Picker Dropdown */}
+                                <select
+                                  value={index}
+                                  onChange={(e) => handleChangeReelPosition(r.id, Number(e.target.value))}
+                                  className="bg-black/90 border border-white/20 text-[11px] font-mono text-white rounded px-1.5 py-1 focus:outline-none focus:border-[#C65D45] cursor-pointer"
+                                  title="Decide exact serial place number"
+                                >
+                                  {reels.map((_, posIdx) => (
+                                    <option key={posIdx} value={posIdx} className="bg-[#14141f] text-white">
+                                      #{posIdx + 1} {posIdx === 0 ? '(1st)' : ''}
+                                    </option>
+                                  ))}
+                                </select>
+                              </div>
+                            </td>
                             <td className="p-3">
                               <img
                                 src={r.thumbnail_url || 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?auto=format&fit=crop&w=100&q=80'}
@@ -1440,7 +1660,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                           </select>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-2">
+                        <div className="grid grid-cols-3 gap-2">
                           <div>
                             <label className="block text-xs font-montserrat uppercase text-white/60 mb-1">
                               Duration
@@ -1463,6 +1683,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                               onChange={(e) => setEditingHorizontal({ ...editingHorizontal, year: e.target.value })}
                               className="w-full px-3 py-2 rounded-lg bg-black border border-white/15 text-sm text-white"
                               placeholder="2026"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-montserrat uppercase text-white/60 mb-1">
+                              Serial Place #
+                            </label>
+                            <input
+                              type="number"
+                              min="1"
+                              value={editingHorizontal.order_index ?? ''}
+                              onChange={(e) => setEditingHorizontal({ ...editingHorizontal, order_index: e.target.value ? Number(e.target.value) : undefined })}
+                              className="w-full px-3 py-2 rounded-lg bg-black border border-white/15 text-sm text-white"
+                              placeholder={editingHorizontal.id ? `Current: #${horizontalVideos.findIndex(v => v.id === editingHorizontal.id) + 1}` : `Default: #${horizontalVideos.length + 1}`}
                             />
                           </div>
                         </div>
@@ -1675,6 +1908,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                     <table className="w-full text-left text-xs">
                       <thead className="bg-white/5 border-b border-white/10 text-white/50 uppercase font-montserrat">
                         <tr>
+                          <th className="p-3 text-center w-36">Order / Place</th>
                           <th className="p-3">Thumbnail</th>
                           <th className="p-3">Title</th>
                           <th className="p-3">Category</th>
@@ -1683,8 +1917,55 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-white/5">
-                        {horizontalVideos.map((v) => (
+                        {horizontalVideos.map((v, index) => (
                           <tr key={v.id} className="hover:bg-white/[0.02]">
+                            <td className="p-3 text-center">
+                              <div className="flex items-center justify-center gap-1.5">
+                                {/* Serial Badge */}
+                                <span
+                                  className="w-7 h-7 rounded-md bg-[#C65D45]/15 text-[#C65D45] border border-[#C65D45]/30 font-mono font-bold text-xs flex items-center justify-center shrink-0"
+                                  title={`Current place on website: #${index + 1}`}
+                                >
+                                  #{index + 1}
+                                </span>
+
+                                {/* Quick Up / Down Buttons */}
+                                <div className="flex flex-col gap-0.5">
+                                  <button
+                                    type="button"
+                                    disabled={index === 0}
+                                    onClick={() => handleMoveHorizontal(index, 'up')}
+                                    className="p-1 rounded bg-white/5 hover:bg-white/20 text-white/70 hover:text-white disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
+                                    title="Move Up 1 Place"
+                                  >
+                                    <ChevronUp className="w-3 h-3" />
+                                  </button>
+                                  <button
+                                    type="button"
+                                    disabled={index === horizontalVideos.length - 1}
+                                    onClick={() => handleMoveHorizontal(index, 'down')}
+                                    className="p-1 rounded bg-white/5 hover:bg-white/20 text-white/70 hover:text-white disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
+                                    title="Move Down 1 Place"
+                                  >
+                                    <ChevronDown className="w-3 h-3" />
+                                  </button>
+                                </div>
+
+                                {/* Direct Position Picker Dropdown */}
+                                <select
+                                  value={index}
+                                  onChange={(e) => handleChangeHorizontalPosition(v.id, Number(e.target.value))}
+                                  className="bg-black/90 border border-white/20 text-[11px] font-mono text-white rounded px-1.5 py-1 focus:outline-none focus:border-[#C65D45] cursor-pointer"
+                                  title="Decide exact serial place number"
+                                >
+                                  {horizontalVideos.map((_, posIdx) => (
+                                    <option key={posIdx} value={posIdx} className="bg-[#14141f] text-white">
+                                      #{posIdx + 1} {posIdx === 0 ? '(1st)' : ''}
+                                    </option>
+                                  ))}
+                                </select>
+                              </div>
+                            </td>
                             <td className="p-3">
                               <img
                                 src={v.thumbnail_url || 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=150&q=80'}
@@ -1704,6 +1985,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                                     setSelectedHorizontalFrameId(null);
                                   }}
                                   className="p-1.5 rounded-lg bg-white/5 hover:bg-white/15 text-white/70 hover:text-white"
+                                  title="Edit"
                                 >
                                   <Edit className="w-3.5 h-3.5" />
                                 </button>
@@ -1717,6 +1999,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                                     }
                                   }}
                                   className="p-1.5 rounded-lg bg-white/5 hover:bg-red-500/20 text-white/70 hover:text-red-400"
+                                  title="Delete"
                                 >
                                   <Trash2 className="w-3.5 h-3.5" />
                                 </button>
@@ -1825,6 +2108,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
 
                         <div>
                           <label className="block text-xs font-montserrat uppercase text-white/60 mb-1">
+                            Serial Place # (Optional)
+                          </label>
+                          <input
+                            type="number"
+                            min="1"
+                            value={editingTestimonial.order_index ?? ''}
+                            onChange={(e) => setEditingTestimonial({ ...editingTestimonial, order_index: e.target.value ? Number(e.target.value) : undefined })}
+                            className="w-full px-3 py-2 rounded-lg bg-black border border-white/15 text-sm text-white"
+                            placeholder={editingTestimonial.id ? `Current: #${testimonials.findIndex(t => t.id === editingTestimonial.id) + 1}` : `Default: #${testimonials.length + 1}`}
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-montserrat uppercase text-white/60 mb-1">
                             9:16 Video URL *
                           </label>
                           <input
@@ -1926,28 +2223,73 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
 
                   {/* Testimonials List */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {testimonials.map((t) => (
+                    {testimonials.map((t, index) => (
                       <div
                         key={t.id}
                         className="p-4 rounded-2xl bg-[#0e0e15] border border-white/10 flex items-center justify-between gap-4"
                       >
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-3 min-w-0">
+                          {/* Serial Badge & Up/Down */}
+                          <div className="flex flex-col items-center gap-1 shrink-0">
+                            <span
+                              className="w-6 h-6 rounded bg-[#C65D45]/15 text-[#C65D45] border border-[#C65D45]/30 font-mono font-bold text-xs flex items-center justify-center"
+                              title={`Current place: #${index + 1}`}
+                            >
+                              #{index + 1}
+                            </span>
+                            <div className="flex gap-0.5">
+                              <button
+                                type="button"
+                                disabled={index === 0}
+                                onClick={() => handleMoveTestimonial(index, 'up')}
+                                className="p-0.5 rounded bg-white/5 hover:bg-white/20 text-white/70 hover:text-white disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
+                                title="Move Up 1 Place"
+                              >
+                                <ChevronUp className="w-3 h-3" />
+                              </button>
+                              <button
+                                type="button"
+                                disabled={index === testimonials.length - 1}
+                                onClick={() => handleMoveTestimonial(index, 'down')}
+                                className="p-0.5 rounded bg-white/5 hover:bg-white/20 text-white/70 hover:text-white disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
+                                title="Move Down 1 Place"
+                              >
+                                <ChevronDown className="w-3 h-3" />
+                              </button>
+                            </div>
+                          </div>
+
                           <img
                             src={t.thumbnail_url || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=100&q=80'}
                             alt={t.client_name}
-                            className="w-12 h-16 object-cover rounded-lg border border-white/10"
+                            className="w-12 h-16 object-cover rounded-lg border border-white/10 shrink-0"
                           />
-                          <div>
-                            <div className="font-semibold text-white">{t.client_name}</div>
-                            <div className="text-xs text-[#C65D45]">{t.company}</div>
+                          <div className="min-w-0">
+                            <div className="font-semibold text-white truncate">{t.client_name}</div>
+                            <div className="text-xs text-[#C65D45] truncate">{t.company}</div>
                             <div className="text-[11px] text-white/50 line-clamp-1 italic mt-1">"{t.quote}"</div>
                           </div>
                         </div>
 
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 shrink-0">
+                          {/* Direct Position Selector */}
+                          <select
+                            value={index}
+                            onChange={(e) => handleChangeTestimonialPosition(t.id, Number(e.target.value))}
+                            className="bg-black/90 border border-white/20 text-[11px] font-mono text-white rounded px-1.5 py-1 focus:outline-none focus:border-[#C65D45] cursor-pointer"
+                            title="Decide exact serial place number"
+                          >
+                            {testimonials.map((_, posIdx) => (
+                              <option key={posIdx} value={posIdx} className="bg-[#14141f] text-white">
+                                #{posIdx + 1} {posIdx === 0 ? '(1st)' : ''}
+                              </option>
+                            ))}
+                          </select>
+
                           <button
                             onClick={() => setEditingTestimonial(t)}
                             className="p-2 rounded-lg bg-white/5 hover:bg-white/15 text-white/70 hover:text-white"
+                            title="Edit"
                           >
                             <Edit className="w-3.5 h-3.5" />
                           </button>
@@ -1961,6 +2303,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                               }
                             }}
                             className="p-2 rounded-lg bg-white/5 hover:bg-red-500/20 text-white/70 hover:text-red-400"
+                            title="Delete"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
