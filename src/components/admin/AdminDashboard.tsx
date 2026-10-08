@@ -4266,6 +4266,133 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                   {/* ─────────────────────────────────────────────────────── */}
 
                   <div className="space-y-4 p-6 rounded-2xl bg-[#101018] border border-white/10">
+                    {/* Reference Hero Layout Customization Block */}
+                    <div className="p-4 rounded-xl bg-black/40 border border-[#C65D45]/30 space-y-3 mb-4">
+                      <div className="flex items-center gap-2">
+                        <Sparkles className="w-4 h-4 text-[#C65D45]" />
+                        <span className="font-montserrat uppercase tracking-wider text-xs font-bold text-white">
+                          Reference Hero Layout Settings
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-xs font-montserrat uppercase text-white/60 mb-1">
+                            Greeting Pill Text
+                          </label>
+                          <input
+                            type="text"
+                            value={settings.hero_greeting || ''}
+                            onChange={(e) => setSettings({ ...settings, hero_greeting: e.target.value })}
+                            className="w-full px-3 py-2 rounded-lg bg-black border border-white/15 text-sm text-white"
+                            placeholder="Hello!"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-montserrat uppercase text-white/60 mb-1">
+                            Name (Highlight Color)
+                          </label>
+                          <input
+                            type="text"
+                            value={settings.hero_name || ''}
+                            onChange={(e) => setSettings({ ...settings, hero_name: e.target.value })}
+                            className="w-full px-3 py-2 rounded-lg bg-black border border-white/15 text-sm text-white"
+                            placeholder="Afsar (or Jenny)"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-montserrat uppercase text-white/60 mb-1">
+                            Role / Title
+                          </label>
+                          <input
+                            type="text"
+                            value={settings.hero_role || ''}
+                            onChange={(e) => setSettings({ ...settings, hero_role: e.target.value })}
+                            className="w-full px-3 py-2 rounded-lg bg-black border border-white/15 text-sm text-white"
+                            placeholder="Video Editor (or Product Designer)"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-montserrat uppercase text-white/60 mb-1">
+                            Arch & Button Accent Color
+                          </label>
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="color"
+                              value={settings.hero_arch_color || '#FF5023'}
+                              onChange={(e) => setSettings({ ...settings, hero_arch_color: e.target.value })}
+                              className="w-10 h-10 rounded border border-white/20 bg-transparent cursor-pointer"
+                            />
+                            <input
+                              type="text"
+                              value={settings.hero_arch_color || '#FF5023'}
+                              onChange={(e) => setSettings({ ...settings, hero_arch_color: e.target.value })}
+                              className="flex-1 px-3 py-2 rounded-lg bg-black border border-white/15 text-sm text-white font-mono"
+                              placeholder="#FF5023"
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-xs font-montserrat uppercase text-white/60 mb-1">
+                            Left Metric Number
+                          </label>
+                          <input
+                            type="text"
+                            value={settings.hero_clients_count || ''}
+                            onChange={(e) => setSettings({ ...settings, hero_clients_count: e.target.value })}
+                            className="w-full px-3 py-2 rounded-lg bg-black border border-white/15 text-sm text-white"
+                            placeholder="450+"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-montserrat uppercase text-white/60 mb-1">
+                            Left Metric Label
+                          </label>
+                          <input
+                            type="text"
+                            value={settings.hero_clients_label || ''}
+                            onChange={(e) => setSettings({ ...settings, hero_clients_label: e.target.value })}
+                            className="w-full px-3 py-2 rounded-lg bg-black border border-white/15 text-sm text-white"
+                            placeholder="Client Served"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-montserrat uppercase text-white/60 mb-1">
+                            Right Metric (Years)
+                          </label>
+                          <input
+                            type="text"
+                            value={settings.hero_experience_years || ''}
+                            onChange={(e) => setSettings({ ...settings, hero_experience_years: e.target.value })}
+                            className="w-full px-3 py-2 rounded-lg bg-black border border-white/15 text-sm text-white"
+                            placeholder="10 Years (or 2+ Years)"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-montserrat uppercase text-white/60 mb-1">
+                            Right Metric Label
+                          </label>
+                          <input
+                            type="text"
+                            value={settings.hero_experience_label || ''}
+                            onChange={(e) => setSettings({ ...settings, hero_experience_label: e.target.value })}
+                            className="w-full px-3 py-2 rounded-lg bg-black border border-white/15 text-sm text-white"
+                            placeholder="Experts"
+                          />
+                        </div>
+                        <div className="sm:col-span-2">
+                          <label className="block text-xs font-montserrat uppercase text-white/60 mb-1">
+                            Left Side Testimonial Quote
+                          </label>
+                          <textarea
+                            rows={2}
+                            value={settings.hero_quote || ''}
+                            onChange={(e) => setSettings({ ...settings, hero_quote: e.target.value })}
+                            className="w-full px-3 py-2 rounded-lg bg-black border border-white/15 text-sm text-white"
+                            placeholder="Afsar's exceptional video editing ensured our website's success. Highly recommended!"
+                          />
+                        </div>
+                      </div>
+                    </div>
                     <div>
                       <label className="block text-xs font-montserrat uppercase text-white/60 mb-1">
                         Hero Headline

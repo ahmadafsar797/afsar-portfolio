@@ -122,6 +122,16 @@ export interface SettingsData {
   hero_bg_video_overlay_opacity?: string;
   hero_bg_video_blur?: string;
   hero_text_theme?: string;
+  hero_greeting?: string;
+  hero_name?: string;
+  hero_role?: string;
+  hero_quote?: string;
+  hero_clients_count?: string;
+  hero_clients_label?: string;
+  hero_experience_years?: string;
+  hero_experience_label?: string;
+  hero_arch_color?: string;
+  hero_character_image_url?: string;
 }
 
 export interface ContactMessage {

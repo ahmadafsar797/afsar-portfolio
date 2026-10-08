@@ -216,6 +216,7 @@ export const App: React.FC = () => {
         {/* Hero */}
         <Hero
           settings={settings}
+          about={about}
           onWatchShowreel={() =>
             openLightbox(
               settings.featured_showreel_url ||
