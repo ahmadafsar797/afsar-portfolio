@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "syncedAt": "2026-10-08T15:35:00.000Z",
+  "syncedAt": "2026-10-08T16:15:00.000Z",
   "settings": {
     "site_name": "AFSAR AHMAD | Video Editor & Motion Designer",
     "hero_headline": "I Edit Stories That Make People Stop Scrolling.",
@@ -26,7 +26,11 @@
     "hero_experience_label": "Experts",
     "hero_arch_color": "#FF5023",
     "hero_character_image_url": "/images/hero-character.png",
-    "last_seed_synced_at": "2026-10-08T15:35:00.000Z"
+    "hero_image_scale": "100",
+    "hero_image_max_height": "510",
+    "hero_image_offset_y": "0",
+    "hero_image_offset_x": "0",
+    "last_seed_synced_at": "2026-10-08T16:15:00.000Z"
   },
   "about": {
     "headline": "Story first. Pacing second. Effects serve the narrative.",

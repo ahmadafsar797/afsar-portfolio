@@ -132,6 +132,10 @@ export interface SettingsData {
   hero_experience_label?: string;
   hero_arch_color?: string;
   hero_character_image_url?: string;
+  hero_image_scale?: string;
+  hero_image_max_height?: string;
+  hero_image_offset_y?: string;
+  hero_image_offset_x?: string;
 }
 
 export interface ContactMessage {

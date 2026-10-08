@@ -36,6 +36,10 @@ export const Hero: React.FC<HeroProps> = ({ settings, about, onWatchShowreel }) 
     settings?.hero_character_image_url ||
     '/images/hero-character.png';
   const archColor = settings?.hero_arch_color || '#FF5023';
+  const imgScale = Number(settings?.hero_image_scale || '100') / 100;
+  const imgMaxHeight = Number(settings?.hero_image_max_height || '510');
+  const imgOffsetY = Number(settings?.hero_image_offset_y || '0');
+  const imgOffsetX = Number(settings?.hero_image_offset_x || '0');
 
   // Background Video Support (preserved from settings)
   const hasBgVideo = Boolean(
@@ -234,14 +238,21 @@ export const Hero: React.FC<HeroProps> = ({ settings, about, onWatchShowreel }) 
                 }}
               />
 
-              {/* Person Cutout Portrait Image */}
-              <div className="absolute inset-0 flex items-end justify-center pointer-events-none">
+              {/* Person Cutout Portrait Image with size, scale and position controls */}
+              <div
+                className="absolute inset-0 flex items-end justify-center pointer-events-none transition-transform duration-150 ease-out"
+                style={{
+                  transform: `translate(${imgOffsetX}px, ${imgOffsetY}px) scale(${imgScale})`,
+                  transformOrigin: 'bottom center',
+                }}
+              >
                 <img
                   ref={portraitRef}
                   src={characterImg}
                   alt={`${heroName} - ${heroRole}`}
-                  className="w-auto max-h-[380px] sm:max-h-[460px] md:max-h-[510px] object-contain drop-shadow-2xl select-none"
+                  className="w-auto object-contain drop-shadow-2xl select-none"
                   style={{
+                    maxHeight: `min(${imgMaxHeight}px, 85vh)`,
                     filter: 'drop-shadow(0 16px 24px rgba(0, 0, 0, 0.18))',
                   }}
                 />
