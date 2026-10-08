@@ -21,19 +21,16 @@ export const Hero: React.FC<HeroProps> = ({ settings, about, onWatchShowreel }) 
   const ctaPillRef = useRef<HTMLDivElement>(null);
   const arrowRef = useRef<HTMLDivElement>(null);
 
-  // Content configuration with defaults matching reference layout
+  // Content configuration with defaults matching reference layout verbatim
   const greeting = settings?.hero_greeting || 'Hello!';
-  const heroName = settings?.hero_name || 'Afsar';
-  const heroRole = settings?.hero_role || 'Video Editor';
+  const heroName = settings?.hero_name || 'Jenny';
+  const heroRole = settings?.hero_role || 'Product Designer';
   const quoteText =
     settings?.hero_quote ||
-    "Afsar's exceptional video editing ensured our website's success. Highly recommended!";
-  const clientsCount =
-    settings?.hero_clients_count || about?.projects_delivered || '450+';
+    "Jenny's exceptional product design ensured our website's success. Highly recommended!";
+  const clientsCount = settings?.hero_clients_count || '450+';
   const clientsLabel = settings?.hero_clients_label || 'Client Served';
-  const experienceYears =
-    settings?.hero_experience_years ||
-    (about?.years_experience ? `${about.years_experience} Years` : '10 Years');
+  const experienceYears = settings?.hero_experience_years || '10 Years';
   const experienceLabel = settings?.hero_experience_label || 'Experts';
   const characterImg =
     settings?.hero_character_image_url ||

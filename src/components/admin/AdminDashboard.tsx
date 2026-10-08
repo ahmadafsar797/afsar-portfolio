@@ -4291,12 +4291,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                           <label className="block text-xs font-montserrat uppercase text-white/60 mb-1">
                             Name (Highlight Color)
                           </label>
-                          <input
+                            <input
                             type="text"
                             value={settings.hero_name || ''}
                             onChange={(e) => setSettings({ ...settings, hero_name: e.target.value })}
                             className="w-full px-3 py-2 rounded-lg bg-black border border-white/15 text-sm text-white"
-                            placeholder="Afsar (or Jenny)"
+                            placeholder="Jenny"
                           />
                         </div>
                         <div>
@@ -4308,7 +4308,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                             value={settings.hero_role || ''}
                             onChange={(e) => setSettings({ ...settings, hero_role: e.target.value })}
                             className="w-full px-3 py-2 rounded-lg bg-black border border-white/15 text-sm text-white"
-                            placeholder="Video Editor (or Product Designer)"
+                            placeholder="Product Designer"
                           />
                         </div>
                         <div>
@@ -4364,7 +4364,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                             value={settings.hero_experience_years || ''}
                             onChange={(e) => setSettings({ ...settings, hero_experience_years: e.target.value })}
                             className="w-full px-3 py-2 rounded-lg bg-black border border-white/15 text-sm text-white"
-                            placeholder="10 Years (or 2+ Years)"
+                            placeholder="10 Years"
                           />
                         </div>
                         <div>
@@ -4388,7 +4388,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                             value={settings.hero_quote || ''}
                             onChange={(e) => setSettings({ ...settings, hero_quote: e.target.value })}
                             className="w-full px-3 py-2 rounded-lg bg-black border border-white/15 text-sm text-white"
-                            placeholder="Afsar's exceptional video editing ensured our website's success. Highly recommended!"
+                            placeholder="Jenny's exceptional product design ensured our website's success. Highly recommended!"
                           />
                         </div>
                         <div className="sm:col-span-2">
