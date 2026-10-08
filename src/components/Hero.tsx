@@ -37,7 +37,6 @@ export const Hero: React.FC<HeroProps> = ({ settings, about, onWatchShowreel }) 
   const experienceLabel = settings?.hero_experience_label || 'Experts';
   const characterImg =
     settings?.hero_character_image_url ||
-    settings?.profile_picture_url ||
     '/images/hero-character.png';
   const archColor = settings?.hero_arch_color || '#FF5023';
 

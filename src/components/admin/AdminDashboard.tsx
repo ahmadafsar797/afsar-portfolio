@@ -4391,6 +4391,46 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                             placeholder="Afsar's exceptional video editing ensured our website's success. Highly recommended!"
                           />
                         </div>
+                        <div className="sm:col-span-2">
+                          <label className="block text-xs font-montserrat uppercase text-white/60 mb-1">
+                            Hero Cutout Portrait Image (Transparent PNG)
+                          </label>
+                          <div className="flex flex-wrap items-center gap-3">
+                            <input
+                              type="text"
+                              value={settings.hero_character_image_url || ''}
+                              onChange={(e) => setSettings({ ...settings, hero_character_image_url: e.target.value })}
+                              className="flex-1 px-3 py-2 rounded-lg bg-black border border-white/15 text-sm text-white"
+                              placeholder="Default: /images/hero-character.png (Transparent PNG)"
+                            />
+                            <label className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-xs cursor-pointer border border-white/15 text-white">
+                              <Upload className="w-3.5 h-3.5 text-[#C65D45]" />
+                              <span>Upload Cutout PNG</span>
+                              <input
+                                type="file"
+                                accept="image/png,image/webp,image/*"
+                                className="hidden"
+                                onChange={(e) =>
+                                  handleFileUpload(e, (url) =>
+                                    setSettings({ ...settings, hero_character_image_url: url })
+                                  )
+                                }
+                              />
+                            </label>
+                            {settings.hero_character_image_url && (
+                              <button
+                                type="button"
+                                onClick={() => setSettings({ ...settings, hero_character_image_url: '' })}
+                                className="px-3 py-2 rounded-lg bg-white/5 hover:bg-white/15 text-xs text-white/60 hover:text-white"
+                              >
+                                Reset to Default PNG
+                              </button>
+                            )}
+                          </div>
+                          <p className="text-[11px] text-white/40 mt-1">
+                            Uses the transparent cutout PNG (<span className="text-white/60 font-mono">/images/hero-character.png</span>) without any black square background.
+                          </p>
+                        </div>
                       </div>
                     </div>
                     <div>
