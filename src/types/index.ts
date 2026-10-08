@@ -125,6 +125,7 @@ export interface SettingsData {
   hero_greeting?: string;
   hero_name?: string;
   hero_role?: string;
+  hero_location?: string;
   hero_quote?: string;
   hero_clients_count?: string;
   hero_clients_label?: string;

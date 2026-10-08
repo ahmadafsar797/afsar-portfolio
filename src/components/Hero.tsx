@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from 'react';
-import { ArrowUpRight, Play } from 'lucide-react';
+import { Play, ArrowUpRight } from 'lucide-react';
 import { SettingsData, AboutData } from '../types';
 import { gsap } from 'gsap';
 
@@ -9,78 +9,82 @@ interface HeroProps {
   onWatchShowreel?: () => void;
 }
 
-export const Hero: React.FC<HeroProps> = ({ settings, about, onWatchShowreel }) => {
+export const Hero: React.FC<HeroProps> = ({ settings, onWatchShowreel }) => {
   const heroRef = useRef<HTMLElement>(null);
-  const badgeRef = useRef<HTMLDivElement>(null);
-  const titleRef = useRef<HTMLHeadingElement>(null);
-  const leftColRef = useRef<HTMLDivElement>(null);
-  const centerColRef = useRef<HTMLDivElement>(null);
-  const rightColRef = useRef<HTMLDivElement>(null);
-  const archRef = useRef<HTMLDivElement>(null);
-  const portraitRef = useRef<HTMLImageElement>(null);
-  const ctaPillRef = useRef<HTMLDivElement>(null);
-  const arrowRef = useRef<HTMLDivElement>(null);
+  const tagRef = useRef<HTMLDivElement>(null);
+  const headlineRef = useRef<HTMLHeadingElement>(null);
+  const subtitleRef = useRef<HTMLParagraphElement>(null);
+  const ctaRef = useRef<HTMLDivElement>(null);
+  const imageRef = useRef<HTMLDivElement>(null);
+  const shapeRef = useRef<HTMLDivElement>(null);
+  const badgeRef = useRef<HTMLAnchorElement>(null);
+  const floatRef1 = useRef<HTMLDivElement>(null);
+  const floatRef2 = useRef<HTMLDivElement>(null);
+  const playBtnRef = useRef<HTMLButtonElement>(null);
 
-  // Content configuration with defaults matching reference layout verbatim
-  const greeting = settings?.hero_greeting || 'Hello!';
-  const heroName = settings?.hero_name || 'Jenny';
-  const heroRole = settings?.hero_role || 'Product Designer';
-  const quoteText =
-    settings?.hero_quote ||
-    "Jenny's exceptional product design ensured our website's success. Highly recommended!";
-  const clientsCount = settings?.hero_clients_count || '450+';
-  const clientsLabel = settings?.hero_clients_label || 'Client Served';
-  const experienceYears = settings?.hero_experience_years || '10 Years';
-  const experienceLabel = settings?.hero_experience_label || 'Experts';
-  const characterImg =
-    settings?.hero_character_image_url ||
-    '/images/hero-character.png';
-  const archColor = settings?.hero_arch_color || '#FF5023';
+  // Content variables with customizable overrides and exact reference defaults
+  const heroGreeting = settings?.hero_greeting || 'Hello There!';
+  const heroName = settings?.hero_name || 'Afsar Ahmad';
+  const heroRole = settings?.hero_role || 'Video Editor';
+  const heroLocation = settings?.hero_location || 'Based in Mumbai.';
+  const heroSubtitle =
+    settings?.hero_subtitle ||
+    'Creative Video Editor specializing in high-retention short-form reels, cinematic commercial brand films, and engaging long-form YouTube content.';
+
+  // Image replacement, scale, and offset controls
+  const characterImg = settings?.hero_character_image_url || '/images/hero-character.png';
   const imgScale = Number(settings?.hero_image_scale || '100') / 100;
-  const imgMaxHeight = Number(settings?.hero_image_max_height || '510');
+  const imgMaxHeight = settings?.hero_image_max_height ? Number(settings.hero_image_max_height) : null;
   const imgOffsetY = Number(settings?.hero_image_offset_y || '0');
   const imgOffsetX = Number(settings?.hero_image_offset_x || '0');
 
-  // Background Video Support (preserved from settings)
-  const hasBgVideo = Boolean(
-    settings?.hero_bg_video_url && settings?.hero_bg_video_enabled !== '0'
-  );
-  const videoOpacity = Number(settings?.hero_bg_video_opacity ?? '75') / 100;
-  const overlayStyle = settings?.hero_bg_video_overlay || 'warm';
-  const overlayOpacity = Number(settings?.hero_bg_video_overlay_opacity ?? '65') / 100;
-  const videoBlur = Number(settings?.hero_bg_video_blur ?? '0');
-
-  // Entrance animations
+  // Cinematic Hero entrance
   useEffect(() => {
     if (typeof window === 'undefined') return;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
     const ctx = gsap.context(() => {
-      const tl = gsap.timeline({ delay: 0.15 });
+      const tl = gsap.timeline({ delay: 0.1 });
 
-      // Initial positions
-      gsap.set([badgeRef.current, titleRef.current], { opacity: 0, y: 24 });
-      if (archRef.current) gsap.set(archRef.current, { scale: 0.85, opacity: 0, transformOrigin: 'bottom center' });
-      if (portraitRef.current) gsap.set(portraitRef.current, { y: 40, opacity: 0 });
-      if (ctaPillRef.current) gsap.set(ctaPillRef.current, { scale: 0.8, opacity: 0 });
-      if (arrowRef.current) gsap.set(arrowRef.current, { scale: 0, opacity: 0, rotate: -20 });
-      if (leftColRef.current) gsap.set(leftColRef.current, { x: -35, opacity: 0 });
-      if (rightColRef.current) gsap.set(rightColRef.current, { x: 35, opacity: 0 });
+      // Initial clean hidden states
+      gsap.set([tagRef.current, headlineRef.current, subtitleRef.current, ctaRef.current], {
+        opacity: 0,
+        y: 28,
+      });
+      if (shapeRef.current) gsap.set(shapeRef.current, { scale: 0.84, opacity: 0 });
+      if (imageRef.current) gsap.set(imageRef.current, { y: 36, opacity: 0, scale: 1.05 });
+      if (badgeRef.current) gsap.set(badgeRef.current, { scale: 0, rotate: -35, opacity: 0 });
+      if (floatRef1.current) gsap.set(floatRef1.current, { x: -30, opacity: 0 });
+      if (floatRef2.current) gsap.set(floatRef2.current, { x: 30, opacity: 0 });
 
-      tl.to(badgeRef.current, { opacity: 1, y: 0, duration: 0.5, ease: 'power3.out' }, 0)
-        .to(titleRef.current, { opacity: 1, y: 0, duration: 0.65, ease: 'power3.out' }, 0.12)
-        .to(archRef.current, { opacity: 1, scale: 1, duration: 0.75, ease: 'back.out(1.4)' }, 0.22)
-        .to(portraitRef.current, { opacity: 1, y: 0, duration: 0.85, ease: 'power3.out' }, 0.3)
-        .to(leftColRef.current, { opacity: 1, x: 0, duration: 0.65, ease: 'power3.out' }, 0.45)
-        .to(rightColRef.current, { opacity: 1, x: 0, duration: 0.65, ease: 'power3.out' }, 0.45)
-        .to(ctaPillRef.current, { opacity: 1, scale: 1, duration: 0.6, ease: 'back.out(2)' }, 0.55)
-        .to(arrowRef.current, { opacity: 1, scale: 1, rotate: 0, duration: 0.5, ease: 'back.out(2.5)' }, 0.68);
+      tl.to(shapeRef.current, { scale: 1, opacity: 1, duration: 0.85, ease: 'power3.out' }, 0)
+        .to(imageRef.current, { y: 0, opacity: 1, scale: 1, duration: 0.95, ease: 'power3.out' }, 0.12)
+        .to(tagRef.current, { y: 0, opacity: 1, duration: 0.55, ease: 'power3.out' }, 0.18)
+        .to(headlineRef.current, { y: 0, opacity: 1, duration: 0.75, ease: 'power3.out' }, 0.26)
+        .to(subtitleRef.current, { y: 0, opacity: 1, duration: 0.65, ease: 'power3.out' }, 0.42)
+        .to(ctaRef.current, { y: 0, opacity: 1, duration: 0.55, ease: 'power3.out' }, 0.55)
+        .to(badgeRef.current, { scale: 1, rotate: 0, opacity: 1, duration: 0.7, ease: 'back.out(2)' }, 0.62)
+        .to(floatRef1.current, { x: 0, opacity: 1, duration: 0.55, ease: 'power3.out' }, 0.7)
+        .to(floatRef2.current, { x: 0, opacity: 1, duration: 0.55, ease: 'power3.out' }, 0.76);
+
+      // Continuous subtle floating tags loop
+      [floatRef1, floatRef2].forEach((r, i) => {
+        if (!r.current) return;
+        gsap.to(r.current, {
+          y: i === 0 ? -9 : 8,
+          duration: 2.4 + i * 0.4,
+          repeat: -1,
+          yoyo: true,
+          ease: 'sine.inOut',
+          delay: 1.2 + i * 0.3,
+        });
+      });
     }, heroRef);
 
     return () => ctx.revert();
   }, []);
 
-  // Subtle 3D mouse parallax on desktop
+  // Subtle 3D mouse depth parallax
   const handleHeroMouseMove = (e: React.MouseEvent<HTMLElement>) => {
     if (window.innerWidth < 1024) return;
     const hero = heroRef.current;
@@ -89,32 +93,56 @@ export const Hero: React.FC<HeroProps> = ({ settings, about, onWatchShowreel }) 
     const xPct = (e.clientX - rect.left) / rect.width - 0.5;
     const yPct = (e.clientY - rect.top) / rect.height - 0.5;
 
-    if (portraitRef.current) {
-      gsap.to(portraitRef.current, {
-        x: xPct * 16,
-        y: yPct * 10,
-        duration: 0.5,
+    if (imageRef.current) {
+      gsap.to(imageRef.current, {
+        x: xPct * 18,
+        y: yPct * 12,
+        duration: 0.6,
         ease: 'power2.out',
       });
     }
-    if (archRef.current) {
-      gsap.to(archRef.current, {
-        x: -xPct * 8,
-        y: -yPct * 6,
-        duration: 0.7,
+    if (shapeRef.current) {
+      gsap.to(shapeRef.current, {
+        x: -xPct * 14,
+        y: -yPct * 10,
+        duration: 0.8,
         ease: 'power2.out',
       });
     }
   };
 
   const handleHeroMouseLeave = () => {
-    if (portraitRef.current) {
-      gsap.to(portraitRef.current, { x: 0, y: 0, duration: 0.7, ease: 'power3.out' });
+    if (imageRef.current) {
+      gsap.to(imageRef.current, { x: 0, y: 0, duration: 0.8, ease: 'power3.out' });
     }
-    if (archRef.current) {
-      gsap.to(archRef.current, { x: 0, y: 0, duration: 0.7, ease: 'power3.out' });
+    if (shapeRef.current) {
+      gsap.to(shapeRef.current, { x: 0, y: 0, duration: 0.8, ease: 'power3.out' });
     }
   };
+
+  // Magnetic play button
+  const handlePlayMagnetic = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const btn = playBtnRef.current;
+    if (!btn) return;
+    const rect = btn.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    const dx = (e.clientX - cx) * 0.38;
+    const dy = (e.clientY - cy) * 0.38;
+    gsap.to(btn, { x: dx, y: dy, scale: 1.08, duration: 0.25, ease: 'power2.out' });
+  };
+
+  const handlePlayLeave = () => {
+    if (!playBtnRef.current) return;
+    gsap.to(playBtnRef.current, { x: 0, y: 0, scale: 1, duration: 0.55, ease: 'elastic.out(1, 0.4)' });
+  };
+
+  const hasBgVideo = Boolean(settings?.hero_bg_video_url && settings?.hero_bg_video_enabled !== '0');
+  const videoOpacity = (Number(settings?.hero_bg_video_opacity ?? '75')) / 100;
+  const overlayStyle = settings?.hero_bg_video_overlay || 'warm'; // 'warm' | 'dark' | 'none'
+  const overlayOpacity = (Number(settings?.hero_bg_video_overlay_opacity ?? '65')) / 100;
+  const videoBlur = Number(settings?.hero_bg_video_blur ?? '0');
+  const isDarkTheme = settings?.hero_text_theme === 'light' || (hasBgVideo && overlayStyle === 'dark' && settings?.hero_text_theme !== 'dark');
 
   return (
     <section
@@ -122,9 +150,11 @@ export const Hero: React.FC<HeroProps> = ({ settings, about, onWatchShowreel }) 
       id="home"
       onMouseMove={handleHeroMouseMove}
       onMouseLeave={handleHeroMouseLeave}
-      className="relative w-full min-h-screen bg-white text-[#1A1A1A] flex flex-col justify-between overflow-hidden font-sans select-none transition-colors duration-500 pt-24 sm:pt-28 md:pt-32 pb-12 sm:pb-16"
+      className={`relative w-full min-h-[100dvh] lg:h-screen lg:max-h-[1080px] flex flex-col justify-between overflow-hidden font-sans select-none transition-colors duration-500 ${
+        isDarkTheme ? 'bg-[#0E0907]' : 'bg-[#F8F1E7]'
+      }`}
     >
-      {/* Optional Fullscreen Video Background if configured in settings */}
+      {/* Fullscreen Video Background */}
       {hasBgVideo && (
         <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
           <video
@@ -136,233 +166,245 @@ export const Hero: React.FC<HeroProps> = ({ settings, about, onWatchShowreel }) 
             style={{
               opacity: videoOpacity,
               filter: videoBlur > 0 ? `blur(${videoBlur}px)` : undefined,
+              transform: videoBlur > 0 ? 'scale(1.05)' : undefined,
             }}
             src={settings?.hero_bg_video_url}
           />
+
+          {/* Calibrated Overlay Tint */}
           {overlayStyle === 'dark' ? (
             <div
-              className="absolute inset-0 bg-black/80 pointer-events-none"
+              className="absolute inset-0 bg-gradient-to-r from-black/95 via-black/80 to-black/60 pointer-events-none"
               style={{ opacity: overlayOpacity }}
             />
           ) : overlayStyle === 'none' ? null : (
+            /* Warm Editorial Parchment Tint */
             <div
-              className="absolute inset-0 bg-white/85 pointer-events-none"
+              className="absolute inset-0 bg-gradient-to-r from-[#F8F1E7]/95 via-[#F8F1E7]/80 to-[#F8F1E7]/60 pointer-events-none"
               style={{ opacity: overlayOpacity }}
             />
           )}
+
+          {/* Bottom Edge Fade for Seamless Section Continuity */}
+          <div
+            className={`absolute inset-x-0 bottom-0 h-28 pointer-events-none ${
+              isDarkTheme
+                ? 'bg-gradient-to-t from-[#0E0907] to-transparent'
+                : 'bg-gradient-to-t from-[#F8F1E7] to-transparent'
+            }`}
+          />
         </div>
       )}
 
-      {/* Main Container */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative z-10 flex-1 flex flex-col justify-center">
-        
-        {/* 1. TOP HEADER: "Hello!" pill + Centered Large Title */}
-        <div className="flex flex-col items-center text-center mb-6 sm:mb-8 md:mb-10">
-          
-          {/* Hello! Badge with 3 Orange Sparkle Rays */}
-          <div ref={badgeRef} className="relative inline-flex items-center mb-3 sm:mb-4">
-            <div className="px-4 sm:px-5 py-1 sm:py-1.5 rounded-full border border-neutral-300 bg-white/95 shadow-sm text-xs sm:text-sm font-semibold text-[#1A1A1A] tracking-wide">
-              {greeting}
-            </div>
+      {/* Subtle Demo Background Grid & Geometric Rings */}
+      <div className={`absolute inset-0 pointer-events-none ${hasBgVideo ? 'opacity-20' : 'opacity-40'}`}>
+        <div className={`absolute top-16 left-10 w-80 h-80 rounded-full border ${isDarkTheme ? 'border-white/10' : 'border-[#2B170F]/10'}`} />
+        <div className={`absolute top-32 right-16 w-[440px] h-[440px] rounded-full border ${isDarkTheme ? 'border-white/10' : 'border-[#2B170F]/10'}`} />
+        <div
+          className="w-full h-full"
+          style={{
+            backgroundImage: isDarkTheme
+              ? 'radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.08) 1px, transparent 0)'
+              : 'radial-gradient(circle at 1px 1px, rgba(43, 23, 15, 0.06) 1px, transparent 0)',
+            backgroundSize: '36px 36px',
+          }}
+        />
+      </div>
 
-            {/* Sparkle rays (matching reference image) */}
-            <svg
-              className="absolute -top-3 sm:-top-3.5 -right-3 sm:-right-3.5 w-5 h-5 sm:w-6 sm:h-6 text-[#FF5023]"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.4"
-              strokeLinecap="round"
+      {/* Main Hero Body */}
+      <div className="flex-1 flex items-center max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full pt-28 sm:pt-32 lg:pt-20 pb-12 sm:pb-16 lg:pb-12 relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center w-full">
+          {/* Left Column */}
+          <div className="lg:col-span-7 flex flex-col items-start text-left z-20">
+            {/* Bounding-box tag */}
+            <div
+              ref={tagRef}
+              className={`relative inline-flex items-center px-3.5 py-1 border border-[#C65D45] rounded-sm text-xs font-sans font-semibold shadow-sm mb-4 select-none ${
+                isDarkTheme ? 'bg-[#180E09]/90 text-white' : 'bg-[#FFF9F2] text-[#2B170F]'
+              }`}
             >
-              <line x1="12" y1="3" x2="12" y2="7" />
-              <line x1="4" y1="6" x2="8" y2="9" />
-              <line x1="20" y1="6" x2="16" y2="9" />
-            </svg>
-          </div>
-
-          {/* Main Headline */}
-          <h1
-            ref={titleRef}
-            data-font="hero-title"
-            className="text-4xl sm:text-6xl md:text-7xl lg:text-[76px] font-bold text-[#1A1A1A] tracking-[-0.03em] leading-[1.1] sm:leading-[1.08]"
-          >
-            I'm <span style={{ color: archColor }}>{heroName},</span>
-            <br />
-            <span>{heroRole}</span>
-          </h1>
-        </div>
-
-        {/* 2. THREE-COLUMN HERO BODY */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-4 items-center w-full max-w-6xl mx-auto">
-          
-          {/* LEFT COLUMN: Testimonial Quote & Client Served */}
-          <div
-            ref={leftColRef}
-            className="order-2 lg:order-1 lg:col-span-3 flex flex-col items-start justify-center text-left"
-          >
-            {/* Big Elegant Quotation Mark */}
-            <div className="text-5xl sm:text-6xl font-serif text-[#1A1A1A] font-bold leading-none mb-2 select-none">
-              “
+              <span className="absolute -top-1 -left-1 w-2 h-2 bg-[#C65D45] border border-[#FFF9F2]" />
+              <span className="absolute -top-1 -right-1 w-2 h-2 bg-[#C65D45] border border-[#FFF9F2]" />
+              <span className="absolute -bottom-1 -left-1 w-2 h-2 bg-[#C65D45] border border-[#FFF9F2]" />
+              <span className="absolute -bottom-1 -right-1 w-2 h-2 bg-[#C65D45] border border-[#FFF9F2]" />
+              <span>{heroGreeting}</span>
             </div>
 
-            {/* Testimonial Quote Snippet */}
-            <p className="text-xs sm:text-sm text-[#4A4A4A] font-medium leading-relaxed max-w-[240px] mb-6 sm:mb-8">
-              {quoteText}
+            {/* Main Headline */}
+            <h1
+              ref={headlineRef}
+              data-font="hero-title"
+              className={`font-hero-title font-pogonia text-3xl sm:text-5xl md:text-6xl lg:text-6xl xl:text-7xl font-bold leading-[1.24] sm:leading-[1.12] lg:leading-[1.08] tracking-tight mb-4 ${
+                isDarkTheme ? 'text-[#FFF9F2]' : 'text-[#2B170F]'
+              }`}
+            >
+              I'm{' '}
+              <span className="text-[#C65D45] underline decoration-[#C65D45] decoration-2 sm:decoration-4 underline-offset-[3px] sm:underline-offset-6 lg:underline-offset-8">
+                {heroName},
+              </span>
+              <br />
+              {heroRole}
+              <br />
+              {heroLocation}
+            </h1>
+
+            {/* Subtitle */}
+            <p
+              ref={subtitleRef}
+              className={`font-sans text-xs sm:text-sm md:text-base max-w-md xl:max-w-lg leading-relaxed mb-6 font-medium ${
+                isDarkTheme ? 'text-white/80' : 'text-[#756A62]'
+              }`}
+            >
+              {heroSubtitle}
             </p>
 
-            {/* 450+ Client Served */}
-            <div>
-              <div className="text-3xl sm:text-4xl font-extrabold text-[#1A1A1A] tracking-tight">
-                {clientsCount}
+            {/* CTAs */}
+            <div ref={ctaRef} className="flex flex-wrap items-center gap-3 sm:gap-5">
+              {/* Luxury Tactile Switch Pill Button (from reference design) */}
+              <div className="relative inline-flex items-center rounded-full p-1 sm:p-1.5 bg-[#180E09] border border-[#2B170F]/40 shadow-[inset_0_3px_8px_rgba(0,0,0,0.7),inset_0_-1px_2px_rgba(255,255,255,0.08),0_8px_24px_rgba(43,23,15,0.28)] group select-none transition-all duration-300 hover:shadow-[inset_0_3px_8px_rgba(0,0,0,0.7),0_8px_28px_rgba(198,93,69,0.35)]">
+                {/* Active Colored Track (Left Side) */}
+                <a
+                  href="#reels"
+                  data-cursor="open"
+                  data-font="cta"
+                  className="font-cta group/explore relative z-10 px-5 sm:px-6 py-2.5 sm:py-3 rounded-l-full bg-gradient-to-r from-[#C65D45] via-[#D8684F] to-[#E2725B] text-[#FFF9F2] font-sans font-black text-xs uppercase tracking-wide shadow-[inset_0_1px_2px_rgba(255,255,255,0.45),0_0_16px_rgba(198,93,69,0.35)] hover:brightness-110 active:scale-98 transition-all duration-200 flex items-center gap-2"
+                >
+                  <span className="absolute inset-0 rounded-l-full overflow-hidden pointer-events-none">
+                    <span className="absolute inset-0 -translate-x-full group-hover/explore:translate-x-full group-active/explore:translate-x-full transition-transform duration-500 bg-gradient-to-r from-transparent via-white/25 to-transparent" />
+                  </span>
+                  <span className="relative">Explore Portfolio</span>
+                </a>
+
+                {/* Tactile 3D Slider Knob with Glowing LED Indicator (Right Side) */}
+                <button
+                  ref={playBtnRef}
+                  onClick={onWatchShowreel}
+                  onMouseMove={handlePlayMagnetic}
+                  onMouseLeave={handlePlayLeave}
+                  data-cursor="play"
+                  data-font="cta"
+                  className="relative z-10 ml-1 px-4 sm:px-5 py-2.5 sm:py-3 rounded-full bg-gradient-to-b from-[#341C13] via-[#24130C] to-[#160B06] border border-white/20 text-[#FFF9F2] flex items-center gap-3 shadow-[-4px_0_12px_rgba(0,0,0,0.55),0_4px_10px_rgba(0,0,0,0.6),inset_0_1px_1px_rgba(255,255,255,0.25)] group-hover:shadow-[-6px_0_16px_rgba(0,0,0,0.65),0_6px_14px_rgba(0,0,0,0.7),0_0_20px_rgba(198,93,69,0.3)] group-hover:border-[#C65D45]/60 transition-all duration-300 cursor-pointer active:scale-95"
+                  title="Watch Master Showreel"
+                  aria-label="Watch Master Showreel"
+                >
+                  <Play className="w-3.5 h-3.5 fill-current text-white/95 ml-0.5" />
+                </button>
               </div>
-              <div className="text-xs sm:text-sm font-medium text-[#71717A] mt-1">
-                {clientsLabel}
-              </div>
+
+              {/* Hire Me Secondary Tactile Pill Button */}
+              <a
+                href="#contact"
+                data-cursor="open"
+                data-font="cta"
+                className="font-cta group/hire relative px-6 sm:px-7 py-3.5 sm:py-4 rounded-full bg-gradient-to-b from-[#28150D] via-[#1E0F09] to-[#140A06] text-[#FFF9F2] font-sans font-black text-xs uppercase tracking-wide border border-[#2B170F]/50 shadow-[0_4px_14px_rgba(0,0,0,0.25),inset_0_1px_1px_rgba(255,255,255,0.15)] hover:border-[#C65D45] hover:shadow-[0_4px_22px_rgba(198,93,69,0.45)] hover:scale-105 active:scale-95 transition-all duration-300"
+              >
+                <span className="absolute inset-0 rounded-full overflow-hidden pointer-events-none">
+                  <span className="absolute inset-0 -translate-x-full group-hover/hire:translate-x-full group-active/hire:translate-x-full transition-transform duration-500 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                </span>
+                <span className="relative">Hire Me</span>
+              </a>
             </div>
           </div>
 
-          {/* CENTER COLUMN: Orange Arch + Portrait + Dual Pill Button + Arrow */}
-          <div
-            ref={centerColRef}
-            className="order-1 lg:order-2 lg:col-span-6 flex flex-col items-center justify-end relative pb-6 sm:pb-8"
-          >
-            <div className="relative w-full max-w-[360px] sm:max-w-[440px] md:max-w-[480px] flex flex-col items-center justify-end">
-              
-              {/* Vibrant Orange Arch Dome Backdrop */}
-              <div
-                ref={archRef}
-                className="w-[260px] sm:w-[340px] md:w-[390px] h-[260px] sm:h-[330px] md:h-[380px] rounded-t-full shadow-2xl relative overflow-hidden"
-                style={{
-                  backgroundColor: archColor,
-                  boxShadow: `0 24px 60px ${archColor}40`,
-                }}
-              />
+          {/* Right Column */}
+          <div className="lg:col-span-5 relative flex items-end justify-center min-h-[300px] sm:min-h-[400px] lg:min-h-[580px] mt-4 lg:mt-0">
+            {/* Ambient soft translucent glow behind circle */}
+            <div
+              className="absolute top-[40%] sm:top-[42%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[270px] sm:w-[370px] md:w-[430px] lg:w-[460px] h-[270px] sm:h-[370px] md:h-[430px] lg:h-[460px] bg-gradient-to-tr from-[#C65D45]/30 to-[#ffba3b]/25 rounded-full blur-2xl pointer-events-none"
+              style={{
+                maskImage: 'linear-gradient(to bottom, black 50%, transparent 95%)',
+                WebkitMaskImage: 'linear-gradient(to bottom, black 50%, transparent 95%)',
+              }}
+            />
 
-              {/* Person Cutout Portrait Image with size, scale and position controls */}
-              <div
-                className="absolute inset-0 flex items-end justify-center pointer-events-none transition-transform duration-150 ease-out"
-                style={{
-                  transform: `translate(${imgOffsetX}px, ${imgOffsetY}px) scale(${imgScale})`,
-                  transformOrigin: 'bottom center',
-                }}
-              >
+            {/* Proper Circle Shape with Transparent Gradient */}
+            <div
+              ref={shapeRef}
+              className="absolute top-[40%] sm:top-[42%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[240px] sm:w-[330px] md:w-[390px] lg:w-[420px] h-[240px] sm:h-[330px] md:h-[390px] lg:h-[420px] bg-gradient-to-tr from-[#C65D45] via-[#df674d] to-[#ffba3b] rounded-full shadow-2xl shadow-[#C65D45]/30 pointer-events-none will-change-transform"
+              style={{
+                maskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 92%)',
+                WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 92%)',
+              }}
+            />
+
+            {/* Subtle contour ring framing the circle */}
+            <div
+              className={`absolute top-[40%] sm:top-[42%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[270px] sm:w-[370px] md:w-[430px] lg:w-[460px] h-[270px] sm:h-[370px] md:h-[430px] lg:h-[460px] rounded-full border pointer-events-none ${
+                isDarkTheme ? 'border-white/25' : 'border-[#2B170F]/15'
+              }`}
+              style={{
+                maskImage: 'linear-gradient(to bottom, black 45%, transparent 92%)',
+                WebkitMaskImage: 'linear-gradient(to bottom, black 45%, transparent 92%)',
+              }}
+            />
+
+            {/* Character image with wrapper handling user replace, size, scale & offset */}
+            <div
+              className="relative z-10 w-full flex items-end justify-center pointer-events-none transition-transform duration-150 ease-out"
+              style={{
+                transform: `translate(${imgOffsetX}px, ${imgOffsetY}px) scale(${imgScale})`,
+                transformOrigin: 'bottom center',
+              }}
+            >
+              <div ref={imageRef} className="w-full flex items-end justify-center will-change-transform">
                 <img
-                  ref={portraitRef}
                   src={characterImg}
-                  alt={`${heroName} - ${heroRole}`}
-                  className="w-auto object-contain drop-shadow-2xl select-none"
-                  style={{
-                    maxHeight: `min(${imgMaxHeight}px, 85vh)`,
-                    filter: 'drop-shadow(0 16px 24px rgba(0, 0, 0, 0.18))',
-                  }}
+                  alt={`${heroName} - Professional ${heroRole}`}
+                  className="max-h-[38vh] sm:max-h-[50vh] md:max-h-[60vh] lg:max-h-[64vh] xl:max-h-[68vh] w-auto object-contain filter drop-shadow-2xl select-none transition-transform duration-500 hover:scale-[1.02]"
+                  style={
+                    imgMaxHeight
+                      ? { maxHeight: `min(${imgMaxHeight}px, 85vh)` }
+                      : undefined
+                  }
                 />
               </div>
+            </div>
 
-              {/* Decorative Hand-Drawn Doodle Stars on Character Shoulder */}
-              <div className="absolute top-[42%] right-[14%] sm:right-[16%] z-15 pointer-events-none text-[#1A1A1A]">
-                <svg className="w-5 h-5 fill-none stroke-current" viewBox="0 0 24 24" strokeWidth="2.2">
-                  <path d="M12 2 L14 9 L21 11 L15 15 L17 22 L12 18 L7 22 L9 15 L3 11 L10 9 Z" />
-                </svg>
+            {/* Hire Me badge */}
+            <a
+              ref={badgeRef}
+              href="#contact"
+              data-cursor="open"
+              className="absolute top-2 sm:top-4 right-1 sm:-right-2 z-20 w-20 h-20 sm:w-24 sm:h-24 md:w-26 md:h-26 rounded-full bg-[#2B170F] border-2 border-[#FFF9F2] shadow-2xl flex items-center justify-center cursor-pointer group hover:scale-110 active:scale-95 transition-transform duration-300"
+              title="Hire Me"
+            >
+              <svg className="absolute inset-0 w-full h-full animate-spin-slow pointer-events-none" viewBox="0 0 100 100">
+                <path
+                  id="hireCirclePath"
+                  d="M 50, 50 m -37, 0 a 37,37 0 1,1 74,0 a 37,37 0 1,1 -74,0"
+                  fill="none"
+                />
+                <text className="text-[9.5px] font-sans font-bold fill-[#C65D45] uppercase tracking-[0.16em]">
+                  <textPath href="#hireCirclePath" startOffset="0%">
+                    • HIRE ME • HIRE ME • HIRE ME •
+                  </textPath>
+                </text>
+              </svg>
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#C65D45] text-[#2B170F] flex items-center justify-center shadow-inner group-hover:scale-110 group-hover:rotate-45 transition-transform duration-300">
+                <ArrowUpRight className="w-4 h-4 sm:w-5 sm:h-5 stroke-[2.5]" />
               </div>
-              <div className="absolute top-[48%] right-[10%] sm:right-[12%] z-15 pointer-events-none text-[#1A1A1A]">
-                <svg className="w-3.5 h-3.5 fill-none stroke-current" viewBox="0 0 24 24" strokeWidth="2.2">
-                  <path d="M12 2 L14 9 L21 11 L15 15 L17 22 L12 18 L7 22 L9 15 L3 11 L10 9 Z" />
-                </svg>
+            </a>
+
+            {/* Floating tag 1 */}
+            <div ref={floatRef1} className="absolute bottom-10 -left-3 sm:left-1 z-20 flex items-start gap-1 drop-shadow-xl will-change-transform">
+              <svg className="w-4 h-4 sm:w-5 sm:h-5 text-[#2B170F] fill-current -rotate-12 drop-shadow" viewBox="0 0 24 24">
+                <path d="M4 0l16 12.279-6.951 1.17 4.325 8.817-3.596 1.734-4.35-8.879-5.428 5.428z" />
+              </svg>
+              <div className="bg-[#2B170F] text-[#FFF9F2] px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-xl text-[11px] sm:text-xs font-sans font-semibold border border-white/20 shadow-md">
+                Video Editor
               </div>
+            </div>
 
-              {/* Floating Dual Pill CTA Button Group */}
-              <div
-                ref={ctaPillRef}
-                className="relative z-30 mt-[-24px] sm:mt-[-28px] inline-flex items-center"
-              >
-                {/* Curved Arrow Doodle pointing to Portfolio Button */}
-                <div
-                  ref={arrowRef}
-                  className="absolute -left-12 sm:-left-16 bottom-1 sm:bottom-2 pointer-events-none"
-                >
-                  <svg
-                    className="w-11 sm:w-14 h-8 sm:h-10 text-[#1A1A1A] fill-none stroke-current -rotate-6"
-                    viewBox="0 0 60 45"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M 8,4 C 6,24 16,36 46,34" />
-                    <path d="M 37,27 L 47,34 L 38,41" />
-                  </svg>
-                </div>
-
-                {/* Pill Container */}
-                <div className="inline-flex items-center p-1.5 rounded-full bg-white border border-neutral-300 shadow-[0_14px_36px_rgba(0,0,0,0.14)] gap-1.5">
-                  {/* Portfolio ↗ Button */}
-                  <a
-                    href="#reels"
-                    data-cursor="open"
-                    className="px-5 sm:px-6 py-2.5 sm:py-3 rounded-full text-white font-bold text-xs sm:text-sm tracking-wide flex items-center gap-1.5 shadow-md hover:brightness-110 active:scale-95 transition-all duration-200"
-                    style={{ backgroundColor: archColor }}
-                  >
-                    <span>Portfolio</span>
-                    <ArrowUpRight className="w-4 h-4 stroke-[2.5]" />
-                  </a>
-
-                  {/* Hire Me Button */}
-                  <a
-                    href="#contact"
-                    data-cursor="open"
-                    className="px-5 sm:px-6 py-2.5 sm:py-3 rounded-full bg-white text-[#1A1A1A] hover:text-black font-bold text-xs sm:text-sm tracking-wide border border-neutral-300 hover:border-neutral-900 active:scale-95 transition-all duration-200"
-                  >
-                    Hire Me
-                  </a>
-
-                  {/* Subtle Showreel Play trigger if configured */}
-                  {onWatchShowreel && (
-                    <button
-                      type="button"
-                      onClick={onWatchShowreel}
-                      className="p-2.5 rounded-full bg-neutral-100 hover:bg-neutral-200 text-[#1A1A1A] transition-colors"
-                      title="Watch Showreel"
-                    >
-                      <Play className="w-3.5 h-3.5 fill-current text-[#1A1A1A]" />
-                    </button>
-                  )}
-                </div>
+            {/* Floating tag 2 */}
+            <div ref={floatRef2} className="absolute top-[48%] sm:top-[50%] -right-2 sm:right-0 z-20 flex items-start gap-1 drop-shadow-xl will-change-transform">
+              <svg className="w-4 h-4 sm:w-5 sm:h-5 text-[#C65D45] fill-current -rotate-12 drop-shadow" viewBox="0 0 24 24">
+                <path d="M4 0l16 12.279-6.951 1.17 4.325 8.817-3.596 1.734-4.35-8.879-5.428 5.428z" />
+              </svg>
+              <div className="bg-[#C65D45] text-[#2B170F] px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-xl text-[11px] sm:text-xs font-sans font-bold border border-white/40 shadow-md">
+                Motion Designer
               </div>
             </div>
           </div>
-
-          {/* RIGHT COLUMN: 5 Stars, 10 Years Experts & Underline */}
-          <div
-            ref={rightColRef}
-            className="order-3 lg:col-span-3 flex flex-col items-start lg:items-end justify-center text-left lg:text-right"
-          >
-            {/* 5 Orange Stars */}
-            <div className="flex items-center gap-1 mb-2 sm:mb-3">
-              {[...Array(5)].map((_, i) => (
-                <svg
-                  key={i}
-                  className="w-5 h-5 fill-current"
-                  style={{ color: archColor }}
-                  viewBox="0 0 20 20"
-                >
-                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                </svg>
-              ))}
-            </div>
-
-            {/* 10 Years */}
-            <div className="text-3xl sm:text-4xl font-extrabold text-[#1A1A1A] tracking-tight">
-              {experienceYears}
-            </div>
-
-            {/* Experts */}
-            <div className="text-xs sm:text-sm font-medium text-[#71717A] mt-1">
-              {experienceLabel}
-            </div>
-
-            {/* Solid Horizontal Accent Line (matching reference) */}
-            <div className="w-24 sm:w-28 h-0.5 bg-[#1A1A1A] mt-4" />
-          </div>
-
         </div>
       </div>
     </section>

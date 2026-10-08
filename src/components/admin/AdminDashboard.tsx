@@ -4284,19 +4284,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                             value={settings.hero_greeting || ''}
                             onChange={(e) => setSettings({ ...settings, hero_greeting: e.target.value })}
                             className="w-full px-3 py-2 rounded-lg bg-black border border-white/15 text-sm text-white"
-                            placeholder="Hello!"
+                            placeholder="Hello There!"
                           />
                         </div>
                         <div>
                           <label className="block text-xs font-montserrat uppercase text-white/60 mb-1">
                             Name (Highlight Color)
                           </label>
-                            <input
+                          <input
                             type="text"
                             value={settings.hero_name || ''}
                             onChange={(e) => setSettings({ ...settings, hero_name: e.target.value })}
                             className="w-full px-3 py-2 rounded-lg bg-black border border-white/15 text-sm text-white"
-                            placeholder="Jenny"
+                            placeholder="Afsar Ahmad"
                           />
                         </div>
                         <div>
@@ -4308,7 +4308,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                             value={settings.hero_role || ''}
                             onChange={(e) => setSettings({ ...settings, hero_role: e.target.value })}
                             className="w-full px-3 py-2 rounded-lg bg-black border border-white/15 text-sm text-white"
-                            placeholder="Product Designer"
+                            placeholder="Video Editor"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-montserrat uppercase text-white/60 mb-1">
+                            Location Text
+                          </label>
+                          <input
+                            type="text"
+                            value={settings.hero_location || ''}
+                            onChange={(e) => setSettings({ ...settings, hero_location: e.target.value })}
+                            className="w-full px-3 py-2 rounded-lg bg-black border border-white/15 text-sm text-white"
+                            placeholder="Based in Mumbai."
                           />
                         </div>
                         <div>
@@ -4420,8 +4432,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                             {/* Live Preview Box */}
                             <div className="md:col-span-4 flex flex-col items-center justify-center p-3 rounded-xl bg-black/60 border border-white/10 relative overflow-hidden min-h-[170px]">
                               <div
-                                className="w-24 h-24 rounded-t-full relative flex items-end justify-center overflow-hidden shadow-inner"
-                                style={{ backgroundColor: settings.hero_arch_color || '#FF5023' }}
+                                className="w-24 h-24 rounded-full relative flex items-end justify-center overflow-hidden shadow-inner bg-gradient-to-tr from-[#C65D45] via-[#df674d] to-[#ffba3b]"
                               >
                                 <img
                                   src={settings.hero_character_image_url || '/images/hero-character.png'}
@@ -4438,7 +4449,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                                 />
                               </div>
                               <span className="text-[10px] text-white/50 mt-2 font-mono text-center">
-                                {settings.hero_character_image_url ? 'Custom Upload Active' : 'Default Jenny Cutout'}
+                                {settings.hero_character_image_url ? 'Custom Upload Active' : 'Default Character Cutout'}
                               </span>
                             </div>
 
@@ -4449,7 +4460,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                                   Upload / Replace PNG Image
                                 </label>
                                 <div className="flex flex-wrap items-center gap-2">
-                                  <label className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#FF5023] hover:bg-[#e0451b] text-xs font-bold cursor-pointer text-white shadow-md active:scale-95 transition-all">
+                                  <label className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#C65D45] hover:bg-[#d8684f] text-xs font-bold cursor-pointer text-white shadow-md active:scale-95 transition-all">
                                     <Upload className="w-4 h-4" />
                                     <span>Upload New Image PNG</span>
                                     <input
@@ -4474,7 +4485,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                                     }
                                     className="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-xs text-white transition-colors"
                                   >
-                                    Use Jenny Reference PNG
+                                    Use Default Cutout PNG
                                   </button>
                                 </div>
                               </div>

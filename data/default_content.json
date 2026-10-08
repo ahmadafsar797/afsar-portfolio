@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "syncedAt": "2026-10-08T16:15:00.000Z",
+  "syncedAt": "2026-10-08T19:00:00.000Z",
   "settings": {
     "site_name": "AFSAR AHMAD | Video Editor & Motion Designer",
     "hero_headline": "I Edit Stories That Make People Stop Scrolling.",
@@ -16,21 +16,17 @@
     "youtube_url": "https://youtube.com/@afsaredits",
     "twitter_url": "https://x.com/afsar_edits",
     "profile_picture_url": "/uploads/profile-picture.jpg?v=1790886537679",
-    "hero_greeting": "Hello!",
-    "hero_name": "Jenny",
-    "hero_role": "Product Designer",
-    "hero_quote": "Jenny's exceptional product design ensured our website's success. Highly recommended!",
-    "hero_clients_count": "450+",
-    "hero_clients_label": "Client Served",
-    "hero_experience_years": "10 Years",
-    "hero_experience_label": "Experts",
-    "hero_arch_color": "#FF5023",
+    "hero_greeting": "Hello There!",
+    "hero_name": "Afsar Ahmad",
+    "hero_role": "Video Editor",
+    "hero_location": "Based in Mumbai.",
+    "hero_subtitle": "Creative Video Editor specializing in high-retention short-form reels, cinematic commercial brand films, and engaging long-form YouTube content.",
     "hero_character_image_url": "/images/hero-character.png",
     "hero_image_scale": "100",
-    "hero_image_max_height": "510",
+    "hero_image_max_height": "",
     "hero_image_offset_y": "0",
     "hero_image_offset_x": "0",
-    "last_seed_synced_at": "2026-10-08T16:15:00.000Z"
+    "last_seed_synced_at": "2026-10-08T19:00:00.000Z"
   },
   "about": {
     "headline": "Story first. Pacing second. Effects serve the narrative.",
