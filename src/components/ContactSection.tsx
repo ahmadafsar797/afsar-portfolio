@@ -41,17 +41,17 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ settings, presel
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/80 backdrop-blur-md border border-[#2B170F]/10 shadow-sm mb-4">
             <span className="w-2 h-2 rounded-full bg-[#25D366] animate-pulse" />
             <span className="text-xs font-bold uppercase tracking-wider text-[#C65D45]">
-              Direct Collaboration • Fast Response
+              Open For Collaboration • Let's Connect
             </span>
           </div>
 
           <h2 className="font-pogonia text-4xl sm:text-6xl lg:text-7xl font-bold text-[#2B170F] leading-[1.08] mb-6">
-            Let's Discuss Your <br />
-            <span className="text-[#C65D45]">Next Video.</span>
+            Liked My Work? <br />
+            <span className="text-[#C65D45]">Let's Create Together.</span>
           </h2>
 
           <p className="text-base sm:text-lg lg:text-xl text-[#756A62] font-medium leading-relaxed max-w-2xl sm:max-w-3xl mx-auto">
-            Skip the long forms, agency middlemen, and delayed emails. Reach out directly on WhatsApp to share your raw footage, timeline, and project vision.
+            Whether you are a creator, brand, or director looking for intentional editing, cinematic pacing, or dynamic visual storytelling — reach out directly to discuss your vision.
           </p>
         </div>
 
@@ -69,12 +69,12 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ settings, presel
                 <span className="relative inline-flex rounded-full h-3 w-3 bg-[#25D366]" />
               </span>
               <span className="text-xs sm:text-sm font-semibold tracking-wide text-white/90">
-                Online & Available for New Projects
+                Available for Select Projects & Collaborations
               </span>
             </div>
             <div className="flex items-center gap-2 text-xs sm:text-sm text-white/60 font-medium">
               <Clock className="w-3.5 h-3.5 text-[#25D366]" />
-              <span>Replies within 1 hour</span>
+              <span>Direct & Friendly Response</span>
             </div>
           </div>
 
@@ -110,26 +110,26 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ settings, presel
               </div>
 
               <p className="text-sm sm:text-base lg:text-lg text-white/75 leading-relaxed font-light max-w-3xl">
-                Direct communication is key to great pacing. Whether you have a Google Drive link of raw footage, a reference reel, or need an urgent turnaround, ping me directly.
+                Great edits come from clear creative communication. Drop me a message with your project vision, reference reels, or raw ideas, and let's bring it to life.
               </p>
 
-              {/* Perks */}
+              {/* Portfolio Collaboration Highlights */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-2">
                 <div className="flex items-center gap-2.5 text-xs sm:text-sm text-white/85">
                   <CheckCircle2 className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-[#25D366] shrink-0" />
-                  <span>Instant review of links & references</span>
+                  <span>Direct creative collaboration with Afsar</span>
                 </div>
                 <div className="flex items-center gap-2.5 text-xs sm:text-sm text-white/85">
                   <CheckCircle2 className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-[#25D366] shrink-0" />
-                  <span>Direct talk with Afsar (No managers)</span>
+                  <span>Cinematic storytelling & rhythmic pacing</span>
                 </div>
                 <div className="flex items-center gap-2.5 text-xs sm:text-sm text-white/85">
                   <CheckCircle2 className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-[#25D366] shrink-0" />
-                  <span>Custom turnaround timelines</span>
+                  <span>Short-form reels & commercial brand films</span>
                 </div>
                 <div className="flex items-center gap-2.5 text-xs sm:text-sm text-white/85">
                   <CheckCircle2 className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-[#25D366] shrink-0" />
-                  <span>High-retention creative consultation</span>
+                  <span>Immersive sound design & color polish</span>
                 </div>
               </div>
             </div>
