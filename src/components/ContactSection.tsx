@@ -11,7 +11,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ settings, presel
   const [copied, setCopied] = useState(false);
 
   const email = settings?.contact_email || 'afsar@ahmadfilms.studio';
-  const whatsapp = settings?.whatsapp_number || '+91 98765 43210';
+  const whatsapp = settings?.whatsapp_number || '+91 7860317481';
   const cleanWhatsapp = whatsapp.replace(/[^0-9]/g, '');
   const instagram = settings?.instagram_url || 'https://instagram.com/afsarahmad.edits';
   const linkedin = settings?.linkedin_url || 'https://linkedin.com/in/afsarahmad-video';
