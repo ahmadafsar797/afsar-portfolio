@@ -2549,53 +2549,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                       />
                     </div>
 
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                      <div>
-                        <label className="block text-xs font-montserrat uppercase text-white/60 mb-1">
-                          Years Exp
-                        </label>
-                        <input
-                          type="text"
-                          value={about.years_experience || ''}
-                          onChange={(e) => setAbout({ ...about, years_experience: e.target.value })}
-                          className="w-full px-3 py-2 rounded-lg bg-black border border-white/15 text-sm text-white"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-montserrat uppercase text-white/60 mb-1">
-                          Views Generated
-                        </label>
-                        <input
-                          type="text"
-                          value={about.views_generated || ''}
-                          onChange={(e) => setAbout({ ...about, views_generated: e.target.value })}
-                          className="w-full px-3 py-2 rounded-lg bg-black border border-white/15 text-sm text-white"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-montserrat uppercase text-white/60 mb-1">
-                          Projects
-                        </label>
-                        <input
-                          type="text"
-                          value={about.projects_delivered || ''}
-                          onChange={(e) => setAbout({ ...about, projects_delivered: e.target.value })}
-                          className="w-full px-3 py-2 rounded-lg bg-black border border-white/15 text-sm text-white"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-montserrat uppercase text-white/60 mb-1">
-                          Client Rate
-                        </label>
-                        <input
-                          type="text"
-                          value={about.client_satisfaction || ''}
-                          onChange={(e) => setAbout({ ...about, client_satisfaction: e.target.value })}
-                          className="w-full px-3 py-2 rounded-lg bg-black border border-white/15 text-sm text-white"
-                        />
-                      </div>
-                    </div>
-
                     <div>
                       <label className="block text-xs font-montserrat uppercase text-white/60 mb-1">
                         Portrait Image URL

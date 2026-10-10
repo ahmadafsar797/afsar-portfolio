@@ -142,53 +142,10 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ about, onOpenShowree
                 "I'm Afsar Ahmad, a freelance video editor and motion designer with over 2 years of dedicated post-production experience. I partner with ambitious creators, modern brands, and growing channels worldwide to craft videos that capture attention within the first 1.5 seconds and retain it through emotional rhythm, dynamic soundscapes, and flawless pacing."}
             </p>
 
-            <p className="text-sm sm:text-base font-medium text-[#756A62]/80 leading-relaxed mb-8">
+            <p className="text-sm sm:text-base font-medium text-[#756A62]/80 leading-relaxed">
               {about?.philosophy ||
                 'In a feed saturated with derivative templates, true engagement comes from intentional narrative tension, hyper-calibrated audio design, and color grading that elevates raw footage into a cinematic world.'}
             </p>
-
-            {/* Quick Metrics */}
-            <div className="grid grid-cols-3 gap-6 pt-6 border-t border-[#2B170F]/10 mb-8">
-              <div>
-                <div className="font-pogonia text-3xl sm:text-4xl text-[#2B170F] font-bold">
-                  {about?.projects_delivered || '180+'}
-                </div>
-                <div className="text-[10px] font-montserrat uppercase font-semibold tracking-wider text-[#756A62] mt-1">
-                  Projects Delivered
-                </div>
-              </div>
-              <div>
-                <div className="font-pogonia text-3xl sm:text-4xl text-[#2B170F] font-bold">
-                  50+
-                </div>
-                <div className="text-[10px] font-montserrat uppercase font-semibold tracking-wider text-[#756A62] mt-1">
-                  Brand Partners
-                </div>
-              </div>
-              <div>
-                <div className="font-pogonia text-3xl sm:text-4xl text-[#C65D45] font-bold">
-                  {about?.client_satisfaction || '99.4%'}
-                </div>
-                <div className="text-[10px] font-montserrat uppercase font-semibold tracking-wider text-[#756A62] mt-1">
-                  On-Time Handoff
-                </div>
-              </div>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-4">
-              <a
-                href="#contact"
-                className="px-6 py-3 rounded-full text-xs font-bold uppercase tracking-widest text-[#2B170F] bg-[#C65D45] hover:bg-[#a84d38] transition-all shadow-md shadow-[#C65D45]/20 active:scale-95"
-              >
-                Inquire For Your Project
-              </a>
-              <button
-                onClick={onOpenShowreel}
-                className="px-6 py-3 rounded-full text-xs font-bold uppercase tracking-widest text-[#2B170F] bg-[#FFF9F2] hover:bg-[#2B170F]/5 border border-[#2B170F]/20 transition-all shadow-sm"
-              >
-                Watch Master Reel
-              </button>
-            </div>
           </div>
         </div>
 
