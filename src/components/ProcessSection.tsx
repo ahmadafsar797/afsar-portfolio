@@ -47,9 +47,9 @@ export const ProcessSection: React.FC = () => {
 
   return (
     <section className="py-24 md:py-36 bg-[#FFF9F2] relative overflow-hidden border-t border-[#2B170F]/10 font-montserrat">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[1720px] 2xl:max-w-[1880px] mx-auto px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20">
         {/* Header */}
-        <div ref={headerRef} className="text-center max-w-3xl mx-auto mb-20">
+        <div ref={headerRef} className="text-center max-w-3xl lg:max-w-4xl mx-auto mb-20">
           <div className="relative inline-flex items-center px-4 py-1.5 rounded-full bg-white/75 backdrop-blur-md border border-white/85 shadow-[0_2px_10px_rgba(43,23,15,0.06),inset_0_1px_1px_rgba(255,255,255,0.95)] overflow-hidden mb-4">
             {/* Glass reflection highlights */}
             <div className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/80 via-white/20 to-transparent pointer-events-none" />
@@ -67,7 +67,7 @@ export const ProcessSection: React.FC = () => {
         </div>
 
         {/* 4 Process Cards */}
-        <div ref={stepsRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 relative">
+        <div ref={stepsRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 lg:gap-8 xl:gap-10 relative">
           {steps.map((step) => {
             const Icon = step.icon;
             return (

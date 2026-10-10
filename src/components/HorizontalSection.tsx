@@ -15,7 +15,7 @@ export const HorizontalSection: React.FC<HorizontalSectionProps> = ({ videos, on
 
   return (
     <section id="horizontal-work" className="py-24 md:py-36 bg-[#FFF9F2] relative overflow-hidden border-t border-[#2B170F]/10 font-sans">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[1720px] 2xl:max-w-[1880px] mx-auto px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20">
         {/* Section Header */}
         <div ref={headerRef} className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
           <div>
@@ -84,7 +84,7 @@ const HorizontalVideoCard: React.FC<HorizontalVideoCardProps> = ({ video, index,
   return (
     <div
       ref={cardRef}
-      className={`grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center p-6 sm:p-10 rounded-3xl bg-[#F8F1E7] border border-[#2B170F]/10 hover:border-[#C65D45]/50 transition-all duration-500 shadow-md hover:shadow-xl group`}
+      className={`grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 xl:gap-14 2xl:gap-16 items-center p-6 sm:p-10 lg:p-10 xl:p-12 2xl:p-14 rounded-3xl lg:rounded-[36px] bg-[#F8F1E7] border border-[#2B170F]/10 hover:border-[#C65D45]/50 transition-all duration-500 shadow-md hover:shadow-xl group`}
     >
       {/* 16:9 Video Canvas */}
       <div
@@ -93,7 +93,7 @@ const HorizontalVideoCard: React.FC<HorizontalVideoCardProps> = ({ video, index,
         onMouseMove={handlePlayMagnetic}
         onMouseLeave={handlePlayLeave}
         data-cursor="play"
-        className={`lg:col-span-7 relative w-full aspect-16-9 rounded-2xl overflow-hidden cursor-pointer bg-black border border-[#2B170F]/10 group-hover:border-[#C65D45]/60 transition-all duration-500 shadow-sm ${
+        className={`lg:col-span-7 xl:col-span-7 2xl:col-span-7 relative w-full aspect-16-9 rounded-2xl lg:rounded-3xl overflow-hidden cursor-pointer bg-black border border-[#2B170F]/10 group-hover:border-[#C65D45]/60 transition-all duration-500 shadow-sm ${
           isEven ? 'lg:order-1' : 'lg:order-2'
         }`}
       >
@@ -124,7 +124,7 @@ const HorizontalVideoCard: React.FC<HorizontalVideoCardProps> = ({ video, index,
       </div>
 
       {/* Editorial Content */}
-      <div ref={contentRef} className={`lg:col-span-5 flex flex-col justify-center ${isEven ? 'lg:order-2' : 'lg:order-1'}`}>
+      <div ref={contentRef} className={`lg:col-span-5 xl:col-span-5 2xl:col-span-5 flex flex-col justify-center ${isEven ? 'lg:order-2' : 'lg:order-1'}`}>
         <div className="flex items-center gap-2 text-xs font-sans tracking-wider text-[#756A62] uppercase mb-3">
           <div className="flex items-center gap-1.5 font-bold text-[#C65D45]">
             <Calendar className="w-3.5 h-3.5 text-[#C65D45]" />
@@ -134,12 +134,12 @@ const HorizontalVideoCard: React.FC<HorizontalVideoCardProps> = ({ video, index,
 
         <h3
           onClick={() => onOpenLightbox(video.video_url, video.title, undefined, video.category)}
-          className="font-pogonia text-3xl sm:text-4xl lg:text-5xl font-bold text-[#2B170F] group-hover:text-[#C65D45] transition-colors leading-[1.15] cursor-pointer mb-4"
+          className="font-pogonia text-3xl sm:text-4xl lg:text-4xl xl:text-5xl font-bold text-[#2B170F] group-hover:text-[#C65D45] transition-colors leading-[1.15] cursor-pointer mb-4"
         >
           {video.title}
         </h3>
 
-        <p className="text-sm sm:text-base font-sans font-medium text-[#756A62] leading-relaxed">
+        <p className="text-sm sm:text-base xl:text-lg font-sans font-medium text-[#756A62] leading-relaxed">
           {video.description ||
             'Editorial post-production featuring 4K multi-cam rhythm cutting, high-fidelity sound synthesis, and calibrated film color grading.'}
         </p>

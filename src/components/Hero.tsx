@@ -150,7 +150,7 @@ export const Hero: React.FC<HeroProps> = ({ settings, onWatchShowreel }) => {
       id="home"
       onMouseMove={handleHeroMouseMove}
       onMouseLeave={handleHeroMouseLeave}
-      className={`relative w-full min-h-[100dvh] lg:h-screen lg:max-h-[1080px] flex flex-col justify-between overflow-hidden font-sans select-none transition-colors duration-500 ${
+      className={`relative w-full min-h-[100dvh] lg:min-h-screen lg:h-auto xl:h-screen xl:min-h-screen flex flex-col justify-between overflow-hidden font-sans select-none transition-colors duration-500 ${
         isDarkTheme ? 'bg-[#0E0907]' : 'bg-[#F8F1E7]'
       }`}
     >
@@ -212,8 +212,8 @@ export const Hero: React.FC<HeroProps> = ({ settings, onWatchShowreel }) => {
       </div>
 
       {/* Main Hero Body */}
-      <div className="flex-1 flex items-center max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full pt-28 sm:pt-32 lg:pt-20 pb-12 sm:pb-16 lg:pb-12 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center w-full">
+      <div className="flex-1 flex items-center max-w-[1720px] 2xl:max-w-[1880px] mx-auto px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 w-full pt-28 sm:pt-32 lg:pt-24 xl:pt-24 pb-12 sm:pb-16 lg:pb-16 relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 xl:gap-14 items-center w-full">
           {/* Left Column */}
           <div className="lg:col-span-7 flex flex-col items-start text-left z-20">
             {/* Bounding-box tag */}
@@ -234,7 +234,7 @@ export const Hero: React.FC<HeroProps> = ({ settings, onWatchShowreel }) => {
             <h1
               ref={headlineRef}
               data-font="hero-title"
-              className={`font-hero-title font-pogonia text-3xl sm:text-5xl md:text-6xl lg:text-6xl xl:text-7xl font-bold leading-[1.24] sm:leading-[1.12] lg:leading-[1.08] tracking-tight mb-4 ${
+              className={`font-hero-title font-pogonia text-3xl sm:text-5xl md:text-6xl lg:text-6xl xl:text-7xl 2xl:text-[82px] font-bold leading-[1.24] sm:leading-[1.12] lg:leading-[1.08] 2xl:leading-[1.04] tracking-tight mb-4 ${
                 isDarkTheme ? 'text-[#FFF9F2]' : 'text-[#2B170F]'
               }`}
             >
@@ -251,7 +251,7 @@ export const Hero: React.FC<HeroProps> = ({ settings, onWatchShowreel }) => {
             {/* Subtitle */}
             <p
               ref={subtitleRef}
-              className={`font-sans text-xs sm:text-sm md:text-base max-w-md xl:max-w-lg leading-relaxed mb-6 font-medium ${
+              className={`font-sans text-xs sm:text-sm md:text-base lg:text-base xl:text-lg max-w-md xl:max-w-xl 2xl:max-w-2xl leading-relaxed mb-6 lg:mb-8 font-medium ${
                 isDarkTheme ? 'text-white/80' : 'text-[#756A62]'
               }`}
             >
@@ -307,10 +307,10 @@ export const Hero: React.FC<HeroProps> = ({ settings, onWatchShowreel }) => {
           </div>
 
           {/* Right Column */}
-          <div className="lg:col-span-5 relative flex items-end justify-center min-h-[300px] sm:min-h-[400px] lg:min-h-[580px] mt-4 lg:mt-0">
+          <div className="lg:col-span-5 relative flex items-end justify-center min-h-[300px] sm:min-h-[400px] lg:min-h-[560px] xl:min-h-[640px] 2xl:min-h-[720px] mt-4 lg:mt-0">
             {/* Ambient soft translucent glow behind circle */}
             <div
-              className="absolute top-[40%] sm:top-[42%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[270px] sm:w-[370px] md:w-[430px] lg:w-[460px] h-[270px] sm:h-[370px] md:h-[430px] lg:h-[460px] bg-gradient-to-tr from-[#C65D45]/30 to-[#ffba3b]/25 rounded-full blur-2xl pointer-events-none"
+              className="absolute top-[40%] sm:top-[42%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[270px] sm:w-[370px] md:w-[430px] lg:w-[460px] xl:w-[520px] 2xl:w-[580px] h-[270px] sm:h-[370px] md:h-[430px] lg:h-[460px] xl:h-[520px] 2xl:h-[580px] bg-gradient-to-tr from-[#C65D45]/30 to-[#ffba3b]/25 rounded-full blur-2xl pointer-events-none"
               style={{
                 maskImage: 'linear-gradient(to bottom, black 50%, transparent 95%)',
                 WebkitMaskImage: 'linear-gradient(to bottom, black 50%, transparent 95%)',
@@ -320,7 +320,7 @@ export const Hero: React.FC<HeroProps> = ({ settings, onWatchShowreel }) => {
             {/* Proper Circle Shape with Transparent Gradient */}
             <div
               ref={shapeRef}
-              className="absolute top-[40%] sm:top-[42%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[240px] sm:w-[330px] md:w-[390px] lg:w-[420px] h-[240px] sm:h-[330px] md:h-[390px] lg:h-[420px] bg-gradient-to-tr from-[#C65D45] via-[#df674d] to-[#ffba3b] rounded-full shadow-2xl shadow-[#C65D45]/30 pointer-events-none will-change-transform"
+              className="absolute top-[40%] sm:top-[42%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[240px] sm:w-[330px] md:w-[390px] lg:w-[420px] xl:w-[480px] 2xl:w-[540px] h-[240px] sm:h-[330px] md:h-[390px] lg:h-[420px] xl:h-[480px] 2xl:h-[540px] bg-gradient-to-tr from-[#C65D45] via-[#df674d] to-[#ffba3b] rounded-full shadow-2xl shadow-[#C65D45]/30 pointer-events-none will-change-transform"
               style={{
                 maskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 92%)',
                 WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 92%)',
@@ -329,7 +329,7 @@ export const Hero: React.FC<HeroProps> = ({ settings, onWatchShowreel }) => {
 
             {/* Subtle contour ring framing the circle */}
             <div
-              className={`absolute top-[40%] sm:top-[42%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[270px] sm:w-[370px] md:w-[430px] lg:w-[460px] h-[270px] sm:h-[370px] md:h-[430px] lg:h-[460px] rounded-full border pointer-events-none ${
+              className={`absolute top-[40%] sm:top-[42%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[270px] sm:w-[370px] md:w-[430px] lg:w-[460px] xl:w-[520px] 2xl:w-[580px] h-[270px] sm:h-[370px] md:h-[430px] lg:h-[460px] xl:h-[520px] 2xl:h-[580px] rounded-full border pointer-events-none ${
                 isDarkTheme ? 'border-white/25' : 'border-[#2B170F]/15'
               }`}
               style={{
@@ -350,7 +350,7 @@ export const Hero: React.FC<HeroProps> = ({ settings, onWatchShowreel }) => {
                 <img
                   src={characterImg}
                   alt={`${heroName} - Professional ${heroRole}`}
-                  className="max-h-[38vh] sm:max-h-[50vh] md:max-h-[60vh] lg:max-h-[64vh] xl:max-h-[68vh] w-auto object-contain filter drop-shadow-2xl select-none transition-transform duration-500 hover:scale-[1.02]"
+                  className="max-h-[38vh] sm:max-h-[50vh] md:max-h-[60vh] lg:max-h-[66vh] xl:max-h-[72vh] 2xl:max-h-[78vh] w-auto object-contain filter drop-shadow-2xl select-none transition-transform duration-500 hover:scale-[1.02]"
                   style={
                     imgMaxHeight
                       ? { maxHeight: `min(${imgMaxHeight}px, 85vh)` }
@@ -365,7 +365,7 @@ export const Hero: React.FC<HeroProps> = ({ settings, onWatchShowreel }) => {
               ref={badgeRef}
               href="#contact"
               data-cursor="open"
-              className="absolute top-2 sm:top-4 right-1 sm:-right-2 z-20 w-20 h-20 sm:w-24 sm:h-24 md:w-26 md:h-26 rounded-full bg-[#2B170F] border-2 border-[#FFF9F2] shadow-2xl flex items-center justify-center cursor-pointer group hover:scale-110 active:scale-95 transition-transform duration-300"
+              className="absolute top-2 sm:top-4 right-1 sm:-right-2 xl:-right-4 2xl:-right-6 z-20 w-20 h-20 sm:w-24 sm:h-24 md:w-26 md:h-26 xl:w-28 xl:h-28 rounded-full bg-[#2B170F] border-2 border-[#FFF9F2] shadow-2xl flex items-center justify-center cursor-pointer group hover:scale-110 active:scale-95 transition-transform duration-300"
               title="Hire Me"
             >
               <svg className="absolute inset-0 w-full h-full animate-spin-slow pointer-events-none" viewBox="0 0 100 100">
@@ -386,21 +386,21 @@ export const Hero: React.FC<HeroProps> = ({ settings, onWatchShowreel }) => {
             </a>
 
             {/* Floating tag 1 */}
-            <div ref={floatRef1} className="absolute bottom-10 -left-3 sm:left-1 z-20 flex items-start gap-1 drop-shadow-xl will-change-transform">
+            <div ref={floatRef1} className="absolute bottom-10 -left-3 sm:left-1 xl:-left-4 2xl:-left-6 z-20 flex items-start gap-1 drop-shadow-xl will-change-transform">
               <svg className="w-4 h-4 sm:w-5 sm:h-5 text-[#2B170F] fill-current -rotate-12 drop-shadow" viewBox="0 0 24 24">
                 <path d="M4 0l16 12.279-6.951 1.17 4.325 8.817-3.596 1.734-4.35-8.879-5.428 5.428z" />
               </svg>
-              <div className="bg-[#2B170F] text-[#FFF9F2] px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-xl text-[11px] sm:text-xs font-sans font-semibold border border-white/20 shadow-md">
+              <div className="bg-[#2B170F] text-[#FFF9F2] px-3 py-1 sm:px-3.5 sm:py-1.5 xl:px-4 xl:py-2 rounded-xl text-[11px] sm:text-xs xl:text-sm font-sans font-semibold border border-white/20 shadow-md">
                 Video Editor
               </div>
             </div>
 
             {/* Floating tag 2 */}
-            <div ref={floatRef2} className="absolute top-[48%] sm:top-[50%] -right-2 sm:right-0 z-20 flex items-start gap-1 drop-shadow-xl will-change-transform">
+            <div ref={floatRef2} className="absolute top-[48%] sm:top-[50%] -right-2 sm:right-0 xl:-right-4 2xl:-right-6 z-20 flex items-start gap-1 drop-shadow-xl will-change-transform">
               <svg className="w-4 h-4 sm:w-5 sm:h-5 text-[#C65D45] fill-current -rotate-12 drop-shadow" viewBox="0 0 24 24">
                 <path d="M4 0l16 12.279-6.951 1.17 4.325 8.817-3.596 1.734-4.35-8.879-5.428 5.428z" />
               </svg>
-              <div className="bg-[#C65D45] text-[#2B170F] px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-xl text-[11px] sm:text-xs font-sans font-bold border border-white/40 shadow-md">
+              <div className="bg-[#C65D45] text-[#2B170F] px-3 py-1 sm:px-3.5 sm:py-1.5 xl:px-4 xl:py-2 rounded-xl text-[11px] sm:text-xs xl:text-sm font-sans font-bold border border-white/40 shadow-md">
                 Motion Designer
               </div>
             </div>

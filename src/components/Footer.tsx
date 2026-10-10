@@ -15,7 +15,7 @@ export const Footer: React.FC<FooterProps> = ({ settings, onOpenAdmin, isAdminLo
 
   return (
     <footer className="bg-[#2B170F] border-t border-[#FFF9F2]/10 py-16 text-[#FFF9F2]/70 relative overflow-hidden font-montserrat">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[1720px] 2xl:max-w-[1880px] mx-auto px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20">
         <div className="flex flex-col md:flex-row items-center justify-between gap-8 pb-12 border-b border-[#FFF9F2]/10">
           {/* Brand */}
           <div className="flex items-center gap-3">

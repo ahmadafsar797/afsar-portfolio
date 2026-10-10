@@ -172,7 +172,7 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({ testim
       id="testimonials"
       className="h-[100dvh] min-h-[580px] max-h-[1080px] md:min-h-[620px] md:max-h-[960px] bg-[#F8F1E7] relative overflow-hidden border-t border-[#2B170F]/10 font-sans flex flex-col justify-center py-4 md:py-0"
     >
-      <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 mb-4 sm:mb-6 md:mb-8">
+      <div className="max-w-[1720px] 2xl:max-w-[1880px] w-full mx-auto px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 mb-4 sm:mb-6 md:mb-8">
         {/* Header with Navigation Controls */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
@@ -252,7 +252,7 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({ testim
       >
         <div
           ref={sliderTrackRef}
-          className="flex items-stretch gap-4 sm:gap-6 md:gap-8 px-4 sm:px-6 lg:px-12 w-max will-change-transform"
+          className="flex items-stretch gap-4 sm:gap-6 md:gap-8 px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 w-max will-change-transform"
         >
           {/* ONLY the original Client Video Testimonial Cards */}
           {testimonials.map((item, idx) => (
@@ -321,7 +321,7 @@ const HorizontalTestimonialCard: React.FC<HorizontalTestimonialCardProps> = ({
       ref={cardRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className="testimonial-slide-card flex-shrink-0 w-[82vw] max-w-[320px] sm:w-[310px] md:w-[340px] lg:w-[355px] rounded-3xl bg-[#FFF9F2] border border-[#2B170F]/10 hover:border-[#C65D45]/50 transition-all duration-400 overflow-hidden shadow-md hover:shadow-2xl flex flex-col justify-between group will-change-transform"
+      className="testimonial-slide-card flex-shrink-0 w-[82vw] max-w-[320px] sm:w-[310px] md:w-[340px] lg:w-[360px] xl:w-[390px] 2xl:w-[410px] rounded-3xl bg-[#FFF9F2] border border-[#2B170F]/10 hover:border-[#C65D45]/50 transition-all duration-400 overflow-hidden shadow-md hover:shadow-2xl flex flex-col justify-between group will-change-transform"
     >
       {/* 9:16 Video Container (Proportionally sized to fit inside screen height without clipping) */}
       <div
@@ -329,7 +329,7 @@ const HorizontalTestimonialCard: React.FC<HorizontalTestimonialCardProps> = ({
           onOpenLightbox(item.video_url, `${item.client_name} - ${item.company}`, 'Video Testimonial')
         }
         data-cursor="play"
-        className="relative w-full h-[240px] sm:h-[285px] md:h-[315px] overflow-hidden bg-black cursor-pointer group/video rounded-t-3xl"
+        className="relative w-full h-[240px] sm:h-[285px] md:h-[315px] lg:h-[330px] xl:h-[350px] overflow-hidden bg-black cursor-pointer group/video rounded-t-3xl"
       >
         <VideoAutoThumbnail
           videoUrl={item.video_url}

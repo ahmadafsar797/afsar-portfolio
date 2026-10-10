@@ -120,11 +120,11 @@ export const Navbar: React.FC<NavbarProps> = ({ settings, onOpenAdmin, isAdminLo
   return (
     <header
       ref={navRef}
-      className="fixed top-3 sm:top-6 md:top-7 left-0 right-0 z-50 px-3 sm:px-8 pointer-events-none"
+      className="fixed top-3 sm:top-6 md:top-7 left-0 right-0 z-50 px-3 sm:px-8 xl:px-12 2xl:px-16 pointer-events-none"
     >
-      <div className="w-full max-w-6xl xl:max-w-[1360px] mx-auto pointer-events-auto">
+      <div className="w-full max-w-[1720px] 2xl:max-w-[1880px] mx-auto pointer-events-auto">
         <div
-          className={`flex items-center justify-between px-3.5 sm:px-8 md:px-10 py-2.5 sm:py-4 md:py-4.5 rounded-full bg-[#2B170F] text-[#FFF9F2] shadow-2xl border border-white/10 transition-shadow duration-300 ${
+          className={`flex items-center justify-between px-3.5 sm:px-8 md:px-10 xl:px-12 py-2.5 sm:py-4 md:py-4.5 rounded-full bg-[#2B170F] text-[#FFF9F2] shadow-2xl border border-white/10 transition-shadow duration-300 ${
             scrolled ? 'bg-[#2B170F]/95 backdrop-blur-xl shadow-black/35 py-2.5 md:py-3.5' : ''
           }`}
         >

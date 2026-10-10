@@ -93,9 +93,9 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ about, onOpenShowree
       style={{ overflowX: 'clip' }}
       className="py-24 md:py-36 bg-[#F8F1E7] relative border-t border-[#2B170F]/10 font-montserrat"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[1720px] 2xl:max-w-[1880px] mx-auto px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20">
         {/* Top Story Block: Editorial Portrait & Philosophy */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center mb-24">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 xl:gap-20 items-center mb-24">
           {/* Portrait Image Column */}
           <div className="lg:col-span-5 relative">
             <div className="relative aspect-4/5 rounded-3xl overflow-hidden border border-[#2B170F]/10 shadow-xl bg-[#FFF9F2] group">

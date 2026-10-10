@@ -12,7 +12,7 @@ interface SelectedProjectsProps {
 export const SelectedProjects: React.FC<SelectedProjectsProps> = ({ projects, onOpenLightbox }) => {
   return (
     <section id="case-studies" className="py-24 md:py-36 bg-[#F8F1E7] relative overflow-hidden border-t border-[#2B170F]/10">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[1720px] 2xl:max-w-[1880px] mx-auto px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20">
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
           <div>

@@ -146,7 +146,7 @@ export const Showreel: React.FC<ShowreelProps> = ({ settings, onOpenLightbox }) 
 
   return (
     <section id="showreel-section" className="relative py-16 md:py-24 bg-[#FFF9F2] border-t border-b border-[#2B170F]/10 overflow-hidden font-sans">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[1720px] 2xl:max-w-[1880px] mx-auto px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20">
         {/* Section Header */}
         <div ref={headerRef} className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
           <div>
@@ -170,7 +170,7 @@ export const Showreel: React.FC<ShowreelProps> = ({ settings, onOpenLightbox }) 
         {/* 16:9 Video Player */}
         <div
           ref={playerRef}
-          className="group relative w-full aspect-16-9 rounded-2xl overflow-hidden bg-black border border-[#2B170F]/15 shadow-xl transition-shadow duration-500 hover:shadow-2xl hover:shadow-[#C65D45]/10 hover:border-[#C65D45]/50"
+          className="group relative w-full aspect-16-9 rounded-2xl lg:rounded-3xl overflow-hidden bg-black border border-[#2B170F]/15 shadow-xl transition-shadow duration-500 hover:shadow-2xl hover:shadow-[#C65D45]/10 hover:border-[#C65D45]/50"
           onMouseEnter={() => setShowControls(true)}
         >
           {isYt ? (

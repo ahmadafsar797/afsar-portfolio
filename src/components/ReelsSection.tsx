@@ -41,7 +41,7 @@ export const ReelsSection: React.FC<ReelsSectionProps> = ({ reels, onOpenLightbo
 
   return (
     <section id="reels" className="py-20 md:py-32 bg-[#F8F1E7] relative overflow-hidden font-sans">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[1720px] 2xl:max-w-[1880px] mx-auto px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20">
         {/* Section Header */}
         <div ref={headerRef} className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
           <div>
@@ -90,8 +90,8 @@ export const ReelsSection: React.FC<ReelsSectionProps> = ({ reels, onOpenLightbo
           </div>
         </div>
 
-        {/* 9:16 Reels Grid - Compact 2-column mobile feed, 3 columns on desktop */}
-        <div ref={gridRef} className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 lg:gap-8">
+        {/* 9:16 Reels Grid - Compact 2-column mobile feed, 3-4 columns on desktop */}
+        <div ref={gridRef} className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-4 gap-3 sm:gap-6 lg:gap-8 xl:gap-8">
           {filteredReels.map((reel, idx) => (
             <div key={reel.id} className="reel-card-animate">
               <ReelCard
