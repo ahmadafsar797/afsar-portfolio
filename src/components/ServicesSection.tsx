@@ -42,7 +42,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ services, onSe
 
   const getIcon = (iconName?: string) => {
     const iconClass =
-      'w-6 h-6 text-[#C65D45] group-hover:text-[#FFF9F2] group-active:text-[#FFF9F2] transition-colors duration-300';
+      'service-icon w-6 h-6 text-[#C65D45] group-hover:text-white group-active:text-white transition-colors duration-300';
     switch (iconName?.toLowerCase()) {
       case 'smartphone':
         return <Smartphone className={iconClass} />;
@@ -305,7 +305,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ services, onSe
                 <div className="relative z-10 flex flex-col justify-start h-full">
                   {/* Icon & Service Number Header */}
                   <div className="flex items-center justify-between mb-6 sm:mb-7">
-                    <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-[#FFF9F2] border border-[#2B170F]/10 flex items-center justify-center group-hover:scale-110 group-hover:bg-[#C65D45] group-hover:border-[#C65D45] group-active:bg-[#C65D45] transition-all duration-300 shadow-sm group-hover:shadow-[0_0_20px_rgba(198,93,69,0.5)]">
+                    <div className="service-icon-box w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-[#FFF9F2] border border-[#2B170F]/10 flex items-center justify-center group-hover:scale-110 group-hover:bg-[#C65D45] group-hover:border-[#C65D45] group-active:bg-[#C65D45] transition-all duration-300 shadow-sm group-hover:shadow-[0_0_20px_rgba(198,93,69,0.5)]">
                       {getIcon(service.icon_name)}
                     </div>
                     <span className="text-xl sm:text-2xl font-mono font-bold text-[#2B170F]/20 group-hover:text-white/30 transition-colors duration-300">

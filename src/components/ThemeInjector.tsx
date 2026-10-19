@@ -211,12 +211,18 @@ export const ThemeInjector: React.FC<ThemeInjectorProps> = ({ settings }) => {
         color: ${buttonTextColor} !important;
       }
 
-      /* 8. Reels Category Inactive Buttons */
-      button[class*="bg-[#2B170F]/8"] {
+      /* 8. Reels Category Filter Buttons */
+      .group\\/filter {
+        font-weight: 700 !important;
+      }
+      button[class*="bg-[#2B170F]/8"],
+      button[class*="bg-[#2B170F]/10"] {
         background-color: ${isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(43, 23, 15, 0.08)'} !important;
         color: ${isDark ? '#CBD5E1' : '#5C4A3D'} !important;
+        font-weight: 700 !important;
       }
-      button[class*="bg-[#2B170F]/8"]:hover {
+      button[class*="bg-[#2B170F]/8"]:hover,
+      button[class*="bg-[#2B170F]/10"]:hover {
         background-color: ${isDark ? 'rgba(255, 255, 255, 0.16)' : 'rgba(43, 23, 15, 0.14)'} !important;
         color: ${text} !important;
       }
@@ -241,6 +247,26 @@ export const ThemeInjector: React.FC<ThemeInjectorProps> = ({ settings }) => {
       }
       .service-card [class*="from-[#2B170F]"] {
         background-image: linear-gradient(180deg, ${elevatedSurface} 0%, ${isDark ? canvas : '#180D07'} 100%) !important;
+      }
+      .service-card:hover .service-icon-box,
+      .service-card:active .service-icon-box {
+        background-color: ${primary} !important;
+        border-color: ${primary} !important;
+      }
+      .service-card:hover .service-icon-box svg,
+      .service-card:active .service-icon-box svg,
+      .service-card:hover svg.service-icon,
+      .service-card:active svg.service-icon {
+        color: #FFFFFF !important;
+        stroke: #FFFFFF !important;
+      }
+      .service-card:hover h3,
+      .service-card:active h3 {
+        color: #FFFFFF !important;
+      }
+      .service-card:hover p,
+      .service-card:active p {
+        color: rgba(255, 255, 255, 0.85) !important;
       }
       .process-step {
         background-color: ${surface} !important;
