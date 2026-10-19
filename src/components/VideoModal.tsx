@@ -57,15 +57,16 @@ export const VideoModal: React.FC<VideoModalProps> = ({
   const [feedback, setFeedback] = useState<{ text: string; id: number } | null>(null);
   const [isDragging, setIsDragging] = useState(false);
 
-  // Auto-hide controls timer
-  const resetControlsTimeout = useCallback(() => {
+  // Auto-hide controls timer (1 second auto-hide for clean, unobstructed viewing)
+  const resetControlsTimeout = useCallback((durationMs: number = 1000) => {
     setShowControls(true);
+    setShowCenterControls(true);
     if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
+    if (centerControlsTimeoutRef.current) clearTimeout(centerControlsTimeoutRef.current);
     controlsTimeoutRef.current = setTimeout(() => {
-      if (videoRef.current && !videoRef.current.paused) {
-        setShowControls(false);
-      }
-    }, 3200);
+      setShowControls(false);
+      setShowCenterControls(false);
+    }, durationMs);
   }, []);
 
   // Auto-hide center action buttons after exactly 1 second (1000ms)
@@ -214,8 +215,24 @@ export const VideoModal: React.FC<VideoModalProps> = ({
 
 
   const handleMouseMove = () => {
-    resetControlsTimeout();
-    showCenterBriefly(1000);
+    resetControlsTimeout(1000);
+  };
+
+  const handleContainerClick = () => {
+    if (!showControls) {
+      resetControlsTimeout(1000);
+    }
+  };
+
+  const handleVideoClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!showControls) {
+      // If controls are currently hidden, clicking wakes them up for 1s without interrupting video playback
+      resetControlsTimeout(1000);
+    } else {
+      // If controls are already showing, clicking video toggles play/pause
+      togglePlay();
+    }
   };
 
   // Keyboard controls
@@ -292,17 +309,18 @@ export const VideoModal: React.FC<VideoModalProps> = ({
 
   // Reset video state when modal opens with a new URL
   useEffect(() => {
-    if (isOpen && !isYt && videoRef.current) {
-      videoRef.current.currentTime = 0;
-      videoRef.current.playbackRate = playbackSpeed;
-      videoRef.current
-        .play()
-        .then(() => setIsPlaying(true))
-        .catch(() => {
-          setIsPlaying(false);
-        });
-      showCenterBriefly(1000);
-      resetControlsTimeout();
+    if (isOpen) {
+      if (!isYt && videoRef.current) {
+        videoRef.current.currentTime = 0;
+        videoRef.current.playbackRate = playbackSpeed;
+        videoRef.current
+          .play()
+          .then(() => setIsPlaying(true))
+          .catch(() => {
+            setIsPlaying(false);
+          });
+      }
+      resetControlsTimeout(1000);
     }
 
     const handleFullscreenChange = () => {
@@ -357,6 +375,10 @@ export const VideoModal: React.FC<VideoModalProps> = ({
   const handleSeekMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     setIsDragging(true);
     seekToPosition(e.clientX);
+    setShowControls(true);
+    setShowCenterControls(true);
+    if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
+    if (centerControlsTimeoutRef.current) clearTimeout(centerControlsTimeoutRef.current);
 
     const handleMouseMove = (moveEvent: MouseEvent) => {
       seekToPosition(moveEvent.clientX);
@@ -364,6 +386,7 @@ export const VideoModal: React.FC<VideoModalProps> = ({
 
     const handleMouseUp = () => {
       setIsDragging(false);
+      resetControlsTimeout(1000);
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
     };
@@ -376,6 +399,10 @@ export const VideoModal: React.FC<VideoModalProps> = ({
     if (!e.touches[0]) return;
     setIsDragging(true);
     seekToPosition(e.touches[0].clientX);
+    setShowControls(true);
+    setShowCenterControls(true);
+    if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
+    if (centerControlsTimeoutRef.current) clearTimeout(centerControlsTimeoutRef.current);
 
     const handleTouchMove = (moveEvent: TouchEvent) => {
       if (moveEvent.touches[0]) {
@@ -385,6 +412,7 @@ export const VideoModal: React.FC<VideoModalProps> = ({
 
     const handleTouchEnd = () => {
       setIsDragging(false);
+      resetControlsTimeout(1000);
       window.removeEventListener('touchmove', handleTouchMove);
       window.removeEventListener('touchend', handleTouchEnd);
       window.removeEventListener('touchcancel', handleTouchEnd);
@@ -416,7 +444,7 @@ export const VideoModal: React.FC<VideoModalProps> = ({
     <div
       ref={containerRef}
       onMouseMove={handleMouseMove}
-      onClick={resetControlsTimeout}
+      onClick={handleContainerClick}
       className="fixed inset-0 z-[99999] w-full h-[100dvh] max-h-[100dvh] bg-black overflow-hidden select-none font-montserrat animate-in fade-in duration-200"
       style={{ height: '100dvh' }}
     >
@@ -441,7 +469,7 @@ export const VideoModal: React.FC<VideoModalProps> = ({
       {/* ── TOP HEADER BAR: TITLE, METADATA & CUT / CLOSE BUTTON (Overlay) ────────────── */}
       <header
         className={`absolute top-0 inset-x-0 z-50 w-full px-4 sm:px-8 py-3.5 sm:py-5 pt-[max(0.875rem,env(safe-area-inset-top))] flex items-center justify-between bg-gradient-to-b from-black/90 via-black/40 to-transparent transition-opacity duration-300 ${
-          showControls || isYt ? 'opacity-100' : 'opacity-0 pointer-events-none'
+          showControls ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
         }`}
       >
         {/* Left: Video Details */}
@@ -514,7 +542,7 @@ export const VideoModal: React.FC<VideoModalProps> = ({
               muted={isMuted}
               onTimeUpdate={handleTimeUpdate}
               onLoadedMetadata={handleLoadedMetadata}
-              onClick={togglePlay}
+              onClick={handleVideoClick}
               className="cursor-pointer transition-all duration-300 w-full h-full max-w-full max-h-[100dvh] object-contain select-none mx-auto my-auto"
             />
 
@@ -539,7 +567,7 @@ export const VideoModal: React.FC<VideoModalProps> = ({
                 showCenterControls ? 'opacity-100' : 'opacity-0'
               }`}
             >
-              <div className="flex items-center gap-3.5 sm:gap-5 pointer-events-auto">
+              <div className={`flex items-center gap-3.5 sm:gap-5 ${showCenterControls ? 'pointer-events-auto' : 'pointer-events-none'}`}>
                 {/* Center Backward -10s Button */}
                 <button
                   onClick={handleBackward}
@@ -585,8 +613,8 @@ export const VideoModal: React.FC<VideoModalProps> = ({
       {!isYt && (
         <footer
           className={`absolute bottom-0 inset-x-0 z-50 w-full px-4 sm:px-8 pb-4 sm:pb-6 pb-[max(1rem,env(safe-area-inset-bottom))] pt-12 bg-gradient-to-t from-black/95 via-black/60 to-transparent transition-opacity duration-300 ${
-            showControls || !isPlaying
-              ? 'opacity-100'
+            showControls
+              ? 'opacity-100 pointer-events-auto'
               : 'opacity-0 pointer-events-none'
           }`}
         >

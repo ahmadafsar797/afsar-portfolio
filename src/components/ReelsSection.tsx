@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Play, Volume2, VolumeX, Maximize2 } from 'lucide-react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { Play, Volume2, VolumeX, Maximize2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Reel } from '../types';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -18,6 +18,45 @@ export const ReelsSection: React.FC<ReelsSectionProps> = ({ reels, onOpenLightbo
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [hoveredReelId, setHoveredReelId] = useState<number | null>(null);
   const [unmutedReelId, setUnmutedReelId] = useState<number | null>(null);
+
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+  const [hasOverflow, setHasOverflow] = useState(false);
+
+  const checkScroll = useCallback(() => {
+    const el = scrollContainerRef.current;
+    if (!el) return;
+    const { scrollLeft, scrollWidth, clientWidth } = el;
+    const overflow = scrollWidth > clientWidth + 4;
+    setHasOverflow(overflow);
+    setCanScrollLeft(scrollLeft > 6);
+    setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 6);
+  }, []);
+
+  useEffect(() => {
+    checkScroll();
+    const el = scrollContainerRef.current;
+    if (!el) return;
+    el.addEventListener('scroll', checkScroll, { passive: true });
+    window.addEventListener('resize', checkScroll);
+    const timer = setTimeout(checkScroll, 120);
+    return () => {
+      el.removeEventListener('scroll', checkScroll);
+      window.removeEventListener('resize', checkScroll);
+      clearTimeout(timer);
+    };
+  }, [checkScroll]);
+
+  const scroll = (direction: 'left' | 'right') => {
+    const el = scrollContainerRef.current;
+    if (!el) return;
+    const scrollAmount = Math.max(240, Math.floor(el.clientWidth * 0.65));
+    el.scrollBy({
+      left: direction === 'left' ? -scrollAmount : scrollAmount,
+      behavior: 'smooth',
+    });
+  };
 
   const headerRef = useFadeUpOnScroll<HTMLDivElement>(0);
   const filtersRef = useFadeUpOnScroll<HTMLDivElement>(0.1);
@@ -62,31 +101,79 @@ export const ReelsSection: React.FC<ReelsSectionProps> = ({ reels, onOpenLightbo
           </p>
         </div>
 
-        {/* Category Filters */}
+        {/* Category Filters - Single Line with Left/Right Navigation Arrows */}
         <div ref={filtersRef} className="w-full mb-10">
-          <div className="flex flex-wrap items-center gap-2.5 sm:gap-3.5 p-1.5 sm:p-2">
-            {categories.map((cat) => {
-              const active = selectedCategory === cat;
-              return (
-                <button
-                  key={cat}
-                  onClick={() => setSelectedCategory(cat)}
-                  className={`group/filter relative text-xs sm:text-sm md:text-base font-sans uppercase tracking-wider px-5 sm:px-7 py-2.5 sm:py-3 rounded-full whitespace-nowrap transition-all duration-300 cursor-pointer font-bold ${
-                    active
-                      ? 'bg-gradient-to-r from-[#C65D45] via-[#D8684F] to-[#E2725B] text-[#FFF9F2] shadow-[0_4px_20px_rgba(198,93,69,0.45)] scale-105 border border-[#C65D45]/60 font-black'
-                      : 'bg-[#2B170F]/10 hover:bg-[#2B170F]/15 text-[#2B170F]/80 hover:text-[#2B170F] border border-[#2B170F]/10 font-bold'
-                  }`}
-                >
-                  {/* shimmer clipped inside its own overflow-hidden wrapper so outer glow is not cut */}
-                  {active && (
-                    <span className="absolute inset-0 rounded-full overflow-hidden pointer-events-none">
-                      <span className="absolute inset-0 -translate-x-full group-hover/filter:translate-x-full group-active/filter:translate-x-full transition-transform duration-500 bg-gradient-to-r from-transparent via-white/25 to-transparent" />
-                    </span>
-                  )}
-                  <span className="relative">{cat}</span>
-                </button>
-              );
-            })}
+          <div className="flex items-center gap-2 sm:gap-3 w-full">
+            {/* Left Scroll Navigation Button */}
+            {hasOverflow && (
+              <button
+                type="button"
+                onClick={() => scroll('left')}
+                disabled={!canScrollLeft}
+                aria-label="Scroll categories left"
+                className={`shrink-0 w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center border transition-all duration-200 z-10 ${
+                  canScrollLeft
+                    ? 'bg-white/80 hover:bg-[#C65D45] text-[#2B170F] hover:text-[#FFF9F2] border-[#2B170F]/15 hover:border-[#C65D45] shadow-sm hover:scale-105 active:scale-95 cursor-pointer'
+                    : 'opacity-25 text-[#2B170F]/40 border-[#2B170F]/10 cursor-not-allowed pointer-events-none'
+                }`}
+              >
+                <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 stroke-[2.5]" />
+              </button>
+            )}
+
+            {/* Scrollable Single-Line Category Pills Container */}
+            <div
+              ref={scrollContainerRef}
+              className="flex-1 flex flex-nowrap items-center gap-2.5 sm:gap-3.5 overflow-x-auto scroll-smooth py-3 px-1 sm:px-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            >
+              {categories.map((cat) => {
+                const active = selectedCategory === cat;
+                return (
+                  <button
+                    key={cat}
+                    type="button"
+                    onClick={(e) => {
+                      setSelectedCategory(cat);
+                      e.currentTarget.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'nearest',
+                        inline: 'center',
+                      });
+                    }}
+                    className={`group/filter shrink-0 relative text-xs sm:text-sm md:text-base font-sans uppercase tracking-wider px-5 sm:px-7 py-2.5 sm:py-3 rounded-full whitespace-nowrap transition-all duration-300 cursor-pointer font-bold ${
+                      active
+                        ? 'bg-gradient-to-r from-[#C65D45] via-[#D8684F] to-[#E2725B] text-[#FFF9F2] shadow-[0_4px_20px_rgba(198,93,69,0.45)] scale-105 border border-[#C65D45]/60 font-black'
+                        : 'bg-[#2B170F]/10 hover:bg-[#2B170F]/15 text-[#2B170F]/80 hover:text-[#2B170F] border border-[#2B170F]/10 font-bold'
+                    }`}
+                  >
+                    {/* shimmer clipped inside its own overflow-hidden wrapper so outer glow is not cut */}
+                    {active && (
+                      <span className="absolute inset-0 rounded-full overflow-hidden pointer-events-none">
+                        <span className="absolute inset-0 -translate-x-full group-hover/filter:translate-x-full group-active/filter:translate-x-full transition-transform duration-500 bg-gradient-to-r from-transparent via-white/25 to-transparent" />
+                      </span>
+                    )}
+                    <span className="relative">{cat}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Right Scroll Navigation Button */}
+            {hasOverflow && (
+              <button
+                type="button"
+                onClick={() => scroll('right')}
+                disabled={!canScrollRight}
+                aria-label="Scroll categories right"
+                className={`shrink-0 w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center border transition-all duration-200 z-10 ${
+                  canScrollRight
+                    ? 'bg-white/80 hover:bg-[#C65D45] text-[#2B170F] hover:text-[#FFF9F2] border-[#2B170F]/15 hover:border-[#C65D45] shadow-sm hover:scale-105 active:scale-95 cursor-pointer'
+                    : 'opacity-25 text-[#2B170F]/40 border-[#2B170F]/10 cursor-not-allowed pointer-events-none'
+                }`}
+              >
+                <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 stroke-[2.5]" />
+              </button>
+            )}
           </div>
         </div>
 
