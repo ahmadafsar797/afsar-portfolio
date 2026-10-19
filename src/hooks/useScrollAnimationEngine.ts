@@ -200,29 +200,8 @@ export function useScrollAnimationEngine() {
 
         // ─── 5. TESTIMONIALS (Handled directly with parallax scroll inside TestimonialsSection.tsx) ──────
 
-        // ─── 6. SERVICES GRID STAGGER REVEAL ──────────────────────────────
-        const servicesSection = document.querySelector<HTMLElement>('#services');
-        if (servicesSection) {
-          const serviceCards = servicesSection.querySelectorAll<HTMLElement>('.service-card');
-          if (serviceCards.length) {
-            gsap.fromTo(
-              serviceCards,
-              { y: 35, opacity: 0 },
-              {
-                y: 0,
-                opacity: 1,
-                duration: 0.65,
-                stagger: 0.07,
-                ease: 'power3.out',
-                scrollTrigger: {
-                  trigger: servicesSection,
-                  start: 'top 82%',
-                  once: true,
-                },
-              }
-            );
-          }
-        }
+        // ─── 6. SERVICES (Handled directly with horizontal pinned slider inside ServicesSection.tsx) ──────
+
 
         // ─── 7. PROCESS PIPELINE STAGGER ──────────────────────────────────
         const processCards = document.querySelectorAll<HTMLElement>('.process-step');
