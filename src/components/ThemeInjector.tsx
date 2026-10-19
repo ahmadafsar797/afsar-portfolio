@@ -24,9 +24,7 @@ export const ThemeInjector: React.FC<ThemeInjectorProps> = ({ settings }) => {
   const arch = settings?.hero_arch_color || '#FF5023';
 
   const isDark = getLuminance(canvas) < 0.35;
-  const isSurfaceDark = getLuminance(surface) < 0.35;
   const borderSubtle = isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(43, 23, 15, 0.1)';
-  const borderCard = isSurfaceDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(43, 23, 15, 0.12)';
 
   useEffect(() => {
     let styleEl = document.getElementById('portfolio-dynamic-theme-styles') as HTMLStyleElement | null;
@@ -54,62 +52,70 @@ export const ThemeInjector: React.FC<ThemeInjectorProps> = ({ settings }) => {
         color: ${muted} !important;
       }
 
-      /* Background Canvas Overrides */
-      [class*="bg-[#F8F1E7]"], .bg-\\[\\#F8F1E7\\] {
+      /* 1. Exact Background Overrides (matches only exact class, never hover/group-hover prefixes) */
+      [class~="bg-[#F8F1E7]"] {
         background-color: ${canvas} !important;
       }
-
-      /* Card Surface Overrides */
-      [class*="bg-[#FFF9F2]"], .bg-\\[\\#FFF9F2\\] {
+      [class~="bg-[#FFF9F2]"] {
         background-color: ${surface} !important;
       }
+      [class~="bg-[#C65D45]"] {
+        background-color: ${primary} !important;
+      }
 
-      /* Heading & Dark Text Overrides */
-      [class*="text-[#2B170F]"], .text-\\[\\#2B170F\\] {
+      /* 2. Exact Text Color Overrides */
+      [class~="text-[#2B170F]"] {
         color: ${text} !important;
       }
-
-      /* Body & Muted Text Overrides */
-      [class*="text-[#756A62]"], .text-\\[\\#756A62\\] {
+      [class~="text-[#756A62]"] {
         color: ${muted} !important;
       }
-
-      /* Accent Highlights & Text */
-      [class*="text-[#C65D45]"], .text-\\[\\#C65D45\\] {
+      [class~="text-[#C65D45]"] {
         color: ${primary} !important;
       }
-      [class*="bg-[#C65D45]"], .bg-\\[\\#C65D45\\] {
-        background-color: ${primary} !important;
-      }
-      [class*="border-[#C65D45]"], .border-\\[\\#C65D45\\] {
+
+      /* 3. Exact Border Color Overrides */
+      [class~="border-[#C65D45]"] {
         border-color: ${primary} !important;
       }
-      [class*="decoration-[#C65D45]"] {
-        text-decoration-color: ${primary} !important;
-      }
-
-      /* Hover States */
-      [class*="hover:border-[#C65D45]"]:hover {
-        border-color: ${primary} !important;
-      }
-      [class*="hover:text-[#C65D45]"]:hover {
-        color: ${primary} !important;
-      }
-      [class*="hover:bg-[#C65D45]"]:hover {
-        background-color: ${primary} !important;
-      }
-
-      /* Subtle Dividers & Card Borders */
-      [class*="border-[#2B170F]/"], .border-\\[\\#2B170F\\]\\/10, .border-\\[\\#2B170F\\]\\/15, .border-\\[\\#2B170F\\]\\/20 {
+      [class~="border-[#2B170F]/5"],
+      [class~="border-[#2B170F]/10"],
+      [class~="border-[#2B170F]/15"],
+      [class~="border-[#2B170F]/20"],
+      [class~="border-[#2B170F]/30"] {
         border-color: ${borderSubtle} !important;
       }
 
-      /* Hero Arch SVG Fill */
-      [data-hero-arch] path, [data-hero-arch] {
-        fill: ${arch} !important;
+      /* 4. Text Decoration */
+      [class~="decoration-[#C65D45]"] {
+        text-decoration-color: ${primary} !important;
       }
 
-      /* Custom Scrollbar */
+      /* 5. Hover & Group-Hover States (activates ONLY on hover) */
+      [class~="hover:bg-[#C65D45]"]:hover {
+        background-color: ${primary} !important;
+      }
+      [class~="hover:text-[#C65D45]"]:hover {
+        color: ${primary} !important;
+      }
+      [class~="hover:border-[#C65D45]"]:hover {
+        border-color: ${primary} !important;
+      }
+
+      .group:hover [class~="group-hover:bg-[#C65D45]"],
+      .group:active [class~="group-active:bg-[#C65D45]"] {
+        background-color: ${primary} !important;
+      }
+      .group:hover [class~="group-hover:text-[#C65D45]"],
+      .group:active [class~="group-active:text-[#C65D45]"] {
+        color: ${primary} !important;
+      }
+      .group:hover [class~="group-hover:border-[#C65D45]"],
+      .group:active [class~="group-active:border-[#C65D45]"] {
+        border-color: ${primary} !important;
+      }
+
+      /* 6. Custom Scrollbar */
       ::-webkit-scrollbar-track {
         background: ${canvas} !important;
       }
@@ -121,10 +127,8 @@ export const ThemeInjector: React.FC<ThemeInjectorProps> = ({ settings }) => {
       }
     `;
 
-    return () => {
-      // Keep style on unmount so layout does not flicker
-    };
-  }, [canvas, surface, text, muted, primary, arch, isDark, isSurfaceDark, borderSubtle]);
+    return () => {};
+  }, [canvas, surface, text, muted, primary, arch, isDark, borderSubtle]);
 
   return null;
 };
