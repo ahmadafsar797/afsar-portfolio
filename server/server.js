@@ -7,6 +7,8 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
+const { uploadBufferToCloudinary } = require('./cloudinary');
+
 const db = require('./db');
 const { verifyToken, JWT_SECRET } = require('./middleware/auth');
 const { syncPermanentSeedCode, importContentIntoDb, seedJsonPath } = require('./seedSync');
@@ -20,7 +22,7 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // Health check / Anti-sleep keep-alive ping endpoint (uses 0 bandwidth)
-app.get(['/health', '/api/health', '/api/ping'], (req, res) => {
+app.get(['/health', '/api/health', '/api/ping'], async (req, res) => {
   res.status(200).json({ status: 'ok', uptime: process.uptime() });
 });
 
@@ -32,10 +34,10 @@ app.use((req, res, next) => {
     !req.path.startsWith('/api/auth') &&
     !req.path.startsWith('/api/contact')
   ) {
-    res.on('finish', () => {
+    res.on('finish', async () => {
       if (res.statusCode >= 200 && res.statusCode < 300) {
         try {
-          syncPermanentSeedCode(db);
+          await syncPermanentSeedCode(db);
         } catch (err) {
           console.error('[Auto-Sync Error]', err.message);
         }
@@ -63,36 +65,26 @@ app.use(
   })
 );
 
-// Multer Storage Configuration
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, uploadsDir);
-  },
-  filename: function (req, file, cb) {
-    const ext = path.extname(file.originalname);
-    const safeBase = path.basename(file.originalname, ext).replace(/[^a-zA-Z0-9_-]/g, '_');
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    cb(null, `${safeBase}-${uniqueSuffix}${ext}`);
-  },
-});
+// Multer Memory Storage Configuration (files go to Cloudinary, not local disk)
+const storage = multer.memoryStorage();
 
 const upload = multer({
   storage: storage,
-  limits: { fileSize: 100 * 1024 * 1024 }, // 100MB
+  limits: { fileSize: 200 * 1024 * 1024 }, // 200MB (Cloudinary handles large files)
 });
 
 /* ==========================================================================
    AUTHENTICATION ROUTES
    ========================================================================== */
 
-app.post('/api/auth/login', (req, res) => {
+app.post('/api/auth/login', async (req, res) => {
   try {
     const { username, password } = req.body;
     if (!username || !password) {
       return res.status(400).json({ error: 'Username and password are required' });
     }
 
-    const admin = db.prepare('SELECT * FROM admins WHERE username = ?').get(username);
+    const admin = await db.prepare('SELECT * FROM admins WHERE username = ?').get(username);
     if (!admin) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
@@ -123,9 +115,9 @@ app.post('/api/auth/login', (req, res) => {
   }
 });
 
-app.get('/api/auth/me', verifyToken, (req, res) => {
+app.get('/api/auth/me', verifyToken, async (req, res) => {
   try {
-    const admin = db.prepare('SELECT id, username, email, created_at FROM admins WHERE id = ?').get(req.user.id);
+    const admin = await db.prepare('SELECT id, username, email, created_at FROM admins WHERE id = ?').get(req.user.id);
     if (!admin) {
       return res.status(404).json({ error: 'User not found' });
     }
@@ -135,21 +127,21 @@ app.get('/api/auth/me', verifyToken, (req, res) => {
   }
 });
 
-app.post('/api/auth/change-password', verifyToken, (req, res) => {
+app.post('/api/auth/change-password', verifyToken, async (req, res) => {
   try {
     const { currentPassword, newPassword } = req.body;
     if (!currentPassword || !newPassword) {
       return res.status(400).json({ error: 'Current and new password are required' });
     }
 
-    const admin = db.prepare('SELECT * FROM admins WHERE id = ?').get(req.user.id);
+    const admin = await db.prepare('SELECT * FROM admins WHERE id = ?').get(req.user.id);
     if (!admin || !bcrypt.compareSync(currentPassword, admin.password_hash)) {
       return res.status(400).json({ error: 'Current password is incorrect' });
     }
 
     const salt = bcrypt.genSaltSync(10);
     const newHash = bcrypt.hashSync(newPassword, salt);
-    db.prepare('UPDATE admins SET password_hash = ? WHERE id = ?').run(newHash, req.user.id);
+    await db.prepare('UPDATE admins SET password_hash = ? WHERE id = ?').run(newHash, req.user.id);
 
     res.json({ message: 'Password updated successfully' });
   } catch (err) {
@@ -157,7 +149,7 @@ app.post('/api/auth/change-password', verifyToken, (req, res) => {
   }
 });
 
-app.post('/api/admin/sync-seed', verifyToken, (req, res) => {
+app.post('/api/admin/sync-seed', verifyToken, async (req, res) => {
   try {
     const success = syncPermanentSeedCode(db);
     if (success) {
@@ -170,7 +162,7 @@ app.post('/api/admin/sync-seed', verifyToken, (req, res) => {
   }
 });
 
-app.get('/api/admin/export-content', verifyToken, (req, res) => {
+app.get('/api/admin/export-content', verifyToken, async (req, res) => {
   try {
     syncPermanentSeedCode(db);
     if (fs.existsSync(seedJsonPath)) {
@@ -185,17 +177,17 @@ app.get('/api/admin/export-content', verifyToken, (req, res) => {
   }
 });
 
-app.post('/api/admin/import-content', verifyToken, (req, res) => {
+app.post('/api/admin/import-content', verifyToken, async (req, res) => {
   try {
     const content = req.body;
-    importContentIntoDb(db, content);
+    await importContentIntoDb(db, content);
     res.json({ message: 'Content restored and synchronized successfully!' });
   } catch (err) {
     res.status(500).json({ error: err.message || 'Import failed' });
   }
 });
 
-app.post('/api/admin/publish-live', verifyToken, (req, res) => {
+app.post('/api/admin/publish-live', verifyToken, async (req, res) => {
   try {
     const { syncPermanentSeedCode } = require('./seedSync');
     syncPermanentSeedCode(db);
@@ -246,7 +238,7 @@ app.post('/api/admin/publish-live', verifyToken, (req, res) => {
     let token = process.env.GITHUB_TOKEN;
     if (!token) {
       try {
-        const row = db.prepare("SELECT value FROM settings WHERE key = 'github_token'").get();
+        const row = await db.prepare("SELECT value FROM settings WHERE key = 'github_token'").get();
         if (row && row.value) token = row.value.trim();
       } catch (e) {}
     }
@@ -301,9 +293,9 @@ app.post('/api/admin/publish-live', verifyToken, (req, res) => {
    SETTINGS ROUTES
    ========================================================================== */
 
-app.get('/api/settings', (req, res) => {
+app.get('/api/settings', async (req, res) => {
   try {
-    const rows = db.prepare('SELECT key, value FROM settings').all();
+    const rows = await db.prepare('SELECT key, value FROM settings').all();
     const settings = {};
     for (const r of rows) {
       settings[r.key] = r.value;
@@ -314,15 +306,15 @@ app.get('/api/settings', (req, res) => {
   }
 });
 
-app.put('/api/settings', verifyToken, (req, res) => {
+app.put('/api/settings', verifyToken, async (req, res) => {
   try {
-    const updateStmt = db.prepare(`
+    const updateStmt = await db.prepare(`
       INSERT INTO settings (key, value) VALUES (?, ?)
       ON CONFLICT(key) DO UPDATE SET value = excluded.value
     `);
 
     for (const [key, value] of Object.entries(req.body)) {
-      updateStmt.run(key, String(value));
+      await updateStmt.run(key, String(value));
     }
 
     res.json({ message: 'Settings updated successfully' });
@@ -336,16 +328,16 @@ app.put('/api/settings', verifyToken, (req, res) => {
    ABOUT ROUTES
    ========================================================================== */
 
-app.get('/api/about', (req, res) => {
+app.get('/api/about', async (req, res) => {
   try {
-    const about = db.prepare('SELECT * FROM about WHERE id = 1').get();
+    const about = await db.prepare('SELECT * FROM about WHERE id = 1').get();
     res.json(about || {});
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch about data' });
   }
 });
 
-app.put('/api/about', verifyToken, (req, res) => {
+app.put('/api/about', verifyToken, async (req, res) => {
   try {
     const {
       headline,
@@ -359,7 +351,7 @@ app.put('/api/about', verifyToken, (req, res) => {
       showreel_url,
     } = req.body;
 
-    db.prepare(`
+    await db.prepare(`
       UPDATE about SET
         headline = ?,
         bio = ?,
@@ -394,26 +386,26 @@ app.put('/api/about', verifyToken, (req, res) => {
    REELS (9:16 VERTICAL)
    ========================================================================== */
 
-app.get('/api/reels', (req, res) => {
+app.get('/api/reels', async (req, res) => {
   try {
-    const reels = db.prepare('SELECT * FROM reels ORDER BY order_index ASC, id DESC').all();
+    const reels = await db.prepare('SELECT * FROM reels ORDER BY order_index ASC, id DESC').all();
     res.json(reels);
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch reels' });
   }
 });
 
-app.post('/api/reels', verifyToken, (req, res) => {
+app.post('/api/reels', verifyToken, async (req, res) => {
   try {
     const { title, category, client, video_url, thumbnail_url, views_count, duration, is_featured, order_index } = req.body;
     if (!title || !video_url) {
       return res.status(400).json({ error: 'Title and video URL are required' });
     }
 
-    const maxOrder = db.prepare('SELECT COALESCE(MAX(order_index), 0) as maxOrder FROM reels').get();
+    const maxOrder = await db.prepare('SELECT COALESCE(MAX(order_index), 0) as maxOrder FROM reels').get();
     const newOrder = (order_index !== undefined && order_index !== null && order_index !== '') ? Number(order_index) : ((maxOrder.maxOrder || 0) + 1);
 
-    const result = db.prepare(`
+    const result = await db.prepare(`
       INSERT INTO reels (title, category, client, video_url, thumbnail_url, views_count, duration, is_featured, order_index)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).run(
@@ -428,7 +420,7 @@ app.post('/api/reels', verifyToken, (req, res) => {
       newOrder
     );
 
-    const created = db.prepare('SELECT * FROM reels WHERE id = ?').get(result.lastInsertRowid);
+    const created = await db.prepare('SELECT * FROM reels WHERE id = ?').get(result.lastInsertRowid);
     res.status(201).json(created);
   } catch (err) {
     console.error('Create reel error:', err);
@@ -436,16 +428,16 @@ app.post('/api/reels', verifyToken, (req, res) => {
   }
 });
 
-app.put('/api/reels/:id', verifyToken, (req, res) => {
+app.put('/api/reels/:id', verifyToken, async (req, res) => {
   try {
     const { id } = req.params;
     const { title, category, client, video_url, thumbnail_url, views_count, duration, is_featured, order_index } = req.body;
 
-    const existing = db.prepare('SELECT * FROM reels WHERE id = ?').get(id);
+    const existing = await db.prepare('SELECT * FROM reels WHERE id = ?').get(id);
     if (!existing) return res.status(404).json({ error: 'Reel not found' });
     const finalOrder = (order_index !== undefined && order_index !== null && order_index !== '') ? Number(order_index) : (existing.order_index ?? 0);
 
-    db.prepare(`
+    await db.prepare(`
       UPDATE reels SET
         title = ?,
         category = ?,
@@ -470,28 +462,28 @@ app.put('/api/reels/:id', verifyToken, (req, res) => {
       id
     );
 
-    const updated = db.prepare('SELECT * FROM reels WHERE id = ?').get(id);
+    const updated = await db.prepare('SELECT * FROM reels WHERE id = ?').get(id);
     res.json(updated);
   } catch (err) {
     res.status(500).json({ error: 'Failed to update reel' });
   }
 });
 
-app.delete('/api/reels/:id', verifyToken, (req, res) => {
+app.delete('/api/reels/:id', verifyToken, async (req, res) => {
   try {
-    db.prepare('DELETE FROM reels WHERE id = ?').run(req.params.id);
+    await db.prepare('DELETE FROM reels WHERE id = ?').run(req.params.id);
     res.json({ message: 'Reel deleted successfully' });
   } catch (err) {
     res.status(500).json({ error: 'Failed to delete reel' });
   }
 });
 
-app.put('/api/reels-reorder', verifyToken, (req, res) => {
+app.put('/api/reels-reorder', verifyToken, async (req, res) => {
   try {
     const { items } = req.body; // array of { id, order_index }
-    const updateStmt = db.prepare('UPDATE reels SET order_index = ? WHERE id = ?');
+    const updateStmt = await db.prepare('UPDATE reels SET order_index = ? WHERE id = ?');
     for (const item of items) {
-      updateStmt.run(item.order_index, item.id);
+      await updateStmt.run(item.order_index, item.id);
     }
     res.json({ message: 'Reels reordered successfully' });
   } catch (err) {
@@ -503,26 +495,26 @@ app.put('/api/reels-reorder', verifyToken, (req, res) => {
    HORIZONTAL VIDEOS (16:9)
    ========================================================================== */
 
-app.get('/api/horizontal-videos', (req, res) => {
+app.get('/api/horizontal-videos', async (req, res) => {
   try {
-    const videos = db.prepare('SELECT * FROM horizontal_videos ORDER BY order_index ASC, id DESC').all();
+    const videos = await db.prepare('SELECT * FROM horizontal_videos ORDER BY order_index ASC, id DESC').all();
     res.json(videos);
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch horizontal videos' });
   }
 });
 
-app.post('/api/horizontal-videos', verifyToken, (req, res) => {
+app.post('/api/horizontal-videos', verifyToken, async (req, res) => {
   try {
     const { title, category, client, video_url, thumbnail_url, description, duration, year, is_featured, order_index } = req.body;
     if (!title || !video_url) {
       return res.status(400).json({ error: 'Title and video URL are required' });
     }
 
-    const maxOrder = db.prepare('SELECT COALESCE(MAX(order_index), 0) as maxOrder FROM horizontal_videos').get();
+    const maxOrder = await db.prepare('SELECT COALESCE(MAX(order_index), 0) as maxOrder FROM horizontal_videos').get();
     const newOrder = (order_index !== undefined && order_index !== null && order_index !== '') ? Number(order_index) : ((maxOrder.maxOrder || 0) + 1);
 
-    const result = db.prepare(`
+    const result = await db.prepare(`
       INSERT INTO horizontal_videos (title, category, client, video_url, thumbnail_url, description, duration, year, is_featured, order_index)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).run(
@@ -538,7 +530,7 @@ app.post('/api/horizontal-videos', verifyToken, (req, res) => {
       newOrder
     );
 
-    const created = db.prepare('SELECT * FROM horizontal_videos WHERE id = ?').get(result.lastInsertRowid);
+    const created = await db.prepare('SELECT * FROM horizontal_videos WHERE id = ?').get(result.lastInsertRowid);
     res.status(201).json(created);
   } catch (err) {
     console.error('Create horizontal video error:', err);
@@ -546,16 +538,16 @@ app.post('/api/horizontal-videos', verifyToken, (req, res) => {
   }
 });
 
-app.put('/api/horizontal-videos/:id', verifyToken, (req, res) => {
+app.put('/api/horizontal-videos/:id', verifyToken, async (req, res) => {
   try {
     const { id } = req.params;
     const { title, category, client, video_url, thumbnail_url, description, duration, year, is_featured, order_index } = req.body;
 
-    const existing = db.prepare('SELECT * FROM horizontal_videos WHERE id = ?').get(id);
+    const existing = await db.prepare('SELECT * FROM horizontal_videos WHERE id = ?').get(id);
     if (!existing) return res.status(404).json({ error: 'Horizontal video not found' });
     const finalOrder = (order_index !== undefined && order_index !== null && order_index !== '') ? Number(order_index) : (existing.order_index ?? 0);
 
-    db.prepare(`
+    await db.prepare(`
       UPDATE horizontal_videos SET
         title = ?,
         category = ?,
@@ -582,28 +574,28 @@ app.put('/api/horizontal-videos/:id', verifyToken, (req, res) => {
       id
     );
 
-    const updated = db.prepare('SELECT * FROM horizontal_videos WHERE id = ?').get(id);
+    const updated = await db.prepare('SELECT * FROM horizontal_videos WHERE id = ?').get(id);
     res.json(updated);
   } catch (err) {
     res.status(500).json({ error: 'Failed to update horizontal video' });
   }
 });
 
-app.delete('/api/horizontal-videos/:id', verifyToken, (req, res) => {
+app.delete('/api/horizontal-videos/:id', verifyToken, async (req, res) => {
   try {
-    db.prepare('DELETE FROM horizontal_videos WHERE id = ?').run(req.params.id);
+    await db.prepare('DELETE FROM horizontal_videos WHERE id = ?').run(req.params.id);
     res.json({ message: 'Horizontal video deleted successfully' });
   } catch (err) {
     res.status(500).json({ error: 'Failed to delete horizontal video' });
   }
 });
 
-app.put('/api/horizontal-videos-reorder', verifyToken, (req, res) => {
+app.put('/api/horizontal-videos-reorder', verifyToken, async (req, res) => {
   try {
     const { items } = req.body; // array of { id, order_index }
-    const updateStmt = db.prepare('UPDATE horizontal_videos SET order_index = ? WHERE id = ?');
+    const updateStmt = await db.prepare('UPDATE horizontal_videos SET order_index = ? WHERE id = ?');
     for (const item of items) {
-      updateStmt.run(item.order_index, item.id);
+      await updateStmt.run(item.order_index, item.id);
     }
     res.json({ message: 'Horizontal videos reordered successfully' });
   } catch (err) {
@@ -615,26 +607,26 @@ app.put('/api/horizontal-videos-reorder', verifyToken, (req, res) => {
    CLIENT TESTIMONIALS (9:16 VERTICAL)
    ========================================================================== */
 
-app.get('/api/testimonials', (req, res) => {
+app.get('/api/testimonials', async (req, res) => {
   try {
-    const testimonials = db.prepare('SELECT * FROM testimonials ORDER BY order_index ASC, id DESC').all();
+    const testimonials = await db.prepare('SELECT * FROM testimonials ORDER BY order_index ASC, id DESC').all();
     res.json(testimonials);
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch testimonials' });
   }
 });
 
-app.post('/api/testimonials', verifyToken, (req, res) => {
+app.post('/api/testimonials', verifyToken, async (req, res) => {
   try {
     const { client_name, client_title, company, avatar_url, video_url, thumbnail_url, quote, rating, order_index } = req.body;
     if (!client_name || !video_url) {
       return res.status(400).json({ error: 'Client name and video URL are required' });
     }
 
-    const maxOrder = db.prepare('SELECT COALESCE(MAX(order_index), 0) as maxOrder FROM testimonials').get();
+    const maxOrder = await db.prepare('SELECT COALESCE(MAX(order_index), 0) as maxOrder FROM testimonials').get();
     const newOrder = (order_index !== undefined && order_index !== null && order_index !== '') ? Number(order_index) : ((maxOrder.maxOrder || 0) + 1);
 
-    const result = db.prepare(`
+    const result = await db.prepare(`
       INSERT INTO testimonials (client_name, client_title, company, avatar_url, video_url, thumbnail_url, quote, rating, order_index)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).run(
@@ -649,7 +641,7 @@ app.post('/api/testimonials', verifyToken, (req, res) => {
       newOrder
     );
 
-    const created = db.prepare('SELECT * FROM testimonials WHERE id = ?').get(result.lastInsertRowid);
+    const created = await db.prepare('SELECT * FROM testimonials WHERE id = ?').get(result.lastInsertRowid);
     res.status(201).json(created);
   } catch (err) {
     console.error('Create testimonial error:', err);
@@ -657,16 +649,16 @@ app.post('/api/testimonials', verifyToken, (req, res) => {
   }
 });
 
-app.put('/api/testimonials/:id', verifyToken, (req, res) => {
+app.put('/api/testimonials/:id', verifyToken, async (req, res) => {
   try {
     const { id } = req.params;
     const { client_name, client_title, company, avatar_url, video_url, thumbnail_url, quote, rating, order_index } = req.body;
 
-    const existing = db.prepare('SELECT * FROM testimonials WHERE id = ?').get(id);
+    const existing = await db.prepare('SELECT * FROM testimonials WHERE id = ?').get(id);
     if (!existing) return res.status(404).json({ error: 'Testimonial not found' });
     const finalOrder = (order_index !== undefined && order_index !== null && order_index !== '') ? Number(order_index) : (existing.order_index ?? 0);
 
-    db.prepare(`
+    await db.prepare(`
       UPDATE testimonials SET
         client_name = ?,
         client_title = ?,
@@ -691,28 +683,28 @@ app.put('/api/testimonials/:id', verifyToken, (req, res) => {
       id
     );
 
-    const updated = db.prepare('SELECT * FROM testimonials WHERE id = ?').get(id);
+    const updated = await db.prepare('SELECT * FROM testimonials WHERE id = ?').get(id);
     res.json(updated);
   } catch (err) {
     res.status(500).json({ error: 'Failed to update testimonial' });
   }
 });
 
-app.delete('/api/testimonials/:id', verifyToken, (req, res) => {
+app.delete('/api/testimonials/:id', verifyToken, async (req, res) => {
   try {
-    db.prepare('DELETE FROM testimonials WHERE id = ?').run(req.params.id);
+    await db.prepare('DELETE FROM testimonials WHERE id = ?').run(req.params.id);
     res.json({ message: 'Testimonial deleted successfully' });
   } catch (err) {
     res.status(500).json({ error: 'Failed to delete testimonial' });
   }
 });
 
-app.put('/api/testimonials-reorder', verifyToken, (req, res) => {
+app.put('/api/testimonials-reorder', verifyToken, async (req, res) => {
   try {
     const { items } = req.body; // array of { id, order_index }
-    const updateStmt = db.prepare('UPDATE testimonials SET order_index = ? WHERE id = ?');
+    const updateStmt = await db.prepare('UPDATE testimonials SET order_index = ? WHERE id = ?');
     for (const item of items) {
-      updateStmt.run(item.order_index, item.id);
+      await updateStmt.run(item.order_index, item.id);
     }
     res.json({ message: 'Testimonials reordered successfully' });
   } catch (err) {
@@ -724,18 +716,18 @@ app.put('/api/testimonials-reorder', verifyToken, (req, res) => {
    SELECTED PROJECTS (CASE STUDIES)
    ========================================================================== */
 
-app.get('/api/projects', (req, res) => {
+app.get('/api/projects', async (req, res) => {
   try {
-    const projects = db.prepare('SELECT * FROM projects ORDER BY order_index ASC, id DESC').all();
+    const projects = await db.prepare('SELECT * FROM projects ORDER BY order_index ASC, id DESC').all();
     res.json(projects);
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch projects' });
   }
 });
 
-app.get('/api/projects/:id', (req, res) => {
+app.get('/api/projects/:id', async (req, res) => {
   try {
-    const project = db.prepare('SELECT * FROM projects WHERE id = ?').get(req.params.id);
+    const project = await db.prepare('SELECT * FROM projects WHERE id = ?').get(req.params.id);
     if (!project) return res.status(404).json({ error: 'Project not found' });
     res.json(project);
   } catch (err) {
@@ -743,7 +735,7 @@ app.get('/api/projects/:id', (req, res) => {
   }
 });
 
-app.post('/api/projects', verifyToken, (req, res) => {
+app.post('/api/projects', verifyToken, async (req, res) => {
   try {
     const {
       title,
@@ -760,10 +752,10 @@ app.post('/api/projects', verifyToken, (req, res) => {
       metrics,
     } = req.body;
 
-    const maxOrder = db.prepare('SELECT COALESCE(MAX(order_index), 0) as maxOrder FROM projects').get();
+    const maxOrder = await db.prepare('SELECT COALESCE(MAX(order_index), 0) as maxOrder FROM projects').get();
     const newOrder = (maxOrder.maxOrder || 0) + 1;
 
-    const result = db.prepare(`
+    const result = await db.prepare(`
       INSERT INTO projects (
         title, client, category, thumbnail_url, video_url, brief, approach, deliverables, software_used, before_image_url, after_image_url, metrics, order_index
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -783,7 +775,7 @@ app.post('/api/projects', verifyToken, (req, res) => {
       newOrder
     );
 
-    const created = db.prepare('SELECT * FROM projects WHERE id = ?').get(result.lastInsertRowid);
+    const created = await db.prepare('SELECT * FROM projects WHERE id = ?').get(result.lastInsertRowid);
     res.status(201).json(created);
   } catch (err) {
     console.error('Create project error:', err);
@@ -791,7 +783,7 @@ app.post('/api/projects', verifyToken, (req, res) => {
   }
 });
 
-app.put('/api/projects/:id', verifyToken, (req, res) => {
+app.put('/api/projects/:id', verifyToken, async (req, res) => {
   try {
     const { id } = req.params;
     const {
@@ -809,7 +801,7 @@ app.put('/api/projects/:id', verifyToken, (req, res) => {
       metrics,
     } = req.body;
 
-    db.prepare(`
+    await db.prepare(`
       UPDATE projects SET
         title = ?,
         client = ?,
@@ -840,16 +832,16 @@ app.put('/api/projects/:id', verifyToken, (req, res) => {
       id
     );
 
-    const updated = db.prepare('SELECT * FROM projects WHERE id = ?').get(id);
+    const updated = await db.prepare('SELECT * FROM projects WHERE id = ?').get(id);
     res.json(updated);
   } catch (err) {
     res.status(500).json({ error: 'Failed to update project' });
   }
 });
 
-app.delete('/api/projects/:id', verifyToken, (req, res) => {
+app.delete('/api/projects/:id', verifyToken, async (req, res) => {
   try {
-    db.prepare('DELETE FROM projects WHERE id = ?').run(req.params.id);
+    await db.prepare('DELETE FROM projects WHERE id = ?').run(req.params.id);
     res.json({ message: 'Project deleted successfully' });
   } catch (err) {
     res.status(500).json({ error: 'Failed to delete project' });
@@ -860,39 +852,39 @@ app.delete('/api/projects/:id', verifyToken, (req, res) => {
    SERVICES
    ========================================================================== */
 
-app.get('/api/services', (req, res) => {
+app.get('/api/services', async (req, res) => {
   try {
-    const services = db.prepare('SELECT * FROM services WHERE is_active = 1 ORDER BY order_index ASC').all();
+    const services = await db.prepare('SELECT * FROM services WHERE is_active = 1 ORDER BY order_index ASC').all();
     res.json(services);
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch services' });
   }
 });
 
-app.post('/api/services', verifyToken, (req, res) => {
+app.post('/api/services', verifyToken, async (req, res) => {
   try {
     const { title, slug, icon_name, short_description, deliverables, turnaround } = req.body;
-    const maxOrder = db.prepare('SELECT COALESCE(MAX(order_index), 0) as maxOrder FROM services').get();
+    const maxOrder = await db.prepare('SELECT COALESCE(MAX(order_index), 0) as maxOrder FROM services').get();
     const newOrder = (maxOrder.maxOrder || 0) + 1;
 
-    const result = db.prepare(`
+    const result = await db.prepare(`
       INSERT INTO services (title, slug, icon_name, short_description, deliverables, turnaround, order_index, is_active)
       VALUES (?, ?, ?, ?, ?, ?, ?, 1)
     `).run(title, slug, icon_name || 'Film', short_description, deliverables, turnaround, newOrder);
 
-    const created = db.prepare('SELECT * FROM services WHERE id = ?').get(result.lastInsertRowid);
+    const created = await db.prepare('SELECT * FROM services WHERE id = ?').get(result.lastInsertRowid);
     res.status(201).json(created);
   } catch (err) {
     res.status(500).json({ error: 'Failed to create service' });
   }
 });
 
-app.put('/api/services/:id', verifyToken, (req, res) => {
+app.put('/api/services/:id', verifyToken, async (req, res) => {
   try {
     const { id } = req.params;
     const { title, icon_name, short_description, deliverables, turnaround, is_active } = req.body;
 
-    db.prepare(`
+    await db.prepare(`
       UPDATE services SET
         title = ?,
         icon_name = ?,
@@ -903,16 +895,16 @@ app.put('/api/services/:id', verifyToken, (req, res) => {
       WHERE id = ?
     `).run(title, icon_name, short_description, deliverables, turnaround, is_active ? 1 : 0, id);
 
-    const updated = db.prepare('SELECT * FROM services WHERE id = ?').get(id);
+    const updated = await db.prepare('SELECT * FROM services WHERE id = ?').get(id);
     res.json(updated);
   } catch (err) {
     res.status(500).json({ error: 'Failed to update service' });
   }
 });
 
-app.delete('/api/services/:id', verifyToken, (req, res) => {
+app.delete('/api/services/:id', verifyToken, async (req, res) => {
   try {
-    db.prepare('DELETE FROM services WHERE id = ?').run(req.params.id);
+    await db.prepare('DELETE FROM services WHERE id = ?').run(req.params.id);
     res.json({ message: 'Service deleted successfully' });
   } catch (err) {
     res.status(500).json({ error: 'Failed to delete service' });
@@ -923,14 +915,14 @@ app.delete('/api/services/:id', verifyToken, (req, res) => {
    CONTACT INQUIRIES
    ========================================================================== */
 
-app.post('/api/contact', (req, res) => {
+app.post('/api/contact', async (req, res) => {
   try {
     const { name, email, company, project_type, budget, message, brief_url } = req.body;
     if (!name || !email || !message) {
       return res.status(400).json({ error: 'Name, email, and message are required fields.' });
     }
 
-    const result = db.prepare(`
+    const result = await db.prepare(`
       INSERT INTO messages (name, email, company, project_type, budget, message, brief_url, status)
       VALUES (?, ?, ?, ?, ?, ?, ?, 'unread')
     `).run(
@@ -954,28 +946,28 @@ app.post('/api/contact', (req, res) => {
   }
 });
 
-app.get('/api/messages', verifyToken, (req, res) => {
+app.get('/api/messages', verifyToken, async (req, res) => {
   try {
-    const messages = db.prepare('SELECT * FROM messages ORDER BY id DESC').all();
+    const messages = await db.prepare('SELECT * FROM messages ORDER BY id DESC').all();
     res.json(messages);
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch messages' });
   }
 });
 
-app.patch('/api/messages/:id/status', verifyToken, (req, res) => {
+app.patch('/api/messages/:id/status', verifyToken, async (req, res) => {
   try {
     const { status } = req.body;
-    db.prepare('UPDATE messages SET status = ? WHERE id = ?').run(status, req.params.id);
+    await db.prepare('UPDATE messages SET status = ? WHERE id = ?').run(status, req.params.id);
     res.json({ message: 'Message status updated' });
   } catch (err) {
     res.status(500).json({ error: 'Failed to update message status' });
   }
 });
 
-app.delete('/api/messages/:id', verifyToken, (req, res) => {
+app.delete('/api/messages/:id', verifyToken, async (req, res) => {
   try {
-    db.prepare('DELETE FROM messages WHERE id = ?').run(req.params.id);
+    await db.prepare('DELETE FROM messages WHERE id = ?').run(req.params.id);
     res.json({ message: 'Message deleted successfully' });
   } catch (err) {
     res.status(500).json({ error: 'Failed to delete message' });
@@ -986,22 +978,35 @@ app.delete('/api/messages/:id', verifyToken, (req, res) => {
    FILE UPLOAD (VIDEO & IMAGE)
    ========================================================================== */
 
-app.post('/api/upload', verifyToken, upload.single('file'), (req, res) => {
+app.post('/api/upload', verifyToken, upload.single('file'), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'No file uploaded' });
     }
-    const fileUrl = `/uploads/${req.file.filename}`;
+
+    // Determine resource type for Cloudinary (video or image)
+    const isVideo = req.file.mimetype.startsWith('video/');
+    const resourceType = isVideo ? 'video' : 'image';
+
+    // Upload buffer to Cloudinary
+    const result = await uploadBufferToCloudinary(req.file.buffer, {
+      folder: 'portfolio',
+      resource_type: resourceType,
+      // Use original filename (sanitized) as public_id
+      public_id: `${Date.now()}-${req.file.originalname.replace(/[^a-zA-Z0-9_.-]/g, '_')}`,
+    });
+
     res.json({
       message: 'File uploaded successfully',
-      url: fileUrl,
-      filename: req.file.filename,
-      size: req.file.size,
+      url: result.secure_url,
+      filename: result.public_id,
+      size: result.bytes,
       mimetype: req.file.mimetype,
+      cloudinary_id: result.public_id,
     });
   } catch (err) {
     console.error('Upload error:', err);
-    res.status(500).json({ error: 'File upload failed' });
+    res.status(500).json({ error: 'File upload failed', details: err.message });
   }
 });
 
@@ -1012,19 +1017,9 @@ app.post('/api/upload', verifyToken, upload.single('file'), (req, res) => {
    -------------------------------------------------------------------------- */
 
 // Multer config specifically for profile pictures (images only, 5MB max)
-const profilePicStorage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, uploadsDir);
-  },
-  filename: function (req, file, cb) {
-    const ext = path.extname(file.originalname);
-    cb(null, `profile-picture${ext}`);
-  },
-});
-
 const profilePicUpload = multer({
-  storage: profilePicStorage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB
   fileFilter: (req, file, cb) => {
     if (!file.mimetype.startsWith('image/')) {
       return cb(new Error('Only image files are allowed'));
@@ -1033,17 +1028,22 @@ const profilePicUpload = multer({
   },
 });
 
-app.post('/api/upload/profile-picture', verifyToken, profilePicUpload.single('file'), (req, res) => {
+app.post('/api/upload/profile-picture', verifyToken, profilePicUpload.single('file'), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'No image uploaded' });
     }
 
-    // Always serve at a stable, cache-busting URL
-    const fileUrl = `/uploads/${req.file.filename}?v=${Date.now()}`;
+    const result = await uploadBufferToCloudinary(req.file.buffer, {
+      folder: 'portfolio',
+      public_id: `profile-picture-${Date.now()}`,
+      resource_type: 'image',
+    });
+
+    const fileUrl = result.secure_url;
 
     // Persist URL into settings so /api/settings returns it to the frontend
-    db.prepare(`
+    await db.prepare(`
       INSERT INTO settings (key, value) VALUES ('profile_picture_url', ?)
       ON CONFLICT(key) DO UPDATE SET value = excluded.value
     `).run(fileUrl);
@@ -1054,20 +1054,14 @@ app.post('/api/upload/profile-picture', verifyToken, profilePicUpload.single('fi
     });
   } catch (err) {
     console.error('Profile picture upload error:', err);
-    res.status(500).json({ error: 'Profile picture upload failed' });
+    res.status(500).json({ error: 'Profile picture upload failed', details: err.message });
   }
 });
 
-app.delete('/api/upload/profile-picture', verifyToken, (req, res) => {
+app.delete('/api/upload/profile-picture', verifyToken, async (req, res) => {
   try {
     // Remove from settings
-    db.prepare(`DELETE FROM settings WHERE key = 'profile_picture_url'`).run();
-
-    // Try to delete the file too (all common extensions)
-    ['jpg', 'jpeg', 'png', 'webp', 'gif'].forEach((ext) => {
-      const filePath = path.join(uploadsDir, `profile-picture.${ext}`);
-      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-    });
+    await db.prepare(`DELETE FROM settings WHERE key = 'profile_picture_url'`).run();
 
     res.json({ message: 'Profile picture removed' });
   } catch (err) {

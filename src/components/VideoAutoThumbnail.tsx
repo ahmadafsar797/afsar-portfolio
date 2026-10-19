@@ -28,13 +28,19 @@ export const VideoAutoThumbnail: React.FC<VideoAutoThumbnailProps> = ({
   const isYt = isYouTubeUrl(videoUrl);
   const ytThumbnail = isYt ? getYouTubeThumbnail(videoUrl) : null;
 
-  // Derive static cover if uploaded MP4
+  // Derive static cover if uploaded MP4 (local or Cloudinary)
+  const isCloudinaryVideo = videoUrl.includes('cloudinary.com') && videoUrl.includes('/video/upload/');
+  const cloudinaryPoster =
+    !thumbnailUrl && !isYt && isCloudinaryVideo
+      ? videoUrl.replace(/\.[a-zA-Z0-9]+$/i, '.jpg')
+      : null;
+
   const derivedUploadCover =
     !thumbnailUrl && !isYt && videoUrl.startsWith('/uploads/') && videoUrl.endsWith('.mp4')
       ? videoUrl.replace(/\.mp4$/i, '-cover.jpg')
       : null;
 
-  const resolvedThumb = thumbnailUrl || ytThumbnail || derivedUploadCover || null;
+  const resolvedThumb = thumbnailUrl || ytThumbnail || cloudinaryPoster || derivedUploadCover || null;
 
   const [imageSrc, setImageSrc] = useState<string | null>(resolvedThumb);
   const [isLoaded, setIsLoaded] = useState<boolean>(false);

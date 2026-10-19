@@ -9,6 +9,7 @@
     "client": "vite",
     "build": "vite build",
     "render-build": "npm install --include=dev && npm run build",
+    "migrate:cloudinary": "node scripts/migrate_uploads_to_cloudinary.js",
     "start": "node server/server.js"
   },
   "keywords": [],
@@ -22,6 +23,7 @@
     "@gsap/react": "^2.1.2",
     "bcryptjs": "^3.0.3",
     "canvas-confetti": "^1.9.4",
+    "cloudinary": "^2.11.0",
     "concurrently": "^10.0.5",
     "cors": "^2.8.6",
     "dotenv": "^18.0.5",
@@ -31,6 +33,7 @@
     "jsonwebtoken": "^9.0.3",
     "lucide-react": "^1.49.0",
     "multer": "^2.4.0",
+    "pg": "^8.23.1",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "sql.js": "^1.14.2"

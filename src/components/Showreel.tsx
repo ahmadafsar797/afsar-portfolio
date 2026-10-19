@@ -27,10 +27,10 @@ export const Showreel: React.FC<ShowreelProps> = ({ settings, onOpenLightbox }) 
 
   const videoUrl =
     settings?.featured_showreel_url ||
-    '/uploads/Cinematic_Reel_2-1791004710300-248821251.mp4';
+    'https://res.cloudinary.com/nem8to4j/video/upload/v1792401309/portfolio/Cinematic_Reel_2-1791004710300-248821251.mp4';
   const posterUrl =
     settings?.featured_showreel_poster ||
-    '/uploads/master-showreel-thumb-1791004753890-1791004755766-85054138.jpg';
+    'https://res.cloudinary.com/nem8to4j/image/upload/v1792400487/portfolio/portfolio/master-showreel-thumb-1791004753890-1791004755766-85054138.jpg';
   const isYt = isYouTubeUrl(videoUrl);
   const effectivePoster = posterUrl || (isYt ? getYouTubeThumbnail(videoUrl) : autoThumbnail);
 

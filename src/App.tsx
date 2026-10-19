@@ -220,7 +220,7 @@ export const App: React.FC = () => {
           onWatchShowreel={() =>
             openLightbox(
               settings.featured_showreel_url ||
-                '/uploads/Cinematic_Reel_2-1791004710300-248821251.mp4',
+                'https://res.cloudinary.com/nem8to4j/video/upload/v1792401309/portfolio/Cinematic_Reel_2-1791004710300-248821251.mp4',
               'Master Cinematic Showreel',
               'Afsar Ahmad Films',
               'Showreel'
@@ -256,7 +256,7 @@ export const App: React.FC = () => {
           onOpenShowreel={() =>
             openLightbox(
               settings.featured_showreel_url ||
-                '/uploads/Cinematic_Reel_2-1791004710300-248821251.mp4',
+                'https://res.cloudinary.com/nem8to4j/video/upload/v1792401309/portfolio/Cinematic_Reel_2-1791004710300-248821251.mp4',
               'Master Cinematic Showreel',
               'Afsar Ahmad Films',
               'Showreel'
