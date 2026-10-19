@@ -792,11 +792,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
 
         {/* Live Cloud vs Localhost Notice Bar */}
         {!isLocalhost && (
-          <div className="bg-amber-500/10 border-b border-amber-500/20 px-6 py-2.5 flex items-center justify-between text-xs text-amber-200">
+          <div className="bg-emerald-500/10 border-b border-emerald-500/20 px-6 py-2.5 flex items-center justify-between text-xs text-emerald-200">
             <div className="flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 text-amber-400 shrink-0" />
+              <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" />
               <span>
-                <strong>Live Cloud Notice:</strong> Video files uploaded directly on Render reset when deploying. To upload videos permanently, run <strong>Run Portfolio Admin.bat</strong> on your laptop!
+                <strong>Cloud Storage Active:</strong> Media uploaded from mobile or PC saves permanently to <strong>Cloudinary CDN</strong> & <strong>Supabase</strong> — staying 100% safe across all future deploys.
               </span>
             </div>
           </div>
