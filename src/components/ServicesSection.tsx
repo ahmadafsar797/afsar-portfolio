@@ -11,7 +11,6 @@ import {
   Briefcase,
   ChevronLeft,
   ChevronRight,
-  ArrowUpRight,
 } from 'lucide-react';
 import { Service } from '../types';
 import { gsap } from 'gsap';
@@ -39,6 +38,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ services, onSe
   const dragScrollYRef = useRef(0);
 
   const totalSlides = services.length;
+  const reversedServices = [...services].reverse();
 
   const getIcon = (iconName?: string) => {
     const iconClass =
@@ -67,7 +67,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ services, onSe
     }
   };
 
-  /* ── Master Horizontal Pinned Scroll Engine ── */
+  /* ── Master Horizontal Pinned Scroll Engine (Rightward Motion) ── */
   useEffect(() => {
     const section = sectionRef.current;
     const track = sliderTrackRef.current;
@@ -76,54 +76,40 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ services, onSe
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
     const ctx = gsap.context(() => {
-      const getScrollDistance = () => {
+      const getShiftDistance = () => {
         const isMobile = window.innerWidth < 768;
-        return Math.max(track.scrollWidth - viewport.clientWidth + (isMobile ? 40 : 160), 300);
+        return Math.max(track.scrollWidth - viewport.clientWidth + (isMobile ? 32 : 120), 200);
       };
 
       const isMobile = window.innerWidth < 768;
 
-      const slideTween = gsap.to(track, {
-        x: () => -getScrollDistance(),
-        ease: 'none',
-        scrollTrigger: {
-          id: 'services-pin-slider',
-          trigger: section,
-          pin: true,
-          start: 'top top',
-          end: () => `+=${Math.max(getScrollDistance() * (isMobile ? 1.3 : 1.3), isMobile ? 1000 : 850)}`,
-          scrub: isMobile ? 0.8 : 1.1,
-          anticipatePin: 1,
-          invalidateOnRefresh: true,
-          onUpdate: (self) => {
-            const p = self.progress;
-            setScrollProgress(p);
-            const idx = Math.min(Math.floor(p * totalSlides), totalSlides - 1);
-            setActiveIndex(idx);
-          },
+      // Animate from negative shift to 0 -> cards glide to the RIGHT (->)
+      gsap.fromTo(
+        track,
+        {
+          x: () => -getShiftDistance(),
         },
-      });
-
-      // Subtle slide-in stagger effect for individual cards
-      const cards = track.querySelectorAll<HTMLElement>('.service-card');
-      cards.forEach((card, idx) => {
-        gsap.fromTo(
-          card,
-          { x: isMobile ? 25 : 35, opacity: idx === 0 ? 1 : 0.85 },
-          {
-            x: 0,
-            opacity: 1,
-            ease: 'power2.out',
-            scrollTrigger: {
-              trigger: card,
-              containerAnimation: slideTween,
-              start: 'left 95%',
-              end: 'left 65%',
-              scrub: true,
+        {
+          x: 0,
+          ease: 'none',
+          scrollTrigger: {
+            id: 'services-pin-slider',
+            trigger: section,
+            pin: true,
+            start: 'top top',
+            end: () => `+=${Math.max(getShiftDistance() * (isMobile ? 1.3 : 1.3), isMobile ? 1000 : 850)}`,
+            scrub: isMobile ? 0.8 : 1.1,
+            anticipatePin: 1,
+            invalidateOnRefresh: true,
+            onUpdate: (self) => {
+              const p = self.progress;
+              setScrollProgress(p);
+              const idx = Math.min(Math.floor(p * totalSlides), totalSlides - 1);
+              setActiveIndex(idx);
             },
-          }
-        );
-      });
+          },
+        }
+      );
     }, sectionRef);
 
     const refreshTimer = setTimeout(() => {
@@ -172,7 +158,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ services, onSe
     const deltaX = e.clientX - dragStartXRef.current;
     const st = ScrollTrigger.getById('services-pin-slider');
     if (st && window.scrollY >= st.start && window.scrollY <= st.end) {
-      const scrollDelta = -deltaX * 1.5;
+      const scrollDelta = deltaX * 1.5;
       window.scrollTo({
         top: Math.max(st.start, Math.min(st.end, dragScrollYRef.current + scrollDelta)),
       });
@@ -197,7 +183,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ services, onSe
     const deltaX = e.touches[0].clientX - dragStartXRef.current;
     const st = ScrollTrigger.getById('services-pin-slider');
     if (st && window.scrollY >= st.start && window.scrollY <= st.end) {
-      const scrollDelta = -deltaX * 1.5;
+      const scrollDelta = deltaX * 1.5;
       window.scrollTo({
         top: Math.max(st.start, Math.min(st.end, dragScrollYRef.current + scrollDelta)),
       });
@@ -302,23 +288,29 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ services, onSe
           ref={sliderTrackRef}
           className="flex items-stretch gap-4 sm:gap-6 md:gap-8 px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 w-max will-change-transform"
         >
-          {services.map((service, idx) => (
-            <div
-              key={service.id || idx}
-              onClick={() => handleCardClick(service.title)}
-              className="service-card group relative flex-shrink-0 w-[84vw] max-w-[340px] sm:w-[350px] md:w-[380px] lg:w-[410px] xl:w-[430px] p-7 sm:p-9 rounded-3xl bg-[#F8F1E7] border border-[#2B170F]/10 hover:border-[#C65D45] transition-all duration-500 shadow-md hover:shadow-2xl hover:shadow-[#2B170F]/25 flex flex-col justify-between overflow-hidden cursor-pointer select-none will-change-transform active:scale-[0.98]"
-            >
-              {/* Background Glow & Hover Dark Layer */}
-              <div className="absolute inset-0 rounded-3xl bg-gradient-to-b from-[#2B170F] via-[#24130C] to-[#180D07] opacity-0 group-hover:opacity-100 group-active:opacity-100 transition-opacity duration-500 pointer-events-none" />
-              <div className="absolute -top-12 -right-12 w-40 h-40 bg-[#C65D45]/20 rounded-full blur-2xl opacity-0 group-hover:opacity-100 group-active:opacity-100 transition-opacity duration-500 pointer-events-none" />
+          {reversedServices.map((service) => {
+            const originalIndex = services.findIndex((s) => (s.id ? s.id === service.id : s.title === service.title));
+            const cardNum = String(originalIndex >= 0 ? originalIndex + 1 : 1).padStart(2, '0');
 
-              <div className="relative z-10 flex flex-col justify-between h-full">
-                <div>
-                  {/* Icon */}
-                  <div className="mb-6 sm:mb-7">
+            return (
+              <div
+                key={service.id || service.title}
+                onClick={() => handleCardClick(service.title)}
+                className="service-card group relative flex-shrink-0 w-[84vw] max-w-[340px] sm:w-[350px] md:w-[380px] lg:w-[410px] xl:w-[430px] p-7 sm:p-9 rounded-3xl bg-[#F8F1E7] border border-[#2B170F]/10 hover:border-[#C65D45] transition-all duration-500 shadow-md hover:shadow-2xl hover:shadow-[#2B170F]/25 flex flex-col justify-start overflow-hidden cursor-pointer select-none will-change-transform active:scale-[0.98]"
+              >
+                {/* Background Glow & Hover Dark Layer */}
+                <div className="absolute inset-0 rounded-3xl bg-gradient-to-b from-[#2B170F] via-[#24130C] to-[#180D07] opacity-0 group-hover:opacity-100 group-active:opacity-100 transition-opacity duration-500 pointer-events-none" />
+                <div className="absolute -top-12 -right-12 w-40 h-40 bg-[#C65D45]/20 rounded-full blur-2xl opacity-0 group-hover:opacity-100 group-active:opacity-100 transition-opacity duration-500 pointer-events-none" />
+
+                <div className="relative z-10 flex flex-col justify-start h-full">
+                  {/* Icon & Service Number Header */}
+                  <div className="flex items-center justify-between mb-6 sm:mb-7">
                     <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-[#FFF9F2] border border-[#2B170F]/10 flex items-center justify-center group-hover:scale-110 group-hover:bg-[#C65D45] group-hover:border-[#C65D45] group-active:bg-[#C65D45] transition-all duration-300 shadow-sm group-hover:shadow-[0_0_20px_rgba(198,93,69,0.5)]">
                       {getIcon(service.icon_name)}
                     </div>
+                    <span className="text-xl sm:text-2xl font-mono font-bold text-[#2B170F]/20 group-hover:text-white/30 transition-colors duration-300">
+                      #{cardNum}
+                    </span>
                   </div>
 
                   <h3 className="font-pogonia text-2xl sm:text-3xl font-bold text-[#2B170F] group-hover:text-[#FFF9F2] group-active:text-[#FFF9F2] transition-colors duration-300 mb-3 leading-snug">
@@ -329,19 +321,9 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ services, onSe
                     {service.short_description}
                   </p>
                 </div>
-
-                {/* Bottom Action CTA Pill (Deliverables removed) */}
-                <div className="pt-6 sm:pt-8 mt-6 flex items-center justify-between border-t border-[#2B170F]/10 group-hover:border-white/15 transition-colors duration-300">
-                  <span className="text-[11px] sm:text-xs font-montserrat uppercase font-bold tracking-wider text-[#C65D45] group-hover:text-[#FFF9F2] transition-colors duration-300">
-                    Book Service
-                  </span>
-                  <div className="w-8 h-8 rounded-full bg-[#FFF9F2] group-hover:bg-[#C65D45] text-[#2B170F] group-hover:text-white flex items-center justify-center transition-all duration-300 shadow-sm group-hover:scale-110">
-                    <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-                  </div>
-                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 

@@ -28,10 +28,6 @@ import {
   Compass,
   Heading,
   Sparkles,
-  Download,
-  FileUp,
-  HelpCircle,
-  UploadCloud,
   ChevronUp,
   ChevronDown,
   ArrowUpDown,
@@ -96,21 +92,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
   };
 
   const isLocalhost = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
-  const [isPublishing, setIsPublishing] = useState(false);
-
-  const handlePublishLive = async () => {
-    setIsPublishing(true);
-    try {
-      const res = await api.publishLive();
-      showNotice(res.message, 'success');
-      onDataChanged();
-    } catch (err: any) {
-      showNotice(err.message || 'Failed to publish to live website', 'error');
-    } finally {
-      setIsPublishing(false);
-    }
-  };
-
   // Editing state trackers
   const [editingReel, setEditingReel] = useState<Partial<Reel> | null>(null);
   const [editingHorizontal, setEditingHorizontal] = useState<Partial<HorizontalVideo> | null>(null);
@@ -134,45 +115,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
   const [extractingHorizontalFrames, setExtractingHorizontalFrames] = useState<boolean>(false);
   const [selectedHorizontalFrameId, setSelectedHorizontalFrameId] = useState<number | null>(null);
   const [horizontalFramePickerOpen, setHorizontalFramePickerOpen] = useState<boolean>(false);
-
-  // Backup & Deployment Persistence States
-  const [showDeployHelpModal, setShowDeployHelpModal] = useState<boolean>(false);
-
-  const handleExportBackup = async () => {
-    try {
-      showNotice('Generating portfolio backup JSON...');
-      const blob = await api.exportBackup();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `afsar_portfolio_backup_${new Date().toISOString().slice(0, 10)}.json`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-      showNotice('Backup downloaded! Save this file to keep your content permanent.');
-    } catch (e: any) {
-      showNotice(e.message || 'Export failed', 'error');
-    }
-  };
-
-  const handleImportBackup = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    try {
-      showNotice('Restoring portfolio content from backup...');
-      const text = await file.text();
-      const json = JSON.parse(text);
-      await api.importBackup(json);
-      await loadAllAdminData();
-      onDataChanged();
-      showNotice('All content, reels, and settings restored successfully!');
-    } catch (e: any) {
-      showNotice(e.message || 'Failed to restore backup. Invalid JSON file.', 'error');
-    } finally {
-      e.target.value = '';
-    }
-  };
 
   // Password change state
   const [passwordForm, setPasswordForm] = useState({
@@ -826,68 +768,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
             )}
 
             {isAuthenticated && (
-              <>
-                <button
-                  onClick={handlePublishLive}
-                  disabled={isPublishing}
-                  className={`p-2 px-3.5 rounded-xl text-xs flex items-center gap-1.5 transition-all shadow-lg font-montserrat uppercase font-bold cursor-pointer ${
-                    isPublishing
-                      ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 cursor-wait'
-                      : 'bg-gradient-to-r from-[#C65D45] to-[#E2725B] hover:brightness-110 text-white border border-[#E2725B]/40 active:scale-95 shadow-[0_0_15px_rgba(198,93,69,0.35)]'
-                  }`}
-                  title="Permanently commits all uploaded videos, thumbnails, and changes to Git and deploys to Render."
-                >
-                  <UploadCloud className={`w-4 h-4 ${isPublishing ? 'animate-bounce' : ''}`} />
-                  <span className="inline font-montserrat text-[11px] uppercase font-bold tracking-wider">
-                    {isPublishing ? 'Publishing...' : '🚀 Push to Live Site'}
-                  </span>
-                </button>
-
-                <button
-                  onClick={handleExportBackup}
-                  className="p-2 px-3 rounded-xl bg-white/5 hover:bg-white/10 text-white/80 hover:text-white text-xs flex items-center gap-1.5 transition-colors border border-white/10"
-                  title="Download a complete JSON backup file of all reels, videos, testimonials, and settings."
-                >
-                  <Download className="w-3.5 h-3.5 text-[#C65D45]" />
-                  <span className="hidden sm:inline font-montserrat text-[11px] uppercase font-semibold">
-                    Backup JSON
-                  </span>
-                </button>
-
-                <label
-                  className="p-2 px-3 rounded-xl bg-white/5 hover:bg-white/10 text-white/80 hover:text-white text-xs flex items-center gap-1.5 transition-colors border border-white/10 cursor-pointer"
-                  title="Restore all reels, videos, and settings from a downloaded backup JSON file."
-                >
-                  <FileUp className="w-3.5 h-3.5 text-blue-400" />
-                  <span className="hidden sm:inline font-montserrat text-[11px] uppercase font-semibold">
-                    Restore JSON
-                  </span>
-                  <input
-                    type="file"
-                    accept=".json,application/json"
-                    className="hidden"
-                    onChange={handleImportBackup}
-                  />
-                </label>
-
-                <button
-                  onClick={() => setShowDeployHelpModal(true)}
-                  className="p-2 px-2.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 text-xs flex items-center gap-1 transition-colors border border-amber-500/20"
-                  title="Why do changes reset after deployment? Click to learn how to keep changes permanent."
-                >
-                  <HelpCircle className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline font-montserrat text-[11px] uppercase font-medium">Why Reset?</span>
-                </button>
-
-                <button
-                  onClick={handleLogout}
-                  className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-white/70 hover:text-red-400 text-xs flex items-center gap-1.5 transition-colors border border-white/10"
-                  title="Log Out"
-                >
-                  <LogOut className="w-4 h-4" />
-                  <span className="hidden sm:inline font-montserrat text-[11px] uppercase">Logout</span>
-                </button>
-              </>
+              <button
+                onClick={handleLogout}
+                className="p-2 px-3 rounded-xl bg-white/5 hover:bg-white/10 text-white/70 hover:text-red-400 text-xs flex items-center gap-1.5 transition-colors border border-white/10"
+                title="Log Out"
+              >
+                <LogOut className="w-4 h-4" />
+                <span className="hidden sm:inline font-montserrat text-[11px] uppercase">Logout</span>
+              </button>
             )}
 
             <button
@@ -1144,50 +1032,40 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                     </div>
                   </div>
 
-                  {/* Permanent Deployment Center Card */}
-                  <div className="p-6 rounded-3xl bg-gradient-to-br from-[#1C120C] to-[#120B07] border border-[#C65D45]/30 space-y-4">
+                  {/* Live Cloud Database & Media Store Active Banner */}
+                  <div className="p-6 rounded-3xl bg-gradient-to-br from-[#1C120C] to-[#120B07] border border-emerald-500/30 space-y-4">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                       <div>
-                        <div className="flex items-center gap-2 text-[#C65D45] text-xs font-bold uppercase tracking-wider">
-                          <Sparkles className="w-4 h-4" />
-                          <span>1-Click Permanent Deployment Center</span>
+                        <div className="flex items-center gap-2 text-emerald-400 text-xs font-bold uppercase tracking-wider">
+                          <CheckCircle className="w-4 h-4" />
+                          <span>Live Cloud Database & Media Store Active</span>
                         </div>
                         <h4 className="font-pogonia text-xl text-white mt-1">
-                          {isLocalhost ? '💻 Master Workstation (Localhost Mode)' : '☁️ Live Cloud Demo Mode'}
+                          ⚡ Instant Real-Time Cloud Sync
                         </h4>
                         <p className="text-xs text-white/60 mt-1 max-w-xl">
-                          {isLocalhost
-                            ? 'Every video, thumbnail, and title you add here is saved to your laptop hard drive. Click below to automatically commit and push to live Render with 1 click!'
-                            : 'Uploads made directly here will reset when deploying. To keep new videos permanently, launch Run Portfolio Admin.bat on your laptop.'}
+                          Your portfolio is permanently connected to <strong>Supabase Cloud Database</strong> and <strong>Cloudinary CDN</strong>. All video uploads, thumbnails, reordering, testimonials, and color palette customizations save directly to the cloud instantly without needing manual git pushes or deployment triggers.
                         </p>
                       </div>
 
-                      <button
-                        onClick={handlePublishLive}
-                        disabled={isPublishing}
-                        className={`px-6 py-3.5 rounded-2xl text-xs font-montserrat uppercase font-bold tracking-wider transition-all duration-300 flex items-center gap-2.5 shadow-xl cursor-pointer shrink-0 ${
-                          isPublishing
-                            ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 cursor-wait'
-                            : 'bg-gradient-to-r from-[#C65D45] to-[#E2725B] hover:brightness-110 text-white shadow-[0_0_20px_rgba(198,93,69,0.4)] active:scale-95'
-                        }`}
-                      >
-                        <UploadCloud className={`w-4 h-4 ${isPublishing ? 'animate-bounce' : ''}`} />
-                        <span>{isPublishing ? 'Publishing Updates...' : '🚀 Push to Live Website'}</span>
-                      </button>
+                      <div className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs font-montserrat font-bold uppercase tracking-wider shrink-0">
+                        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                        <span>Cloud Database Live</span>
+                      </div>
                     </div>
 
                     <div className="pt-3 border-t border-white/10 flex flex-wrap items-center gap-4 text-[11px] text-white/50">
                       <span className="flex items-center gap-1.5">
                         <CheckCircle className="w-3.5 h-3.5 text-emerald-400" />
-                        <span>Permanent Seed Tracking</span>
+                        <span>Supabase PostgreSQL Cloud Storage</span>
                       </span>
                       <span className="flex items-center gap-1.5">
                         <CheckCircle className="w-3.5 h-3.5 text-emerald-400" />
-                        <span>Automatic Git Commit</span>
+                        <span>Cloudinary Ultra-Fast CDN</span>
                       </span>
                       <span className="flex items-center gap-1.5">
                         <CheckCircle className="w-3.5 h-3.5 text-emerald-400" />
-                        <span>Zero Data Loss on Render</span>
+                        <span>Real-Time Permanent Persistence</span>
                       </span>
                     </div>
                   </div>
@@ -4935,85 +4813,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
           }}
           title={editingHorizontal.title ? `Film: ${editingHorizontal.title}` : 'Film Frame Picker'}
         />
-      )}
-
-      {/* Deployment & Permanent Sync Guide Modal */}
-      {showDeployHelpModal && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/85 backdrop-blur-md p-4">
-          <div className="relative w-full max-w-xl bg-[#14141f] border border-amber-500/40 rounded-2xl p-6 text-white shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-200">
-            <div className="flex items-center justify-between pb-3 border-b border-white/10">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center">
-                  <HelpCircle className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="font-pogonia text-xl text-white">Why Do Changes Reset on Deploy?</h3>
-                  <p className="text-[11px] text-white/50">Understanding Render Cloud Hosting & Git Persistence</p>
-                </div>
-              </div>
-              <button
-                onClick={() => setShowDeployHelpModal(false)}
-                className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 hover:text-white"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            <div className="space-y-3.5 text-xs text-white/80 leading-relaxed max-h-[60vh] overflow-y-auto pr-1">
-              <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-200">
-                <p className="font-semibold mb-1">⚠️ Render Ephemeral Disk Rule:</p>
-                <p className="text-[11px] text-amber-200/80">
-                  Render free tier servers rebuild from scratch directly from your <strong>GitHub repository</strong> every time you deploy or restart. Render <strong>cannot push files back to GitHub</strong> automatically.
-                </p>
-              </div>
-
-              <div className="space-y-1.5">
-                <h4 className="font-semibold text-white text-[13px] flex items-center gap-1.5">
-                  <span className="w-5 h-5 rounded-full bg-[#C65D45] text-white inline-flex items-center justify-center text-[11px]">1</span>
-                  Best Method: Edit Locally & Push to GitHub (Recommended)
-                </h4>
-                <p className="text-white/60 text-[11px]">
-                  When you make changes on your laptop (localhost):
-                </p>
-                <ol className="list-decimal list-inside space-y-1 pl-1 text-[11px] text-white/70">
-                  <li>Click <strong>Permanent Sync</strong> in the admin header (saves to <code className="text-[#C65D45]">data/default_content.json</code>).</li>
-                  <li>In your VS Code terminal, run:
-                    <pre className="mt-1 p-2 rounded bg-black/60 border border-white/10 font-mono text-[10px] text-emerald-400">
-git add .
-git commit -m "Update portfolio content"
-git push
-                    </pre>
-                  </li>
-                  <li>Render will automatically deploy and keep your changes 100% permanent forever!</li>
-                </ol>
-              </div>
-
-              <div className="space-y-1.5 pt-2 border-t border-white/10">
-                <h4 className="font-semibold text-white text-[13px] flex items-center gap-1.5">
-                  <span className="w-5 h-5 rounded-full bg-blue-500 text-white inline-flex items-center justify-center text-[11px]">2</span>
-                  Made Changes on the Live Deployed Website? Use JSON Backup!
-                </h4>
-                <p className="text-white/60 text-[11px]">
-                  If you edited reels or titles directly on your live website:
-                </p>
-                <ul className="list-disc list-inside space-y-1 pl-1 text-[11px] text-white/70">
-                  <li>Click <strong>Backup JSON</strong> in the top header to download your content file.</li>
-                  <li>If you ever redeploy and data resets, simply click <strong>Restore JSON</strong> and select your file — all reels, titles, and settings restore in 1 second!</li>
-                  <li>You can also replace <code className="text-blue-300">data/default_content.json</code> in your local folder with this file and git push.</li>
-                </ul>
-              </div>
-            </div>
-
-            <div className="pt-3 border-t border-white/10 flex justify-end">
-              <button
-                onClick={() => setShowDeployHelpModal(false)}
-                className="px-5 py-2 rounded-full text-xs font-montserrat uppercase tracking-wider text-white bg-[#C65D45] font-semibold"
-              >
-                Got It
-              </button>
-            </div>
-          </div>
-        </div>
       )}
     </div>
   );
