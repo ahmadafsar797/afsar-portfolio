@@ -33,6 +33,9 @@ import {
   ArrowUpDown,
   Hash,
   Palette,
+  Mail,
+  Share2,
+  MessageCircle,
 } from 'lucide-react';
 import { VideoFramePickerModal } from '../VideoFramePickerModal';
 import { ThemeStudioTab } from './ThemeStudioTab';
@@ -70,7 +73,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
 
   // Active Admin Tab
   const [activeTab, setActiveTab] = useState<
-    'overview' | 'reels' | 'horizontal' | 'testimonials' | 'services' | 'about' | 'hero-bg' | 'theme' | 'settings'
+    'overview' | 'reels' | 'horizontal' | 'testimonials' | 'services' | 'about' | 'hero-bg' | 'theme' | 'contact' | 'settings'
   >('overview');
 
   // Hero Background Video
@@ -977,6 +980,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                   className="w-2.5 h-2.5 rounded-full border border-white/20"
                   style={{ backgroundColor: settings.theme_primary_color || '#C65D45' }}
                 />
+              </button>
+
+              <button
+                onClick={() => setActiveTab('contact')}
+                className={`w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-xs font-montserrat uppercase tracking-wider transition-all text-left whitespace-nowrap ${
+                  activeTab === 'contact' ? 'bg-[#C65D45] text-[#2B170F] font-bold font-medium shadow-md' : 'text-white/70 hover:bg-white/5 hover:text-white'
+                }`}
+              >
+                <Share2 className="w-4 h-4" />
+                <span>Contact & Socials</span>
               </button>
 
               <button
@@ -2976,6 +2989,153 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                   }}
                   showNotice={showNotice}
                 />
+              )}
+
+              {/* TAB: CONTACT & SOCIALS */}
+              {activeTab === 'contact' && (
+                <div className="space-y-6 max-w-4xl">
+                  <div>
+                    <h3 className="font-pogonia text-3xl font-bold text-white">
+                      Contact Details & Social Links
+                    </h3>
+                    <p className="text-xs text-white/50">
+                      Manage your public direct contact channels. Any detail saved here instantly links to your website's contact section.
+                    </p>
+                  </div>
+
+                  <div className="p-6 sm:p-8 rounded-2xl bg-[#101018] border border-white/10 space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {/* Email */}
+                      <div>
+                        <label className="flex items-center gap-2 text-xs font-montserrat uppercase tracking-wider text-white/80 font-bold mb-2">
+                          <Mail className="w-4 h-4 text-[#C65D45]" />
+                          <span>Contact Email Address</span>
+                        </label>
+                        <input
+                          type="email"
+                          value={settings.contact_email || ''}
+                          onChange={(e) => setSettings({ ...settings, contact_email: e.target.value })}
+                          placeholder="e.g. contact@afsaredits.com"
+                          className="w-full px-4 py-2.5 rounded-xl bg-black border border-white/15 text-sm text-white focus:outline-none focus:border-[#C65D45] transition-colors"
+                        />
+                        <p className="text-[11px] text-white/40 mt-1.5">
+                          Shown on the Email card and opens mail client on click.
+                        </p>
+                      </div>
+
+                      {/* WhatsApp */}
+                      <div>
+                        <label className="flex items-center gap-2 text-xs font-montserrat uppercase tracking-wider text-white/80 font-bold mb-2">
+                          <MessageCircle className="w-4 h-4 text-[#C65D45]" />
+                          <span>WhatsApp Phone Number</span>
+                        </label>
+                        <input
+                          type="text"
+                          value={settings.whatsapp_number || ''}
+                          onChange={(e) => setSettings({ ...settings, whatsapp_number: e.target.value })}
+                          placeholder="e.g. +91 7860317481"
+                          className="w-full px-4 py-2.5 rounded-xl bg-black border border-white/15 text-sm text-white focus:outline-none focus:border-[#C65D45] transition-colors"
+                        />
+                        <p className="text-[11px] text-white/40 mt-1.5">
+                          Include country code (+91...). Used for direct WhatsApp messaging.
+                        </p>
+                      </div>
+
+                      {/* Instagram */}
+                      <div>
+                        <label className="flex items-center gap-2 text-xs font-montserrat uppercase tracking-wider text-white/80 font-bold mb-2">
+                          <Share2 className="w-4 h-4 text-[#C65D45]" />
+                          <span>Instagram (Handle or Profile Link)</span>
+                        </label>
+                        <input
+                          type="text"
+                          value={settings.instagram_url || ''}
+                          onChange={(e) => setSettings({ ...settings, instagram_url: e.target.value })}
+                          placeholder="e.g. @afsarahmad.edits or https://instagram.com/afsarahmad.edits"
+                          className="w-full px-4 py-2.5 rounded-xl bg-black border border-white/15 text-sm text-white focus:outline-none focus:border-[#C65D45] transition-colors"
+                        />
+                        <p className="text-[11px] text-white/40 mt-1.5">
+                          Enter your handle (e.g. @afsarahmad.edits) or full profile URL. The card will display your clean handle.
+                        </p>
+                      </div>
+
+                      {/* LinkedIn */}
+                      <div>
+                        <label className="flex items-center gap-2 text-xs font-montserrat uppercase tracking-wider text-white/80 font-bold mb-2">
+                          <Share2 className="w-4 h-4 text-[#C65D45]" />
+                          <span>LinkedIn (Profile Link or Username)</span>
+                        </label>
+                        <input
+                          type="text"
+                          value={settings.linkedin_url || ''}
+                          onChange={(e) => setSettings({ ...settings, linkedin_url: e.target.value })}
+                          placeholder="e.g. in/afsarahmad-video or https://linkedin.com/in/afsarahmad-video"
+                          className="w-full px-4 py-2.5 rounded-xl bg-black border border-white/15 text-sm text-white focus:outline-none focus:border-[#C65D45] transition-colors"
+                        />
+                        <p className="text-[11px] text-white/40 mt-1.5">
+                          Enter your profile slug or full URL. The card will link directly to your network.
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Live Website Preview Banner */}
+                    <div className="pt-4 border-t border-white/10">
+                      <span className="text-[11px] font-montserrat uppercase tracking-wider text-white/50 block mb-3 font-semibold">
+                        Live Contact Cards Preview (As seen by website visitors)
+                      </span>
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div className="p-3.5 rounded-xl bg-[#FFF9F2] text-[#2B170F] border border-black/10">
+                          <span className="text-[10px] font-bold uppercase text-[#756A62] block">Email</span>
+                          <span className="text-xs font-semibold truncate block mt-0.5">
+                            {settings.contact_email || 'afsar@ahmadfilms.studio'}
+                          </span>
+                        </div>
+                        <div className="p-3.5 rounded-xl bg-[#FFF9F2] text-[#2B170F] border border-black/10">
+                          <span className="text-[10px] font-bold uppercase text-[#756A62] block">Instagram</span>
+                          <span className="text-xs font-semibold truncate block mt-0.5">
+                            {settings.instagram_url?.trim()
+                              ? (settings.instagram_url.startsWith('@')
+                                ? settings.instagram_url
+                                : `@${settings.instagram_url.replace(/^https?:\/\/(www\.)?instagram\.com\/?/i, '').replace(/\/$/, '') || 'instagram'}`)
+                              : '@afsarahmad.edits'}
+                          </span>
+                        </div>
+                        <div className="p-3.5 rounded-xl bg-[#FFF9F2] text-[#2B170F] border border-black/10">
+                          <span className="text-[10px] font-bold uppercase text-[#756A62] block">LinkedIn</span>
+                          <span className="text-xs font-semibold truncate block mt-0.5">
+                            {settings.linkedin_url?.trim()
+                              ? (settings.linkedin_url.includes('linkedin.com/in/')
+                                ? `in/${settings.linkedin_url.split('linkedin.com/in/')[1]?.replace(/\/$/, '')}`
+                                : (settings.linkedin_url.startsWith('in/') ? settings.linkedin_url : settings.linkedin_url))
+                              : 'in/afsarahmad-video'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Save Action */}
+                    <div className="pt-2 flex items-center justify-between flex-wrap gap-4">
+                      <button
+                        onClick={async () => {
+                          try {
+                            await api.updateSettings(settings);
+                            showNotice('Contact & Social links updated successfully!');
+                            onDataChanged();
+                          } catch (err: any) {
+                            showNotice(err.message || 'Error updating contact settings', 'error');
+                          }
+                        }}
+                        className="px-8 py-3 rounded-full text-xs font-montserrat uppercase tracking-wider text-white bg-[#C65D45] hover:bg-[#D76E56] font-bold shadow-lg shadow-[#C65D45]/30 cursor-pointer transition-all flex items-center gap-2"
+                      >
+                        <Save className="w-4 h-4" />
+                        <span>Save Contact & Social Details</span>
+                      </button>
+                      <span className="text-xs text-white/40">
+                        Changes will be immediately visible on your live site.
+                      </span>
+                    </div>
+                  </div>
+                </div>
               )}
 
               {/* TAB 8: SETTINGS */}

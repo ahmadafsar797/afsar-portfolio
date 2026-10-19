@@ -93,19 +93,9 @@ export const ProcessSection: React.FC = () => {
                   <p className="text-xs text-[#C65D45] font-bold uppercase tracking-wider mb-4">
                     {step.subtitle}
                   </p>
-                  <p className="text-xs sm:text-sm font-medium text-[#756A62] leading-relaxed mb-6">
+                  <p className="text-xs sm:text-sm font-medium text-[#756A62] leading-relaxed">
                     {step.description}
                   </p>
-                </div>
-
-                {/* Deliverables */}
-                <div className="pt-4 border-t border-[#2B170F]/10 space-y-1.5 mt-auto">
-                  {step.deliverables.map((item, dIdx) => (
-                    <div key={dIdx} className="flex items-center gap-2 text-[11px] text-[#756A62] font-montserrat font-medium">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#C65D45] shrink-0" />
-                      <span>{item}</span>
-                    </div>
-                  ))}
                 </div>
               </div>
             );

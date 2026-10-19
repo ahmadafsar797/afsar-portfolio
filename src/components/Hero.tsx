@@ -18,7 +18,6 @@ export const Hero: React.FC<HeroProps> = ({ settings, onWatchShowreel }) => {
   const ctaRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLDivElement>(null);
   const shapeRef = useRef<HTMLDivElement>(null);
-  const badgeRef = useRef<HTMLAnchorElement>(null);
   const floatRef1 = useRef<HTMLDivElement>(null);
   const floatRef2 = useRef<HTMLDivElement>(null);
   const playBtnRef = useRef<HTMLButtonElement>(null);
@@ -54,7 +53,6 @@ export const Hero: React.FC<HeroProps> = ({ settings, onWatchShowreel }) => {
       });
       if (shapeRef.current) gsap.set(shapeRef.current, { scale: 0.84, opacity: 0 });
       if (imageRef.current) gsap.set(imageRef.current, { y: 36, opacity: 0, scale: 1.05 });
-      if (badgeRef.current) gsap.set(badgeRef.current, { scale: 0, rotate: -35, opacity: 0 });
       if (floatRef1.current) gsap.set(floatRef1.current, { x: -30, opacity: 0 });
       if (floatRef2.current) gsap.set(floatRef2.current, { x: 30, opacity: 0 });
 
@@ -64,9 +62,8 @@ export const Hero: React.FC<HeroProps> = ({ settings, onWatchShowreel }) => {
         .to(headlineRef.current, { y: 0, opacity: 1, duration: 0.75, ease: 'power3.out' }, 0.26)
         .to(subtitleRef.current, { y: 0, opacity: 1, duration: 0.65, ease: 'power3.out' }, 0.42)
         .to(ctaRef.current, { y: 0, opacity: 1, duration: 0.55, ease: 'power3.out' }, 0.55)
-        .to(badgeRef.current, { scale: 1, rotate: 0, opacity: 1, duration: 0.7, ease: 'back.out(2)' }, 0.62)
-        .to(floatRef1.current, { x: 0, opacity: 1, duration: 0.55, ease: 'power3.out' }, 0.7)
-        .to(floatRef2.current, { x: 0, opacity: 1, duration: 0.55, ease: 'power3.out' }, 0.76);
+        .to(floatRef1.current, { x: 0, opacity: 1, duration: 0.55, ease: 'power3.out' }, 0.65)
+        .to(floatRef2.current, { x: 0, opacity: 1, duration: 0.55, ease: 'power3.out' }, 0.72);
 
       // Continuous subtle floating tags loop
       [floatRef1, floatRef2].forEach((r, i) => {
@@ -364,31 +361,6 @@ export const Hero: React.FC<HeroProps> = ({ settings, onWatchShowreel }) => {
                 />
               </div>
             </div>
-
-            {/* Hire Me badge */}
-            <a
-              ref={badgeRef}
-              href="#contact"
-              data-cursor="open"
-              className="absolute top-2 sm:top-4 right-1 sm:-right-2 xl:-right-4 2xl:-right-6 z-20 w-20 h-20 sm:w-24 sm:h-24 md:w-26 md:h-26 xl:w-28 xl:h-28 rounded-full bg-[#2B170F] border-2 border-[#FFF9F2] shadow-2xl flex items-center justify-center cursor-pointer group hover:scale-110 active:scale-95 transition-transform duration-300"
-              title="Hire Me"
-            >
-              <svg className="absolute inset-0 w-full h-full animate-spin-slow pointer-events-none" viewBox="0 0 100 100">
-                <path
-                  id="hireCirclePath"
-                  d="M 50, 50 m -37, 0 a 37,37 0 1,1 74,0 a 37,37 0 1,1 -74,0"
-                  fill="none"
-                />
-                <text className="text-[9.5px] font-sans font-bold fill-[#C65D45] uppercase tracking-[0.16em]">
-                  <textPath href="#hireCirclePath" startOffset="0%">
-                    • HIRE ME • HIRE ME • HIRE ME •
-                  </textPath>
-                </text>
-              </svg>
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#C65D45] text-[#2B170F] flex items-center justify-center shadow-inner group-hover:scale-110 group-hover:rotate-45 transition-transform duration-300">
-                <ArrowUpRight className="w-4 h-4 sm:w-5 sm:h-5 stroke-[2.5]" />
-              </div>
-            </a>
 
             {/* Floating tag 1 */}
             <div ref={floatRef1} className="absolute bottom-10 -left-3 sm:left-1 xl:-left-4 2xl:-left-6 z-20 flex items-start gap-1 drop-shadow-xl will-change-transform">
