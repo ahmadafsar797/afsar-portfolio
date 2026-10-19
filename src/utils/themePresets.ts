@@ -10,6 +10,11 @@ export interface ThemePreset {
   arch: string;        // hero arch shape color
   isDark: boolean;     // whether overall vibe is dark
   description: string;
+  navbarBg?: string;
+  navbarText?: string;
+  navbarActive?: string;
+  navbarCtaBg?: string;
+  navbarCtaText?: string;
 }
 
 export function hexToRgb(hex: string): { r: number; g: number; b: number } {
@@ -59,6 +64,11 @@ export const THEME_PRESETS: ThemePreset[] = [
     arch: '#FF5023',
     isDark: false,
     description: 'The signature editorial look: warm parchment canvas, deep espresso typography & rich terracotta accents.',
+    navbarBg: '#2B170F',
+    navbarText: '#FFF9F2',
+    navbarActive: '#C65D45',
+    navbarCtaBg: '#C65D45',
+    navbarCtaText: '#FFF9F2',
   },
   {
     id: 'midnight-luxury',
@@ -72,6 +82,11 @@ export const THEME_PRESETS: ThemePreset[] = [
     arch: '#D97706',
     isDark: true,
     description: 'Ultra-luxurious cinema suite: pitch obsidian background with prestigious 24K gold accents and crisp white typography.',
+    navbarBg: '#12141A',
+    navbarText: '#FFFFFF',
+    navbarActive: '#F59E0B',
+    navbarCtaBg: '#F59E0B',
+    navbarCtaText: '#08090C',
   },
   {
     id: 'nordic-ice',
@@ -85,6 +100,11 @@ export const THEME_PRESETS: ThemePreset[] = [
     arch: '#0284C7',
     isDark: true,
     description: 'Clean high-tech commercial look: deep navy abyss background with radiant electric cyan highlights.',
+    navbarBg: '#0E1726',
+    navbarText: '#F0F6FC',
+    navbarActive: '#00D2FF',
+    navbarCtaBg: '#00D2FF',
+    navbarCtaText: '#060B14',
   },
   {
     id: 'emerald-cinematic',
@@ -98,6 +118,11 @@ export const THEME_PRESETS: ThemePreset[] = [
     arch: '#059669',
     isDark: true,
     description: 'Analog film-lab aesthetic: deep dark forest canvas with luminous emerald green grading.',
+    navbarBg: '#0E2019',
+    navbarText: '#F2FBF6',
+    navbarActive: '#10B981',
+    navbarCtaBg: '#10B981',
+    navbarCtaText: '#06120D',
   },
   {
     id: 'cyber-crimson',
@@ -111,6 +136,11 @@ export const THEME_PRESETS: ThemePreset[] = [
     arch: '#E11D48',
     isDark: true,
     description: 'High-energy creator vibe: intense neon crimson highlights on stealth midnight obsidian.',
+    navbarBg: '#15131A',
+    navbarText: '#FFFFFF',
+    navbarActive: '#FF2A55',
+    navbarCtaBg: '#FF2A55',
+    navbarCtaText: '#0A090D',
   },
   {
     id: 'tokyo-neon-violet',
@@ -124,6 +154,11 @@ export const THEME_PRESETS: ThemePreset[] = [
     arch: '#7C3AED',
     isDark: true,
     description: 'Moody indie film studio vibes: cosmic dark plum void with vibrant fluorescent violet glows.',
+    navbarBg: '#141024',
+    navbarText: '#FAF5FF',
+    navbarActive: '#A855F7',
+    navbarCtaBg: '#A855F7',
+    navbarCtaText: '#090714',
   },
   {
     id: 'minimal-mono',
@@ -137,6 +172,11 @@ export const THEME_PRESETS: ThemePreset[] = [
     arch: '#F97316',
     isDark: false,
     description: 'Clean gallery design agency feel: pristine bright canvas with bold charcoal typography and punchy international orange.',
+    navbarBg: '#0F172A',
+    navbarText: '#FFFFFF',
+    navbarActive: '#EA580C',
+    navbarCtaBg: '#EA580C',
+    navbarCtaText: '#FFFFFF',
   },
   {
     id: 'sunset-amber',
@@ -150,5 +190,10 @@ export const THEME_PRESETS: ThemePreset[] = [
     arch: '#EA580C',
     isDark: true,
     description: 'Warm golden-hour cinema palette: deep roasted espresso wood tones and warm luminous sunset amber.',
+    navbarBg: '#1D1714',
+    navbarText: '#FFF8F0',
+    navbarActive: '#F97316',
+    navbarCtaBg: '#F97316',
+    navbarCtaText: '#110D0B',
   },
 ];

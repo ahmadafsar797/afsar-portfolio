@@ -63,15 +63,15 @@ export const ReelsSection: React.FC<ReelsSectionProps> = ({ reels, onOpenLightbo
         </div>
 
         {/* Category Filters */}
-        <div ref={filtersRef} className="flex items-center gap-2 overflow-x-auto pb-4 mb-10 scrollbar-none">
-          <div className="flex items-center gap-2 pr-4">
+        <div ref={filtersRef} className="w-full mb-10">
+          <div className="flex flex-wrap items-center gap-2.5 sm:gap-3.5 p-1.5 sm:p-2">
             {categories.map((cat) => {
               const active = selectedCategory === cat;
               return (
                 <button
                   key={cat}
                   onClick={() => setSelectedCategory(cat)}
-                  className={`group/filter relative text-sm sm:text-base font-sans uppercase tracking-wider px-6 sm:px-7 py-2.5 sm:py-3 rounded-full whitespace-nowrap transition-all duration-300 cursor-pointer font-bold ${
+                  className={`group/filter relative text-xs sm:text-sm md:text-base font-sans uppercase tracking-wider px-5 sm:px-7 py-2.5 sm:py-3 rounded-full whitespace-nowrap transition-all duration-300 cursor-pointer font-bold ${
                     active
                       ? 'bg-gradient-to-r from-[#C65D45] via-[#D8684F] to-[#E2725B] text-[#FFF9F2] shadow-[0_4px_20px_rgba(198,93,69,0.45)] scale-105 border border-[#C65D45]/60 font-black'
                       : 'bg-[#2B170F]/10 hover:bg-[#2B170F]/15 text-[#2B170F]/80 hover:text-[#2B170F] border border-[#2B170F]/10 font-bold'

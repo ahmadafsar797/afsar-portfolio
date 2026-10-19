@@ -20,6 +20,11 @@ export const ThemeStudioTab: React.FC<ThemeStudioTabProps> = ({
   const [muted, setMuted] = useState<string>(settings.theme_muted_color || '#756A62');
   const [primary, setPrimary] = useState<string>(settings.theme_primary_color || '#C65D45');
   const [arch, setArch] = useState<string>(settings.hero_arch_color || '#FF5023');
+  const [navBg, setNavBg] = useState<string>(settings.navbar_bg_color || '#2B170F');
+  const [navText, setNavText] = useState<string>(settings.navbar_text_color || '#FFF9F2');
+  const [navActive, setNavActive] = useState<string>(settings.navbar_active_color || settings.theme_primary_color || '#C65D45');
+  const [navCtaBg, setNavCtaBg] = useState<string>(settings.navbar_cta_bg_color || settings.theme_primary_color || '#C65D45');
+  const [navCtaText, setNavCtaText] = useState<string>(settings.navbar_cta_text_color || '#FFF9F2');
   const [activePreset, setActivePreset] = useState<string>(settings.theme_preset || 'warm-terracotta');
   const [saving, setSaving] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
@@ -35,6 +40,11 @@ export const ThemeStudioTab: React.FC<ThemeStudioTabProps> = ({
     if (settings.theme_primary_color) setPrimary(settings.theme_primary_color);
     if (settings.hero_arch_color) setArch(settings.hero_arch_color);
     if (settings.theme_preset) setActivePreset(settings.theme_preset);
+    if (settings.navbar_bg_color) setNavBg(settings.navbar_bg_color);
+    if (settings.navbar_text_color) setNavText(settings.navbar_text_color);
+    if (settings.navbar_active_color) setNavActive(settings.navbar_active_color);
+    if (settings.navbar_cta_bg_color) setNavCtaBg(settings.navbar_cta_bg_color);
+    if (settings.navbar_cta_text_color) setNavCtaText(settings.navbar_cta_text_color);
   }, [settings]);
 
   const handleSelectPreset = (preset: ThemePreset) => {
@@ -45,6 +55,11 @@ export const ThemeStudioTab: React.FC<ThemeStudioTabProps> = ({
     setMuted(preset.muted);
     setPrimary(preset.primary);
     setArch(preset.arch);
+    if (preset.navbarBg) setNavBg(preset.navbarBg);
+    if (preset.navbarText) setNavText(preset.navbarText);
+    if (preset.navbarActive) setNavActive(preset.navbarActive);
+    if (preset.navbarCtaBg) setNavCtaBg(preset.navbarCtaBg);
+    if (preset.navbarCtaText) setNavCtaText(preset.navbarCtaText);
     setHasUnsavedChanges(true);
   };
 
@@ -61,6 +76,11 @@ export const ThemeStudioTab: React.FC<ThemeStudioTabProps> = ({
         theme_primary_color: primary,
         hero_arch_color: arch,
         hero_text_theme: isDark ? 'light' : 'dark',
+        navbar_bg_color: navBg,
+        navbar_text_color: navText,
+        navbar_active_color: navActive,
+        navbar_cta_bg_color: navCtaBg,
+        navbar_cta_text_color: navCtaText,
       };
       await onUpdateSettings(updated);
       setHasUnsavedChanges(false);
@@ -312,6 +332,139 @@ export const ThemeStudioTab: React.FC<ThemeStudioTabProps> = ({
               </button>
             );
           })}
+        </div>
+      </div>
+
+      {/* ── NAVBAR & HEADER COLOR STUDIO (REFERENCE IMAGE 2) ── */}
+      <div className="p-6 rounded-2xl bg-[#101018] border border-white/10 space-y-6">
+        <div>
+          <div className="flex items-center gap-2">
+            <h4 className="text-sm font-bold text-white uppercase tracking-wider">
+              Navbar & Header Colors (Reference Screenshot)
+            </h4>
+            <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#C65D45]/20 text-[#C65D45] font-semibold uppercase tracking-wider">
+              Header Theme
+            </span>
+          </div>
+          <p className="text-xs text-white/50 mt-0.5">
+            Customize the floating navbar capsule background, 'Afsar Ahmad' brand text, active nav links, and 'Contact Me' CTA button.
+          </p>
+        </div>
+
+        {/* Live Navbar Visual Preview Simulation */}
+        <div className="p-5 rounded-2xl bg-black/40 border border-white/10 space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-white/50">
+              Live Navbar Visual Preview
+            </span>
+            <span className="text-[10px] text-white/40">Real-time simulation</span>
+          </div>
+
+          <div
+            className="w-full flex items-center justify-between px-4 sm:px-6 py-3 rounded-full border border-white/15 shadow-2xl transition-all"
+            style={{ backgroundColor: navBg, color: navText }}
+          >
+            {/* Brand */}
+            <div className="flex items-center gap-2.5">
+              <div
+                className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs shadow-md shrink-0"
+                style={{ backgroundColor: navActive, color: navBg }}
+              >
+                A
+              </div>
+              <span className="font-bold text-sm tracking-tight" style={{ color: navText }}>
+                Afsar Ahmad
+              </span>
+            </div>
+
+            {/* Nav Links */}
+            <div className="hidden sm:flex items-center gap-5 lg:gap-7 text-xs font-bold">
+              <span className="relative pb-0.5" style={{ color: navActive }}>
+                Home
+                <span className="absolute bottom-0 left-0 w-full h-0.5" style={{ backgroundColor: navActive }} />
+              </span>
+              <span style={{ color: navText, opacity: 0.85 }}>Services</span>
+              <span style={{ color: navText, opacity: 0.85 }}>About</span>
+              <span style={{ color: navText, opacity: 0.85 }}>Reels</span>
+              <span style={{ color: navText, opacity: 0.85 }}>Testimonials</span>
+              <span style={{ color: navText, opacity: 0.85 }}>Contact</span>
+            </div>
+
+            {/* Contact Me CTA */}
+            <div
+              className="px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wide shadow-md transition-all shrink-0"
+              style={{
+                backgroundColor: navCtaBg,
+                color: navCtaText,
+                boxShadow: `0 2px 12px ${navCtaBg}66`,
+              }}
+            >
+              Contact Me
+            </div>
+          </div>
+        </div>
+
+        {/* Navbar 5 Color Pickers Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {/* 1. Navbar Capsule Background */}
+          <ColorPickerCard
+            label="Navbar Background Capsule"
+            description="Background color of the floating header capsule bar"
+            value={navBg}
+            onChange={(val) => {
+              setNavBg(val);
+              setActivePreset('custom');
+              setHasUnsavedChanges(true);
+            }}
+          />
+
+          {/* 2. Navbar Brand & Links Text */}
+          <ColorPickerCard
+            label="Navbar Text & Brand Color"
+            description="Color of 'Afsar Ahmad' brand name and regular nav links"
+            value={navText}
+            onChange={(val) => {
+              setNavText(val);
+              setActivePreset('custom');
+              setHasUnsavedChanges(true);
+            }}
+          />
+
+          {/* 3. Active Nav Link & Underline */}
+          <ColorPickerCard
+            label="Active Nav Link & Indicator"
+            description="Highlight color for active page section link & underline"
+            value={navActive}
+            onChange={(val) => {
+              setNavActive(val);
+              setActivePreset('custom');
+              setHasUnsavedChanges(true);
+            }}
+          />
+
+          {/* 4. Navbar CTA Button Background */}
+          <ColorPickerCard
+            label="Navbar 'Contact Me' CTA Button"
+            description="Background of the 'Contact Me' button in the navbar"
+            value={navCtaBg}
+            onChange={(val) => {
+              setNavCtaBg(val);
+              setActivePreset('custom');
+              setHasUnsavedChanges(true);
+            }}
+          />
+
+          {/* 5. Navbar CTA Button Text */}
+          <ColorPickerCard
+            label="Navbar CTA Button Text"
+            description="Text color inside the 'Contact Me' button"
+            value={navCtaText}
+            onChange={(val) => {
+              setNavCtaText(val);
+              setActivePreset('custom');
+              setHasUnsavedChanges(true);
+            }}
+          />
         </div>
       </div>
 

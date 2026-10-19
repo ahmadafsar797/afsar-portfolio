@@ -143,6 +143,11 @@ export interface SettingsData {
   theme_text_color?: string;
   theme_muted_color?: string;
   theme_primary_color?: string;
+  navbar_bg_color?: string;
+  navbar_text_color?: string;
+  navbar_active_color?: string;
+  navbar_cta_bg_color?: string;
+  navbar_cta_text_color?: string;
 }
 
 export interface ContactMessage {

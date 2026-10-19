@@ -19,6 +19,12 @@ export const ThemeInjector: React.FC<ThemeInjectorProps> = ({ settings }) => {
   const elevatedSurface = isDark ? surface : '#2B170F';
   const tactilePillBg = isDark ? adjustBrightness(canvas, 10) : '#180E09';
 
+  const navBg = settings?.navbar_bg_color || elevatedSurface;
+  const navText = settings?.navbar_text_color || (isDark ? '#FFFFFF' : '#FFF9F2');
+  const navActive = settings?.navbar_active_color || primary;
+  const navCtaBg = settings?.navbar_cta_bg_color || primary;
+  const navCtaText = settings?.navbar_cta_text_color || '#FFFFFF';
+
   const primaryRgb = hexToRgb(primary);
   const primaryLight = adjustBrightness(primary, 18);
   const primaryGlow = `rgba(${primaryRgb.r}, ${primaryRgb.g}, ${primaryRgb.b}, 0.45)`;
@@ -140,11 +146,11 @@ export const ThemeInjector: React.FC<ThemeInjectorProps> = ({ settings }) => {
       /* 5. Navbar Capsule, Bold Nav Links & Mobile Menu */
       header [class~="bg-[#2B170F]"],
       .navbar-capsule {
-        background-color: ${elevatedSurface} !important;
+        background-color: ${navBg} !important;
         border-color: ${isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(255, 255, 255, 0.1)'} !important;
       }
       header [class*="text-[#FFF9F2]"] {
-        color: ${isDark ? '#FFFFFF' : '#FFF9F2'} !important;
+        color: ${navText} !important;
       }
       header nav a,
       header nav span,
@@ -153,7 +159,7 @@ export const ThemeInjector: React.FC<ThemeInjectorProps> = ({ settings }) => {
         font-weight: 700 !important;
       }
       header .sm\\:hidden[class*="bg-[#2B170F]"] {
-        background-color: ${elevatedSurface} !important;
+        background-color: ${navBg} !important;
         border-color: ${isDark ? 'rgba(255, 255, 255, 0.15)' : 'rgba(255, 255, 255, 0.15)'} !important;
       }
 
@@ -326,7 +332,7 @@ export const ThemeInjector: React.FC<ThemeInjectorProps> = ({ settings }) => {
     `;
 
     return () => {};
-  }, [canvas, surface, text, muted, primary, arch, isDark, borderSubtle, elevatedSurface, tactilePillBg, primaryLight, primaryGlow, primaryGlowStrong, buttonTextColor]);
+  }, [canvas, surface, text, muted, primary, arch, isDark, borderSubtle, elevatedSurface, tactilePillBg, primaryLight, primaryGlow, primaryGlowStrong, buttonTextColor, navBg, navText, navActive, navCtaBg, navCtaText]);
 
   return null;
 };

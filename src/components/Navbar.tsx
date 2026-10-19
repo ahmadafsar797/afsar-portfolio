@@ -31,6 +31,13 @@ export const Navbar: React.FC<NavbarProps> = ({ settings, onOpenAdmin, isAdminLo
 
   const profilePicUrl = settings?.profile_picture_url || null;
 
+  // Dynamic Theme Colors for Navbar
+  const navBg = settings?.navbar_bg_color || '#2B170F';
+  const navText = settings?.navbar_text_color || '#FFF9F2';
+  const navActive = settings?.navbar_active_color || settings?.theme_primary_color || '#C65D45';
+  const navCtaBg = settings?.navbar_cta_bg_color || settings?.theme_primary_color || '#C65D45';
+  const navCtaText = settings?.navbar_cta_text_color || '#FFF9F2';
+
   /* ── Scroll: hide/show + shadow ─────────────────────────────── */
   useEffect(() => {
     const handleScroll = () => {
@@ -124,9 +131,13 @@ export const Navbar: React.FC<NavbarProps> = ({ settings, onOpenAdmin, isAdminLo
     >
       <div className="w-full max-w-[1720px] 2xl:max-w-[1880px] mx-auto pointer-events-auto">
         <div
-          className={`flex items-center justify-between px-3.5 sm:px-8 md:px-10 xl:px-12 py-2.5 sm:py-4 md:py-4.5 rounded-full bg-[#2B170F] text-[#FFF9F2] shadow-2xl border border-white/10 transition-shadow duration-300 ${
-            scrolled ? 'bg-[#2B170F]/95 backdrop-blur-xl shadow-black/35 py-2.5 md:py-3.5' : ''
+          className={`navbar-capsule flex items-center justify-between px-3.5 sm:px-8 md:px-10 xl:px-12 py-2.5 sm:py-4 md:py-4.5 rounded-full shadow-2xl border border-white/10 transition-shadow duration-300 ${
+            scrolled ? 'backdrop-blur-xl shadow-black/35 py-2.5 md:py-3.5' : ''
           }`}
+          style={{
+            backgroundColor: scrolled ? `${navBg}F2` : navBg,
+            color: navText,
+          }}
         >
           {/* Brand */}
           <a
@@ -134,7 +145,13 @@ export const Navbar: React.FC<NavbarProps> = ({ settings, onOpenAdmin, isAdminLo
             onClick={() => handleNavClick('home')}
             className="flex items-center gap-2.5 sm:gap-3.5 group shrink-0"
           >
-            <div className="w-9 h-9 sm:w-11 sm:h-11 md:w-12 md:h-12 rounded-full bg-[#C65D45] text-[#2B170F] flex items-center justify-center font-pogonia font-bold text-base sm:text-xl shadow-md group-hover:scale-105 transition-transform duration-300 overflow-hidden shrink-0">
+            <div
+              className="w-9 h-9 sm:w-11 sm:h-11 md:w-12 md:h-12 rounded-full flex items-center justify-center font-pogonia font-bold text-base sm:text-xl shadow-md group-hover:scale-105 transition-transform duration-300 overflow-hidden shrink-0"
+              style={{
+                backgroundColor: navActive,
+                color: navBg,
+              }}
+            >
               {profilePicUrl && !imgError ? (
                 <img
                   src={profilePicUrl}
@@ -146,7 +163,11 @@ export const Navbar: React.FC<NavbarProps> = ({ settings, onOpenAdmin, isAdminLo
                 <span>A</span>
               )}
             </div>
-            <span data-font="nav" className="font-nav font-pogonia text-lg sm:text-2xl md:text-[26px] font-bold tracking-tight text-[#FFF9F2] group-hover:text-[#C65D45] transition-colors duration-300 whitespace-nowrap">
+            <span
+              data-font="nav"
+              className="font-nav font-pogonia text-lg sm:text-2xl md:text-[26px] font-bold tracking-tight transition-colors duration-300 whitespace-nowrap"
+              style={{ color: navText }}
+            >
               Afsar Ahmad
             </span>
           </a>
@@ -158,18 +179,19 @@ export const Navbar: React.FC<NavbarProps> = ({ settings, onOpenAdmin, isAdminLo
                 key={link.name}
                 href={link.href}
                 onClick={() => handleNavClick(link.sectionId)}
-                className={`text-sm lg:text-base font-sans font-bold tracking-wide transition-all duration-200 relative group/link ${
-                  isActive(link.sectionId)
-                    ? 'text-[#C65D45]'
-                    : 'text-[#FFF9F2]/90 hover:text-[#FFF9F2]'
-                }`}
+                className="text-sm lg:text-base font-sans font-bold tracking-wide transition-all duration-200 relative group/link"
+                style={{
+                  color: isActive(link.sectionId) ? navActive : navText,
+                  opacity: isActive(link.sectionId) ? 1 : 0.88,
+                }}
               >
                 {link.name}
                 {/* Active / hover underline */}
                 <span
-                  className={`absolute -bottom-0.5 left-0 h-0.5 bg-[#C65D45] transition-all duration-300 ${
+                  className={`absolute -bottom-0.5 left-0 h-0.5 transition-all duration-300 ${
                     isActive(link.sectionId) ? 'w-full' : 'w-0 group-hover/link:w-full'
                   }`}
+                  style={{ backgroundColor: navActive }}
                 />
               </a>
             ))}
@@ -181,12 +203,17 @@ export const Navbar: React.FC<NavbarProps> = ({ settings, onOpenAdmin, isAdminLo
               href="#contact"
               onClick={() => handleNavClick('contact')}
               data-cursor="open"
-              className="group/navbtn relative px-5 sm:px-6 md:px-7 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-sans font-black text-[#FFF9F2] bg-gradient-to-r from-[#C65D45] via-[#D8684F] to-[#E2725B] uppercase tracking-wide hover:shadow-[0_0_28px_rgba(198,93,69,0.65)] hover:scale-105 active:scale-95 transition-all duration-300 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),0_4px_12px_rgba(0,0,0,0.3)] border border-white/25 cursor-pointer"
+              className="group/navbtn relative px-5 sm:px-6 md:px-7 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-sans font-black uppercase tracking-wide hover:scale-105 active:scale-95 transition-all duration-300 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),0_4px_12px_rgba(0,0,0,0.3)] border border-white/25 cursor-pointer"
+              style={{
+                backgroundColor: navCtaBg,
+                color: navCtaText,
+                boxShadow: `0 4px 18px ${navCtaBg}66`,
+              }}
             >
               <span className="absolute inset-0 rounded-full overflow-hidden pointer-events-none">
                 <span className="absolute inset-0 -translate-x-full group-hover/navbtn:translate-x-full group-active/navbtn:translate-x-full transition-transform duration-500 bg-gradient-to-r from-transparent via-white/25 to-transparent" />
               </span>
-              <span className="relative">Contact Me</span>
+              <span className="relative" style={{ color: navCtaText }}>Contact Me</span>
             </a>
           </div>
 
@@ -195,16 +222,22 @@ export const Navbar: React.FC<NavbarProps> = ({ settings, onOpenAdmin, isAdminLo
             <a
               href="#contact"
               onClick={() => handleNavClick('contact')}
-              className="group/mobilebtn relative px-3 py-1.5 rounded-full text-[11px] font-sans font-black text-[#FFF9F2] bg-gradient-to-r from-[#C65D45] to-[#D8684F] uppercase tracking-wide hover:shadow-[0_0_16px_rgba(198,93,69,0.5)] active:scale-95 transition-all whitespace-nowrap border border-white/20"
+              className="group/mobilebtn relative px-3 py-1.5 rounded-full text-[11px] font-sans font-black uppercase tracking-wide active:scale-95 transition-all whitespace-nowrap border border-white/20"
+              style={{
+                backgroundColor: navCtaBg,
+                color: navCtaText,
+                boxShadow: `0 2px 10px ${navCtaBg}55`,
+              }}
             >
               <span className="absolute inset-0 rounded-full overflow-hidden pointer-events-none">
                 <span className="absolute inset-0 -translate-x-full group-hover/mobilebtn:translate-x-full group-active/mobilebtn:translate-x-full transition-transform duration-500 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
               </span>
-              <span className="relative">Contact</span>
+              <span className="relative" style={{ color: navCtaText }}>Contact</span>
             </a>
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-1.5 rounded-full text-[#FFF9F2] hover:bg-white/10 active:scale-90 transition-all cursor-pointer"
+              className="p-1.5 rounded-full hover:bg-white/10 active:scale-90 transition-all cursor-pointer"
+              style={{ color: navText }}
               aria-label="Toggle menu"
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -216,19 +249,24 @@ export const Navbar: React.FC<NavbarProps> = ({ settings, onOpenAdmin, isAdminLo
         {mobileMenuOpen && (
           <div
             ref={mobileMenuRef}
-            className="sm:hidden mt-3 p-5 rounded-3xl bg-[#2B170F] border border-white/15 shadow-2xl text-[#FFF9F2] space-y-3"
-            style={{ clipPath: 'inset(0% 0% 100% 0%)', opacity: 0 }}
+            className="sm:hidden mt-3 p-5 rounded-3xl border border-white/15 shadow-2xl space-y-3"
+            style={{
+              backgroundColor: navBg,
+              color: navText,
+              clipPath: 'inset(0% 0% 100% 0%)',
+              opacity: 0,
+            }}
           >
             {NAV_LINKS.map((link) => (
               <a
                 key={link.name}
                 href={link.href}
                 onClick={() => handleNavClick(link.sectionId)}
-                className={`block py-2.5 px-4 rounded-xl text-base font-sans font-bold transition-all duration-200 ${
-                  isActive(link.sectionId)
-                    ? 'text-[#C65D45] bg-white/10'
-                    : 'text-[#FFF9F2]/90 hover:bg-white/5'
-                }`}
+                className="block py-2.5 px-4 rounded-xl text-base font-sans font-bold transition-all duration-200"
+                style={{
+                  color: isActive(link.sectionId) ? navActive : navText,
+                  backgroundColor: isActive(link.sectionId) ? 'rgba(255, 255, 255, 0.1)' : 'transparent',
+                }}
               >
                 {link.name}
               </a>
