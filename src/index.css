@@ -146,13 +146,24 @@ body {
   font-weight: 500;
 }
 
-/* Medium thickness (500) for regular text, paragraphs, and descriptions */
-p, blockquote {
+/* Medium thickness (500) strictly across all body text, paragraphs, and descriptions — no 300 Light or 400 Regular */
+body, p, blockquote, label, span, a, li, input, textarea {
   font-weight: 500;
 }
 
+.font-light,
+.font-extralight,
+.font-thin,
 .font-normal {
   font-weight: 500 !important;
+}
+
+/* Navbar Navigation Links: explicitly Bold (700) */
+header nav,
+header nav a,
+header nav a span,
+[data-font="nav"] {
+  font-weight: 700 !important;
 }
 
 .font-badge {

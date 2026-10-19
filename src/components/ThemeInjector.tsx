@@ -137,7 +137,7 @@ export const ThemeInjector: React.FC<ThemeInjectorProps> = ({ settings }) => {
         fill: ${buttonTextColor} !important;
       }
 
-      /* 5. Navbar Capsule & Mobile Menu */
+      /* 5. Navbar Capsule, Bold Nav Links & Mobile Menu */
       header [class~="bg-[#2B170F]"],
       .navbar-capsule {
         background-color: ${elevatedSurface} !important;
@@ -146,9 +146,23 @@ export const ThemeInjector: React.FC<ThemeInjectorProps> = ({ settings }) => {
       header [class*="text-[#FFF9F2]"] {
         color: ${isDark ? '#FFFFFF' : '#FFF9F2'} !important;
       }
+      header nav a,
+      header nav span,
+      header .sm\\:hidden a,
+      [data-font="nav"] {
+        font-weight: 700 !important;
+      }
       header .sm\\:hidden[class*="bg-[#2B170F]"] {
         background-color: ${elevatedSurface} !important;
         border-color: ${isDark ? 'rgba(255, 255, 255, 0.15)' : 'rgba(255, 255, 255, 0.15)'} !important;
+      }
+
+      /* Strictly enforce minimum 500 Medium — no 300 Light or 400 Regular */
+      .font-light,
+      .font-extralight,
+      .font-thin,
+      .font-normal {
+        font-weight: 500 !important;
       }
 
       /* 6. Hero Tactile Switch & Secondary Pill Buttons */

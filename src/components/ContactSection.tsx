@@ -109,7 +109,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ settings, presel
                 </div>
               </div>
 
-              <p className="text-sm sm:text-base lg:text-lg text-white/75 leading-relaxed font-light max-w-3xl">
+              <p className="text-sm sm:text-base lg:text-lg text-white/85 leading-relaxed font-medium max-w-3xl">
                 Great edits come from clear creative communication. Drop me a message with your project vision, reference reels, or raw ideas, and let's bring it to life.
               </p>
 

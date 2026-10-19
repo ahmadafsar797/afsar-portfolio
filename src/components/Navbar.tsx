@@ -158,16 +158,16 @@ export const Navbar: React.FC<NavbarProps> = ({ settings, onOpenAdmin, isAdminLo
                 key={link.name}
                 href={link.href}
                 onClick={() => handleNavClick(link.sectionId)}
-                className={`text-sm lg:text-base font-sans tracking-wide transition-all duration-200 relative group/link ${
+                className={`text-sm lg:text-base font-sans font-bold tracking-wide transition-all duration-200 relative group/link ${
                   isActive(link.sectionId)
-                    ? 'text-[#C65D45] font-bold'
-                    : 'text-[#FFF9F2]/85 hover:text-[#FFF9F2] font-medium'
+                    ? 'text-[#C65D45]'
+                    : 'text-[#FFF9F2]/90 hover:text-[#FFF9F2]'
                 }`}
               >
                 {link.name}
                 {/* Active / hover underline */}
                 <span
-                  className={`absolute -bottom-0.5 left-0 h-px bg-[#C65D45] transition-all duration-300 ${
+                  className={`absolute -bottom-0.5 left-0 h-0.5 bg-[#C65D45] transition-all duration-300 ${
                     isActive(link.sectionId) ? 'w-full' : 'w-0 group-hover/link:w-full'
                   }`}
                 />
@@ -236,10 +236,10 @@ export const Navbar: React.FC<NavbarProps> = ({ settings, onOpenAdmin, isAdminLo
                 key={link.name}
                 href={link.href}
                 onClick={() => handleNavClick(link.sectionId)}
-                className={`block py-2.5 px-4 rounded-xl text-base font-sans transition-all duration-200 ${
+                className={`block py-2.5 px-4 rounded-xl text-base font-sans font-bold transition-all duration-200 ${
                   isActive(link.sectionId)
-                    ? 'text-[#C65D45] font-bold bg-white/10'
-                    : 'text-[#FFF9F2]/85 hover:bg-white/5'
+                    ? 'text-[#C65D45] bg-white/10'
+                    : 'text-[#FFF9F2]/90 hover:bg-white/5'
                 }`}
               >
                 {link.name}

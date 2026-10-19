@@ -805,7 +805,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
               <Shield className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="font-pogonia text-2xl font-normal text-white">
+              <h2 className="font-pogonia text-2xl font-bold text-white">
                 Studio Portfolio Manager
               </h2>
               <p className="text-[10px] font-montserrat uppercase tracking-wider text-white/50">
@@ -919,7 +919,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                 <div className="w-12 h-12 rounded-2xl bg-[#C65D45]/10 border border-[#C65D45]/30 flex items-center justify-center mx-auto mb-3 text-[#C65D45]">
                   <Film className="w-6 h-6" />
                 </div>
-                <h3 className="font-pogonia text-3xl font-normal text-white">
+                <h3 className="font-pogonia text-3xl font-bold text-white">
                   Editor Portal Authentication
                 </h3>
                 <p className="text-xs text-white/50 mt-1">
@@ -1108,7 +1108,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
               {activeTab === 'overview' && (
                 <div className="space-y-8">
                   <div>
-                    <h3 className="font-pogonia text-3xl font-normal text-white mb-1">
+                    <h3 className="font-pogonia text-3xl font-bold text-white mb-1">
                       Portfolio Performance & Operations
                     </h3>
                     <p className="text-xs text-white/50">
@@ -1199,7 +1199,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                 <div className="space-y-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h3 className="font-pogonia text-3xl font-normal text-white">
+                      <h3 className="font-pogonia text-3xl font-bold text-white">
                         Manage 9:16 Vertical Reels
                       </h3>
                       <p className="text-xs text-white/50">
@@ -1605,7 +1605,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                 <div className="space-y-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h3 className="font-pogonia text-3xl font-normal text-white">
+                      <h3 className="font-pogonia text-3xl font-bold text-white">
                         Manage 16:9 Horizontal Videos
                       </h3>
                       <p className="text-xs text-white/50">
@@ -2036,7 +2036,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                 <div className="space-y-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h3 className="font-pogonia text-3xl font-normal text-white">
+                      <h3 className="font-pogonia text-3xl font-bold text-white">
                         Manage Client Video Testimonials
                       </h3>
                       <p className="text-xs text-white/50">
@@ -2337,7 +2337,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                 <div className="space-y-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h3 className="font-pogonia text-3xl font-normal text-white">
+                      <h3 className="font-pogonia text-3xl font-bold text-white">
                         Manage Offered Services
                       </h3>
                       <p className="text-xs text-white/50">
@@ -2522,7 +2522,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
               {activeTab === 'about' && about && (
                 <div className="space-y-6 max-w-3xl">
                   <div>
-                    <h3 className="font-pogonia text-3xl font-normal text-white">
+                    <h3 className="font-pogonia text-3xl font-bold text-white">
                       Edit About & Career Statement
                     </h3>
                     <p className="text-xs text-white/50">
@@ -2618,7 +2618,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/10">
                     <div>
                       <div className="flex items-center gap-2.5">
-                        <h3 className="font-pogonia text-3xl font-normal text-white">
+                        <h3 className="font-pogonia text-3xl font-bold text-white">
                           Landing Page Background Video
                         </h3>
                         <span
@@ -3104,7 +3104,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
               {activeTab === 'settings' && (
                 <div className="space-y-6 max-w-3xl">
                   <div>
-                    <h3 className="font-pogonia text-3xl font-normal text-white">
+                    <h3 className="font-pogonia text-3xl font-bold text-white">
                       Studio Settings & Social Links
                     </h3>
                     <p className="text-xs text-white/50">

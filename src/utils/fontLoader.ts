@@ -65,9 +65,7 @@ export interface FontWeightOption {
 }
 
 export const FONT_WEIGHT_OPTIONS: FontWeightOption[] = [
-  { value: '300', label: '300 — Light' },
-  { value: '400', label: '400 — Regular' },
-  { value: '500', label: '500 — Medium' },
+  { value: '500', label: '500 — Medium (Standard Body)' },
   { value: '600', label: '600 — Semi-Bold' },
   { value: '700', label: '700 — Bold' },
   { value: '800', label: '800 — Extra Bold' },
@@ -106,7 +104,7 @@ export function loadGoogleFont(fontName?: string) {
   link.id = linkId;
   link.rel = 'stylesheet';
   const encodedName = clean.replace(/\s+/g, '+');
-  link.href = `https://fonts.googleapis.com/css2?family=${encodedName}:ital,wght@0,300..900;1,300..900&display=swap`;
+  link.href = `https://fonts.googleapis.com/css2?family=${encodedName}:ital,wght@0,500..900;1,500..900&display=swap`;
 
   link.onerror = () => {
     // Fallback without weight range for single-weight fonts
@@ -127,13 +125,17 @@ function resolveFont(font?: string, fallback: string = 'Montserrat') {
 }
 
 /**
- * Resolves a font weight with fallback
+ * Resolves a font weight with fallback, strictly preventing regular (400) or light (300)
  */
-function resolveWeight(weight?: string, fallback: string = '400') {
+function resolveWeight(weight?: string, fallback: string = '500') {
   if (!weight || weight.trim().toLowerCase() === 'inherit' || weight.trim() === '') {
     return fallback;
   }
-  return weight.trim();
+  const clean = weight.trim();
+  if (clean === '300' || clean === '400') {
+    return '500';
+  }
+  return clean;
 }
 
 /**
@@ -162,14 +164,14 @@ export function applyDynamicFonts(
   const badgeFont = resolveFont(settings.badge_font, bFont);
   const navFont = resolveFont(settings.nav_font, bFont);
 
-  // Weights
+  // Weights (Default body weight is 500 Medium, nav weight is 700 Bold)
   const hWeight = resolveWeight(settings.heading_font_weight, '700');
-  const bWeight = resolveWeight(settings.body_font_weight, '400');
+  const bWeight = resolveWeight(settings.body_font_weight, '500');
   const heroWeight = resolveWeight(settings.hero_title_font_weight, hWeight);
   const secWeight = resolveWeight(settings.section_title_font_weight, hWeight);
   const ctaWeight = resolveWeight(settings.cta_font_weight, '700');
   const badgeWeight = resolveWeight(settings.badge_font_weight, '600');
-  const navWeight = resolveWeight(settings.nav_font_weight, '600');
+  const navWeight = resolveWeight(settings.nav_font_weight, '700');
 
   // Load all selected Google fonts
   [hFont, bFont, heroFont, secFont, ctaFont, badgeFont, navFont].forEach(loadGoogleFont);
@@ -234,6 +236,11 @@ export function applyDynamicFonts(
     .font-montserrat, .font-sans, .font-ui, body, p, blockquote, label {
       font-family: var(--font-custom-body) !important;
       font-weight: var(--font-weight-custom-body) !important;
+    }
+
+    /* Enforce minimum 500 Medium across site — strictly no 300 Light or 400 Regular */
+    .font-light, .font-extralight, .font-thin, .font-normal {
+      font-weight: 500 !important;
     }
 
     /* Specific: Hero Main Title (Highest Specificity for Hero) */
