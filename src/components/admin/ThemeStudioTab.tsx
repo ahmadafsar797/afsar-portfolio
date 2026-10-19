@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Palette, Check, RotateCcw, Save, Sparkles, Eye, ArrowUpRight, Play } from 'lucide-react';
 import { SettingsData } from '../../types';
-import { THEME_PRESETS, ThemePreset } from '../../utils/themePresets';
+import { THEME_PRESETS, ThemePreset, getLuminance } from '../../utils/themePresets';
 
 interface ThemeStudioTabProps {
   settings: SettingsData;
@@ -23,6 +23,9 @@ export const ThemeStudioTab: React.FC<ThemeStudioTabProps> = ({
   const [activePreset, setActivePreset] = useState<string>(settings.theme_preset || 'warm-terracotta');
   const [saving, setSaving] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+
+  const isDark = getLuminance(canvas) < 0.4;
+  const btnTextColor = getLuminance(primary) > 0.48 ? '#0B0B0E' : '#FFFFFF';
 
   useEffect(() => {
     if (settings.theme_canvas_color) setCanvas(settings.theme_canvas_color);
@@ -57,6 +60,7 @@ export const ThemeStudioTab: React.FC<ThemeStudioTabProps> = ({
         theme_muted_color: muted,
         theme_primary_color: primary,
         hero_arch_color: arch,
+        hero_text_theme: isDark ? 'light' : 'dark',
       };
       await onUpdateSettings(updated);
       setHasUnsavedChanges(false);
@@ -152,8 +156,8 @@ export const ThemeStudioTab: React.FC<ThemeStudioTabProps> = ({
             </div>
             <div className="flex items-center gap-2">
               <span
-                className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider"
-                style={{ backgroundColor: primary, color: '#ffffff' }}
+                className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-sm transition-all"
+                style={{ backgroundColor: primary, color: btnTextColor }}
               >
                 Book Project
               </span>
@@ -196,7 +200,7 @@ export const ThemeStudioTab: React.FC<ThemeStudioTabProps> = ({
               <div className="pt-2 flex items-center gap-3">
                 <div
                   className="px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-md transition-all"
-                  style={{ backgroundColor: primary, color: '#ffffff' }}
+                  style={{ backgroundColor: primary, color: btnTextColor }}
                 >
                   <Play className="w-3 h-3 fill-current" />
                   <span>Watch Showreel</span>
@@ -204,8 +208,8 @@ export const ThemeStudioTab: React.FC<ThemeStudioTabProps> = ({
                 <div
                   className="px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider border transition-all"
                   style={{
-                    backgroundColor: surface,
-                    borderColor: 'rgba(128,128,128,0.25)',
+                    backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : surface,
+                    borderColor: isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.15)',
                     color: text,
                   }}
                 >

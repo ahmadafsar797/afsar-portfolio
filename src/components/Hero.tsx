@@ -2,6 +2,7 @@ import React, { useRef, useEffect } from 'react';
 import { Play, ArrowUpRight } from 'lucide-react';
 import { SettingsData, AboutData } from '../types';
 import { gsap } from 'gsap';
+import { getLuminance } from '../utils/themePresets';
 
 interface HeroProps {
   settings?: SettingsData;
@@ -142,7 +143,8 @@ export const Hero: React.FC<HeroProps> = ({ settings, onWatchShowreel }) => {
   const overlayStyle = settings?.hero_bg_video_overlay || 'warm'; // 'warm' | 'dark' | 'none'
   const overlayOpacity = (Number(settings?.hero_bg_video_overlay_opacity ?? '65')) / 100;
   const videoBlur = Number(settings?.hero_bg_video_blur ?? '0');
-  const isDarkTheme = settings?.hero_text_theme === 'light' || (hasBgVideo && overlayStyle === 'dark' && settings?.hero_text_theme !== 'dark');
+  const isThemeDark = settings?.theme_canvas_color ? getLuminance(settings.theme_canvas_color) < 0.4 : false;
+  const isDarkTheme = isThemeDark || settings?.hero_text_theme === 'light' || (hasBgVideo && overlayStyle === 'dark' && settings?.hero_text_theme !== 'dark');
 
   return (
     <section
