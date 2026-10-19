@@ -12,6 +12,7 @@ import { ContactSection } from './components/ContactSection';
 import { Footer } from './components/Footer';
 import { VideoModal } from './components/VideoModal';
 import { AdminDashboard } from './components/admin/AdminDashboard';
+import { ThemeInjector } from './components/ThemeInjector';
 import { api } from './services/api';
 import {
   Reel,
@@ -203,6 +204,7 @@ export const App: React.FC = () => {
 
   return (
     <div className="bg-[#F8F1E7] text-[#756A62] min-h-screen relative font-sans selection:bg-[#C65D45] selection:text-[#2B170F]">
+      <ThemeInjector settings={settings} />
       {/* Scroll-driven layout animation engine — mounts after DOM is full */}
       <ScrollAnimations />
       <Navbar

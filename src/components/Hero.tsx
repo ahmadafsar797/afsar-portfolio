@@ -320,8 +320,11 @@ export const Hero: React.FC<HeroProps> = ({ settings, onWatchShowreel }) => {
             {/* Proper Circle Shape with Transparent Gradient */}
             <div
               ref={shapeRef}
-              className="absolute top-[40%] sm:top-[42%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[240px] sm:w-[330px] md:w-[390px] lg:w-[420px] xl:w-[480px] 2xl:w-[540px] h-[240px] sm:h-[330px] md:h-[390px] lg:h-[420px] xl:h-[480px] 2xl:h-[540px] bg-gradient-to-tr from-[#C65D45] via-[#df674d] to-[#ffba3b] rounded-full shadow-2xl shadow-[#C65D45]/30 pointer-events-none will-change-transform"
+              data-hero-arch
+              className="absolute top-[40%] sm:top-[42%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[240px] sm:w-[330px] md:w-[390px] lg:w-[420px] xl:w-[480px] 2xl:w-[540px] h-[240px] sm:h-[330px] md:h-[390px] lg:h-[420px] xl:h-[480px] 2xl:h-[540px] rounded-full shadow-2xl pointer-events-none will-change-transform"
               style={{
+                background: `linear-gradient(135deg, ${settings?.hero_arch_color || settings?.theme_primary_color || '#C65D45'} 0%, ${settings?.theme_primary_color || '#df674d'} 60%, rgba(255, 255, 255, 0.4) 100%)`,
+                boxShadow: `0 25px 50px -12px ${settings?.hero_arch_color || settings?.theme_primary_color || '#C65D45'}4D`,
                 maskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 92%)',
                 WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 92%)',
               }}

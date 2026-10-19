@@ -36,8 +36,10 @@ import {
   ChevronDown,
   ArrowUpDown,
   Hash,
+  Palette,
 } from 'lucide-react';
 import { VideoFramePickerModal } from '../VideoFramePickerModal';
+import { ThemeStudioTab } from './ThemeStudioTab';
 import { api } from '../../services/api';
 import { FONT_FAMILIES, FONT_WEIGHT_OPTIONS, applyDynamicFonts } from '../../utils/fontLoader';
 import {
@@ -72,7 +74,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
 
   // Active Admin Tab
   const [activeTab, setActiveTab] = useState<
-    'overview' | 'reels' | 'horizontal' | 'testimonials' | 'services' | 'about' | 'hero-bg' | 'settings'
+    'overview' | 'reels' | 'horizontal' | 'testimonials' | 'services' | 'about' | 'hero-bg' | 'theme' | 'settings'
   >('overview');
 
   // Hero Background Video
@@ -1071,6 +1073,22 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                 {settings?.hero_bg_video_url && settings?.hero_bg_video_enabled !== '0' && (
                   <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                 )}
+              </button>
+
+              <button
+                onClick={() => setActiveTab('theme')}
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-montserrat uppercase tracking-wider transition-all text-left whitespace-nowrap ${
+                  activeTab === 'theme' ? 'bg-[#C65D45] text-[#2B170F] font-bold font-medium shadow-md' : 'text-white/70 hover:bg-white/5 hover:text-white'
+                }`}
+              >
+                <div className="flex items-center gap-2.5">
+                  <Palette className="w-4 h-4" />
+                  <span>Color Themes</span>
+                </div>
+                <span
+                  className="w-2.5 h-2.5 rounded-full border border-white/20"
+                  style={{ backgroundColor: settings.theme_primary_color || '#C65D45' }}
+                />
               </button>
 
               <button
@@ -3067,6 +3085,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose,
                     </button>
                   </div>
                 </div>
+              )}
+
+              {/* TAB: COLOR & THEMES */}
+              {activeTab === 'theme' && (
+                <ThemeStudioTab
+                  settings={settings}
+                  onUpdateSettings={async (updated) => {
+                    await api.updateSettings(updated);
+                    setSettings(updated);
+                    onDataChanged();
+                  }}
+                  showNotice={showNotice}
+                />
               )}
 
               {/* TAB 8: SETTINGS */}
