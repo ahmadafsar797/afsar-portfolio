@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Menu, X, ShieldCheck } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { SettingsData } from '../types';
 import { gsap } from 'gsap';
 
 interface NavbarProps {
   settings?: SettingsData;
-  onOpenAdmin: () => void;
-  isAdminLoggedIn: boolean;
+  onOpenAdmin?: () => void;
+  isAdminLoggedIn?: boolean;
 }
 
 const NAV_LINKS = [
@@ -177,18 +177,6 @@ export const Navbar: React.FC<NavbarProps> = ({ settings, onOpenAdmin, isAdminLo
 
           {/* Right CTAs */}
           <div className="hidden sm:flex items-center gap-3 md:gap-4">
-            <button
-              onClick={onOpenAdmin}
-              className={`p-2.5 md:p-3 rounded-full border transition-all duration-300 flex items-center justify-center ${
-                isAdminLoggedIn
-                  ? 'border-[#C65D45] text-[#C65D45] bg-[#C65D45]/10'
-                  : 'border-white/15 text-[#FFF9F2]/70 hover:text-[#FFF9F2] hover:border-white/30 bg-white/5'
-              }`}
-              title="Admin Panel"
-            >
-              <ShieldCheck className="w-4 h-4 md:w-4.5 md:h-4.5" />
-            </button>
-
             <a
               href="#contact"
               onClick={() => handleNavClick('contact')}
@@ -245,18 +233,6 @@ export const Navbar: React.FC<NavbarProps> = ({ settings, onOpenAdmin, isAdminLo
                 {link.name}
               </a>
             ))}
-            <div className="pt-3 border-t border-white/10 flex items-center justify-between">
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  onOpenAdmin();
-                }}
-                className="text-xs text-[#FFF9F2]/70 flex items-center gap-1.5 py-1"
-              >
-                <ShieldCheck className="w-4 h-4 text-[#C65D45]" />
-                <span>Admin Login</span>
-              </button>
-            </div>
           </div>
         )}
       </div>

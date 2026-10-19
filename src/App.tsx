@@ -99,6 +99,55 @@ export const App: React.FC = () => {
     }
   };
 
+  // URL route & Secret shortcut detection for /admin
+  useEffect(() => {
+    const checkAdminRoute = () => {
+      const pathname = window.location.pathname.toLowerCase();
+      const hash = window.location.hash.toLowerCase();
+      const search = window.location.search.toLowerCase();
+
+      if (
+        pathname === '/admin' ||
+        pathname === '/admin/' ||
+        hash === '#admin' ||
+        search === '?admin' ||
+        search.includes('admin=true')
+      ) {
+        setIsAdminOpen(true);
+      }
+    };
+
+    checkAdminRoute();
+
+    window.addEventListener('popstate', checkAdminRoute);
+    window.addEventListener('hashchange', checkAdminRoute);
+
+    // Secret Admin Shortcut: Ctrl + Shift + A (or Cmd + Shift + A on Mac)
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
+        e.preventDefault();
+        setIsAdminOpen((prev) => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('popstate', checkAdminRoute);
+      window.removeEventListener('hashchange', checkAdminRoute);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
+  const handleCloseAdmin = () => {
+    setIsAdminOpen(false);
+    checkAdminToken();
+    const pathname = window.location.pathname.toLowerCase();
+    const hash = window.location.hash.toLowerCase();
+    if (pathname === '/admin' || pathname === '/admin/' || hash === '#admin') {
+      window.history.pushState(null, '', '/');
+    }
+  };
+
   useEffect(() => {
     loadData();
     checkAdminToken();
@@ -290,10 +339,7 @@ export const App: React.FC = () => {
       {/* Interactive Admin Dashboard Panel */}
       <AdminDashboard
         isOpen={isAdminOpen}
-        onClose={() => {
-          setIsAdminOpen(false);
-          checkAdminToken();
-        }}
+        onClose={handleCloseAdmin}
         onDataChanged={() => {
           loadData();
           checkAdminToken();

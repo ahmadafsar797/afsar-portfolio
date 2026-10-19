@@ -1,11 +1,11 @@
 import React from 'react';
-import { Film, ArrowUp, ShieldCheck } from 'lucide-react';
+import { Film, ArrowUp } from 'lucide-react';
 import { SettingsData } from '../types';
 
 interface FooterProps {
   settings?: SettingsData;
-  onOpenAdmin: () => void;
-  isAdminLoggedIn: boolean;
+  onOpenAdmin?: () => void;
+  isAdminLoggedIn?: boolean;
 }
 
 export const Footer: React.FC<FooterProps> = ({ settings, onOpenAdmin, isAdminLoggedIn }) => {
@@ -54,20 +54,22 @@ export const Footer: React.FC<FooterProps> = ({ settings, onOpenAdmin, isAdminLo
           </button>
         </div>
 
-        {/* Bottom credits & admin entry */}
+        {/* Bottom credits */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-8 text-xs text-[#FFF9F2]/50 font-montserrat">
           <div>
-            © {new Date().getFullYear()} Afsar Ahmad. All Rights Reserved. Crafted for high-retention cinematic storytelling.
+            © {new Date().getFullYear()}{' '}
+            <span
+              onDoubleClick={onOpenAdmin}
+              className="cursor-default select-none text-[#FFF9F2]/60 hover:text-[#FFF9F2]/80 transition-colors"
+              title=""
+            >
+              Afsar Ahmad
+            </span>
+            . All Rights Reserved. Crafted for high-retention cinematic storytelling.
           </div>
 
-          <div className="flex items-center gap-4">
-            <button
-              onClick={onOpenAdmin}
-              className="hover:text-[#C65D45] transition-colors flex items-center gap-1.5 cursor-pointer text-[#FFF9F2]/70"
-            >
-              <ShieldCheck className="w-3.5 h-3.5 text-[#C65D45]" />
-              <span>{isAdminLoggedIn ? 'Admin Dashboard' : 'Editor Admin Login'}</span>
-            </button>
+          <div className="flex items-center gap-6 text-[11px] text-[#FFF9F2]/40">
+            <span>Video Editing • Color Grading • Sound Design</span>
           </div>
         </div>
       </div>
