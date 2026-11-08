@@ -263,3 +263,49 @@ header nav a span,
 .subtle-card-shadow {
   box-shadow: 0 10px 30px -10px rgba(43, 23, 15, 0.06);
 }
+
+/* Service Card Hover Styling - Guaranteed High Contrast */
+.service-reel-card {
+  position: relative;
+  transition: all 0.4s ease;
+}
+
+.service-reel-card:hover {
+  border-color: #C65D45 !important;
+  box-shadow: 0 20px 45px -10px rgba(43, 23, 15, 0.45) !important;
+}
+
+.service-reel-card:hover .service-card-title {
+  color: #FFFFFF !important;
+}
+
+.service-reel-card:hover .service-card-desc {
+  color: rgba(255, 249, 242, 0.85) !important;
+}
+
+.service-reel-card:hover .service-card-number {
+  color: rgba(255, 255, 255, 0.4) !important;
+}
+
+.service-reel-card:hover .service-card-icon {
+  background-color: #C65D45 !important;
+  color: #FFFFFF !important;
+  border-color: #C65D45 !important;
+  box-shadow: 0 0 24px rgba(198, 93, 69, 0.6) !important;
+  transform: scale(1.08);
+}
+
+.service-reel-card:hover .service-card-badge {
+  background-color: rgba(255, 255, 255, 0.14) !important;
+  color: rgba(255, 255, 255, 0.95) !important;
+  border-color: rgba(255, 255, 255, 0.25) !important;
+}
+
+.service-reel-card:hover .service-card-tag {
+  color: rgba(255, 249, 242, 0.75) !important;
+}
+
+.service-reel-card:hover .service-card-inquire {
+  color: #FFFFFF !important;
+}
+

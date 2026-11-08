@@ -202,7 +202,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ services, onSe
       <div
         key={service.id || service.title}
         onClick={() => handleCardClick(service.title)}
-        className="group relative flex-shrink-0 w-[300px] sm:w-[360px] md:w-[410px] lg:w-[440px] p-6 sm:p-7 rounded-3xl bg-[#F8F1E7] border border-[#2B170F]/10 hover:border-[#C65D45] transition-all duration-500 shadow-sm hover:shadow-2xl hover:shadow-[#2B170F]/25 flex flex-col justify-between overflow-hidden cursor-pointer select-none active:scale-[0.98] will-change-transform"
+        className="service-reel-card group relative flex-shrink-0 w-[300px] sm:w-[360px] md:w-[410px] lg:w-[440px] p-6 sm:p-7 rounded-3xl bg-[#F8F1E7] border border-[#2B170F]/10 hover:border-[#C65D45] transition-all duration-500 shadow-sm hover:shadow-2xl hover:shadow-[#2B170F]/25 flex flex-col justify-between overflow-hidden cursor-pointer select-none active:scale-[0.98] will-change-transform"
       >
         {/* Dark Obsidian Gradient on Hover */}
         <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-[#24130C] via-[#1A0D07] to-[#120804] opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
@@ -214,43 +214,43 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ services, onSe
           {/* Top Row: Icon + Number + Turnaround */}
           <div>
             <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 rounded-2xl bg-[#FFF9F2] border border-[#2B170F]/10 flex items-center justify-center text-[#C65D45] group-hover:bg-[#C65D45] group-hover:text-white group-hover:border-[#C65D45] group-hover:scale-105 transition-all duration-300 shadow-sm group-hover:shadow-[0_0_20px_rgba(198,93,69,0.5)]">
+              <div className="service-card-icon w-12 h-12 rounded-2xl bg-[#FFF9F2] border border-[#2B170F]/10 flex items-center justify-center text-[#C65D45] transition-all duration-300 shadow-sm">
                 {getIcon(service.icon_name)}
               </div>
 
               <div className="flex items-center gap-2">
                 {service.turnaround && (
-                  <span className="hidden sm:inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-white/70 group-hover:bg-white/10 group-hover:text-white/80 border border-[#2B170F]/10 group-hover:border-white/10 text-[10px] font-mono text-[#756A62] transition-colors">
+                  <span className="service-card-badge hidden sm:inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-white/70 border border-[#2B170F]/10 text-[10px] font-mono text-[#756A62] transition-colors">
                     <Clock className="w-3 h-3 text-[#C65D45]" />
                     {service.turnaround}
                   </span>
                 )}
 
-                <span className="font-mono text-xl sm:text-2xl font-bold text-[#2B170F]/20 group-hover:text-white/30 transition-colors duration-300">
+                <span className="service-card-number font-mono text-xl sm:text-2xl font-bold text-[#2B170F]/20 transition-colors duration-300">
                   #{cardNum}
                 </span>
               </div>
             </div>
 
             {/* Title */}
-            <h3 className="font-pogonia text-xl sm:text-2xl font-bold text-[#2B170F] group-hover:text-white transition-colors duration-300 mb-2 leading-snug">
+            <h3 className="service-card-title font-pogonia text-xl sm:text-2xl font-bold text-[#2B170F] transition-colors duration-300 mb-2 leading-snug">
               {service.title}
             </h3>
 
             {/* Short Description */}
-            <p className="font-montserrat text-xs sm:text-sm text-[#756A62] group-hover:text-white/75 transition-colors duration-300 line-clamp-2 leading-relaxed">
+            <p className="service-card-desc font-montserrat text-xs sm:text-sm text-[#756A62] transition-colors duration-300 line-clamp-2 leading-relaxed">
               {service.short_description}
             </p>
           </div>
 
           {/* Bottom Row: Micro Deliverable Tag & Inquire Link */}
           <div className="pt-4 mt-4 border-t border-[#2B170F]/10 group-hover:border-white/10 flex items-center justify-between transition-colors">
-            <span className="inline-flex items-center gap-1.5 text-[11px] font-montserrat font-semibold text-[#2B170F]/60 group-hover:text-white/60">
+            <span className="service-card-tag inline-flex items-center gap-1.5 text-[11px] font-montserrat font-semibold text-[#2B170F]/60 transition-colors">
               <Sparkle className="w-3 h-3 text-[#C65D45]" />
               Commercial Quality
             </span>
 
-            <span className="inline-flex items-center gap-1 text-xs font-montserrat font-bold text-[#C65D45] group-hover:text-[#e8816c] uppercase tracking-wider transition-colors">
+            <span className="service-card-inquire inline-flex items-center gap-1 text-xs font-montserrat font-bold text-[#C65D45] uppercase tracking-wider transition-colors">
               Inquire
               <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
             </span>
