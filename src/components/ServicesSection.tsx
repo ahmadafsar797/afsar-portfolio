@@ -24,128 +24,129 @@ interface ServicesSectionProps {
 }
 
 export const ServicesSection: React.FC<ServicesSectionProps> = ({ services, onSelectService }) => {
-  const sectionRef = useRef<HTMLElement>(null);
-  const headerRef = useRef<HTMLDivElement>(null);
-  const carouselRef = useRef<HTMLDivElement>(null);
+  const sectionRef    = useRef<HTMLElement>(null);
+  const carouselRef   = useRef<HTMLDivElement>(null);
+  const progressRef   = useRef(0); // 0–1 scroll progress
 
   const [activeIndex, setActiveIndex] = useState(0);
-
-  // Touch / drag refs
-  const dragStartXRef = useRef(0);
-  const isDraggingRef = useRef(false);
-
   const totalSlides = services.length;
 
+  /* ──────────────────────────────────────────────────
+     Icon resolver
+  ────────────────────────────────────────────────── */
   const getIcon = (iconName?: string) => {
-    const iconClass =
-      'service-icon w-6 h-6 text-[#C65D45] group-hover:text-white group-active:text-white transition-colors duration-300';
+    const cls = 'w-6 h-6';
     switch (iconName?.toLowerCase()) {
-      case 'smartphone':  return <Smartphone className={iconClass} />;
-      case 'youtube':     return <MonitorPlay className={iconClass} />;
-      case 'flame':       return <Flame className={iconClass} />;
-      case 'film':        return <Film className={iconClass} />;
-      case 'package':     return <Package className={iconClass} />;
-      case 'sparkles':    return <Sparkles className={iconClass} />;
-      case 'palette':     return <Palette className={iconClass} />;
-      case 'volume2':     return <Volume2 className={iconClass} />;
-      case 'briefcase':   return <Briefcase className={iconClass} />;
-      default:            return <Film className={iconClass} />;
+      case 'smartphone': return <Smartphone className={cls} />;
+      case 'youtube':    return <MonitorPlay className={cls} />;
+      case 'flame':      return <Flame       className={cls} />;
+      case 'film':       return <Film        className={cls} />;
+      case 'package':    return <Package     className={cls} />;
+      case 'sparkles':   return <Sparkles    className={cls} />;
+      case 'palette':    return <Palette     className={cls} />;
+      case 'volume2':    return <Volume2     className={cls} />;
+      case 'briefcase':  return <Briefcase   className={cls} />;
+      default:           return <Film        className={cls} />;
     }
   };
 
-  /* ── Animate each card based on distance from active center ── */
-  const positionCards = useCallback(
-    (idx: number, animate = true) => {
-      const cards = carouselRef.current?.querySelectorAll<HTMLElement>('.coverflow-card');
-      if (!cards) return;
+  /* ──────────────────────────────────────────────────
+     Position all cards based on a floating activeIdx
+     (can be fractional for smooth scrub tweening)
+  ────────────────────────────────────────────────── */
+  const positionCards = useCallback((centerIdx: number, animate = true) => {
+    const cards = carouselRef.current?.querySelectorAll<HTMLElement>('.cf-card');
+    if (!cards) return;
 
-      cards.forEach((card, i) => {
-        const offset = i - idx; // -ve = left, 0 = center, +ve = right
-        const absOffset = Math.abs(offset);
+    const vw = window.innerWidth;
+    const xStep =
+      vw < 480  ? 72 :
+      vw < 768  ? 90 :
+      vw < 1280 ? 115 : 140;
 
-        // How much each step shifts, scales, and tilts
-        const xStep        = window.innerWidth < 640 ? 68  : window.innerWidth < 1024 ? 90  : 110; // px per step
-        const scaleFactor  = Math.max(0.68, 1 - absOffset * 0.11);
-        const rotateY      = offset * 22; // degrees
-        const zDepth       = absOffset === 0 ? 0 : -absOffset * 80;
-        const opacity      = absOffset > 3 ? 0 : Math.max(0.25, 1 - absOffset * 0.22);
-        const brightness   = absOffset === 0 ? 1 : Math.max(0.55, 1 - absOffset * 0.18);
+    cards.forEach((card, i) => {
+      const offset    = i - centerIdx;
+      const absOffset = Math.abs(offset);
 
-        const duration = animate ? 0.55 : 0;
-        const ease     = 'power3.out';
+      const x          = offset * xStep;
+      const scale      = Math.max(0.62, 1 - absOffset * 0.12);
+      const rotateY    = offset * 24;
+      const z          = absOffset === 0 ? 0 : -absOffset * 100;
+      const opacity    = absOffset > 3.5 ? 0 : Math.max(0.2, 1 - absOffset * 0.22);
+      const brightness = Math.max(0.45, 1 - absOffset * 0.2);
 
-        gsap.to(card, {
-          x: offset * xStep,
-          scale: scaleFactor,
-          rotateY,
-          z: zDepth,
-          opacity,
-          filter: `brightness(${brightness})`,
-          duration,
-          ease,
-          overwrite: 'auto',
-          zIndex: 100 - absOffset,
-        });
+      gsap.to(card, {
+        x, scale, rotateY, z,
+        opacity,
+        filter: `brightness(${brightness})`,
+        duration: animate ? 0.6 : 0,
+        ease: 'power3.out',
+        overwrite: 'auto',
+        zIndex: Math.round(100 - absOffset * 10),
       });
-    },
-    []
-  );
-
-  /* ── Reposition whenever activeIndex changes ── */
-  useEffect(() => {
-    positionCards(activeIndex);
-  }, [activeIndex, positionCards, services]);
-
-  /* ── Header scroll-in animation ── */
-  useEffect(() => {
-    if (!headerRef.current) return;
-    const ctx = gsap.context(() => {
-      gsap.fromTo(
-        headerRef.current!.children,
-        { y: 40, opacity: 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 0.75,
-          stagger: 0.12,
-          ease: 'power3.out',
-          scrollTrigger: {
-            trigger: headerRef.current,
-            start: 'top 85%',
-            toggleActions: 'play none none none',
-          },
-        }
-      );
-    }, sectionRef);
-    return () => ctx.revert();
+    });
   }, []);
 
-  /* ── Initial card fan-in on first scroll into view ── */
+  /* ──────────────────────────────────────────────────
+     GSAP Pinned-scroll drives the coverflow
+  ────────────────────────────────────────────────── */
+  useEffect(() => {
+    if (!sectionRef.current || totalSlides === 0) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    // Set initial positions instantly before ScrollTrigger fires
+    positionCards(0, false);
+
+    const ctx = gsap.context(() => {
+      // Proxy object that GSAP tweens from 0 → (totalSlides-1)
+      const proxy = { index: 0 };
+
+      ScrollTrigger.create({
+        id: 'services-coverflow',
+        trigger: sectionRef.current,
+        pin: true,
+        start: 'top top',
+        // Give ~700px of scroll per card
+        end: () => `+=${Math.max((totalSlides - 1) * 720, 600)}`,
+        scrub: 1.2,
+        anticipatePin: 1,
+        invalidateOnRefresh: true,
+        onUpdate(self) {
+          progressRef.current = self.progress;
+          const rawIdx = self.progress * (totalSlides - 1);
+          positionCards(rawIdx, false); // position is scrubbed, so no extra animation
+          const snappedIdx = Math.min(Math.round(rawIdx), totalSlides - 1);
+          setActiveIndex(snappedIdx);
+        },
+      });
+    }, sectionRef);
+
+    const t = setTimeout(() => ScrollTrigger.refresh(), 200);
+    return () => { clearTimeout(t); ctx.revert(); };
+  }, [services, totalSlides, positionCards]);
+
+  /* ──────────────────────────────────────────────────
+     Card fan-in entrance on first scroll into view
+  ────────────────────────────────────────────────── */
   useEffect(() => {
     if (!carouselRef.current || totalSlides === 0) return;
-
-    const cards = carouselRef.current.querySelectorAll<HTMLElement>('.coverflow-card');
-
-    // Set initial hidden state
-    gsap.set(cards, { opacity: 0, scale: 0.6, y: 60, rotateY: 0 });
+    const cards = carouselRef.current.querySelectorAll<HTMLElement>('.cf-card');
+    gsap.set(cards, { opacity: 0, scale: 0.55, y: 80, rotateY: 0 });
 
     const ctx = gsap.context(() => {
       ScrollTrigger.create({
         trigger: carouselRef.current,
-        start: 'top 80%',
+        start: 'top 90%',
         once: true,
-        onEnter: () => {
+        onEnter() {
           gsap.to(cards, {
-            opacity: (i) => {
-              const absOffset = Math.abs(i - activeIndex);
-              return absOffset > 3 ? 0 : Math.max(0.25, 1 - absOffset * 0.22);
-            },
-            scale: (i) => Math.max(0.68, 1 - Math.abs(i - activeIndex) * 0.11),
+            opacity: (i) => Math.max(0.2, 1 - Math.abs(i) * 0.22),
+            scale: (i) => Math.max(0.62, 1 - Math.abs(i) * 0.12),
             y: 0,
-            duration: 0.6,
-            stagger: 0.07,
-            ease: 'back.out(1.3)',
-            onComplete: () => positionCards(activeIndex, false),
+            duration: 0.65,
+            stagger: 0.06,
+            ease: 'back.out(1.4)',
+            onComplete: () => positionCards(0, false),
           });
         },
       });
@@ -155,55 +156,56 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ services, onSe
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [services, totalSlides]);
 
-  /* ── Navigation helpers ── */
-  const handlePrev = () => setActiveIndex((i) => Math.max(0, i - 1));
-  const handleNext = () => setActiveIndex((i) => Math.min(totalSlides - 1, i + 1));
-
-  const handleCardClick = (service: Service, idx: number) => {
-    if (idx !== activeIndex) {
-      setActiveIndex(idx);
-      return;
-    }
-    if (onSelectService) onSelectService(service.title);
-    const contactEl = document.getElementById('contact');
-    if (contactEl) contactEl.scrollIntoView({ behavior: 'smooth' });
+  /* ──────────────────────────────────────────────────
+     Arrow / dot navigation — scroll to that card
+  ────────────────────────────────────────────────── */
+  const navigateToSlide = (targetIdx: number) => {
+    const st = ScrollTrigger.getById('services-coverflow');
+    if (!st) return;
+    const p = totalSlides > 1 ? targetIdx / (totalSlides - 1) : 0;
+    const targetScroll = st.start + (st.end - st.start) * p;
+    window.scrollTo({ top: targetScroll, behavior: 'smooth' });
   };
 
-  /* ── Keyboard navigation ── */
+  const handlePrev = () => navigateToSlide(Math.max(0, activeIndex - 1));
+  const handleNext = () => navigateToSlide(Math.min(totalSlides - 1, activeIndex + 1));
+
+  /* ──────────────────────────────────────────────────
+     Keyboard navigation
+  ────────────────────────────────────────────────── */
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowLeft')  setActiveIndex((i) => Math.max(0, i - 1));
-      if (e.key === 'ArrowRight') setActiveIndex((i) => Math.min(totalSlides - 1, i + 1));
+      if (e.key === 'ArrowLeft')  handlePrev();
+      if (e.key === 'ArrowRight') handleNext();
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [totalSlides]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeIndex, totalSlides]);
 
-  /* ── Touch / mouse drag ── */
-  const handleDragStart = (clientX: number) => {
-    isDraggingRef.current = true;
-    dragStartXRef.current = clientX;
-  };
-  const handleDragEnd = (clientX: number) => {
-    if (!isDraggingRef.current) return;
-    isDraggingRef.current = false;
-    const delta = dragStartXRef.current - clientX;
-    if (Math.abs(delta) > 40) {
-      delta > 0 ? handleNext() : handlePrev();
-    }
+  /* ──────────────────────────────────────────────────
+     Click-on-side-card shortcut
+  ────────────────────────────────────────────────── */
+  const handleCardClick = (service: Service, idx: number) => {
+    if (idx !== activeIndex) { navigateToSlide(idx); return; }
+    if (onSelectService) onSelectService(service.title);
+    document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  /* ──────────────────────────────────────────────────
+     RENDER
+  ────────────────────────────────────────────────── */
   return (
     <section
       ref={sectionRef}
       id="services"
-      className="min-h-[100dvh] bg-[#FFF9F2] relative overflow-hidden border-t border-[#2B170F]/10 font-sans flex flex-col justify-center py-12 md:py-16 select-none"
+      className="h-[100dvh] min-h-[600px] bg-[#FFF9F2] relative overflow-hidden border-t border-[#2B170F]/10 font-sans flex flex-col select-none"
     >
-      {/* ── Header ── */}
-      <div ref={headerRef} className="max-w-[1720px] w-full mx-auto px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 mb-10 md:mb-14">
+      {/* ── Top Header ── */}
+      <div className="max-w-[1720px] w-full mx-auto px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 pt-10 md:pt-14 pb-6 md:pb-8 shrink-0">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
-            {/* pill badge */}
+            {/* pill */}
             <div className="relative inline-flex items-center px-4 py-1.5 rounded-full bg-white/75 backdrop-blur-md border border-white/85 shadow-[0_2px_10px_rgba(43,23,15,0.06),inset_0_1px_1px_rgba(255,255,255,0.95)] overflow-hidden mb-2 sm:mb-3">
               <div className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/80 via-white/20 to-transparent pointer-events-none" />
               <span className="relative z-10 text-xs font-montserrat font-bold uppercase text-[#C65D45] tracking-normal">
@@ -257,90 +259,85 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ services, onSe
         </div>
       </div>
 
-      {/* ── Coverflow Carousel Stage ── */}
+      {/* ── Scroll-hint label ── */}
+      <p className="text-center text-[11px] sm:text-xs font-montserrat font-medium text-[#756A62]/70 shrink-0 -mt-2 mb-1">
+        Scroll to explore · Click side cards to jump · Click center to inquire
+      </p>
+
+      {/* ── Coverflow Stage — fills remaining height ── */}
       <div
         ref={carouselRef}
-        className="relative w-full flex items-center justify-center"
-        style={{ perspective: '1200px', perspectiveOrigin: '50% 50%', height: '420px' }}
-        onMouseDown={(e) => handleDragStart(e.clientX)}
-        onMouseUp={(e) => handleDragEnd(e.clientX)}
-        onMouseLeave={() => { isDraggingRef.current = false; }}
-        onTouchStart={(e) => handleDragStart(e.touches[0].clientX)}
-        onTouchEnd={(e) => handleDragEnd(e.changedTouches[0].clientX)}
-        data-cursor="drag"
+        className="relative flex-1 flex items-center justify-center overflow-visible"
+        style={{ perspective: '1400px', perspectiveOrigin: '50% 50%' }}
       >
         {services.map((service, i) => {
-          const cardNum = String(i + 1).padStart(2, '0');
+          const cardNum  = String(i + 1).padStart(2, '0');
           const isActive = i === activeIndex;
 
           return (
             <div
               key={service.id || service.title}
-              className="coverflow-card absolute"
+              className="cf-card absolute"
               style={{
-                width: 'clamp(260px, 30vw, 390px)',
+                width: 'clamp(240px, 28vw, 400px)',
                 transformStyle: 'preserve-3d',
-                willChange: 'transform, opacity',
+                willChange: 'transform, opacity, filter',
                 cursor: isActive ? 'pointer' : 'default',
               }}
               onClick={() => handleCardClick(service, i)}
             >
+              {/* Card face */}
               <div
-                className={`group relative w-full p-7 sm:p-9 rounded-3xl flex flex-col justify-start overflow-hidden transition-all duration-500 shadow-md
+                className={`relative w-full p-6 sm:p-8 rounded-3xl flex flex-col overflow-hidden transition-shadow duration-500
                   ${isActive
-                    ? 'bg-[#2B170F] border border-[#C65D45]/40 shadow-2xl shadow-[#2B170F]/40 ring-1 ring-[#C65D45]/30'
-                    : 'bg-[#F8F1E7] border border-[#2B170F]/10'
+                    ? 'bg-[#2B170F] border border-[#C65D45]/40 shadow-[0_30px_80px_rgba(43,23,15,0.5)] ring-1 ring-[#C65D45]/30'
+                    : 'bg-[#F8F1E7] border border-[#2B170F]/10 shadow-md'
                   }`}
-                style={{ minHeight: '340px' }}
+                style={{ minHeight: 'clamp(280px, 36vh, 400px)' }}
               >
-                {/* Glow on active */}
+                {/* warm glow behind active card */}
                 {isActive && (
-                  <div className="absolute -top-12 -right-12 w-40 h-40 bg-[#C65D45]/25 rounded-full blur-2xl pointer-events-none" />
+                  <>
+                    <div className="absolute -top-16 -right-16 w-48 h-48 bg-[#C65D45]/20 rounded-full blur-3xl pointer-events-none" />
+                    <div className="absolute -bottom-10 -left-10 w-36 h-36 bg-[#C65D45]/10 rounded-full blur-2xl pointer-events-none" />
+                  </>
                 )}
 
-                <div className="relative z-10 flex flex-col justify-start h-full">
-                  {/* Icon + Number row */}
-                  <div className="flex items-center justify-between mb-6 sm:mb-7">
+                <div className="relative z-10 flex flex-col h-full">
+                  {/* Icon + number */}
+                  <div className="flex items-center justify-between mb-5 sm:mb-6">
                     <div
                       className={`w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center transition-all duration-300 shadow-sm
                         ${isActive
-                          ? 'bg-[#C65D45] border border-[#C65D45] shadow-[0_0_20px_rgba(198,93,69,0.5)]'
-                          : 'bg-[#FFF9F2] border border-[#2B170F]/10 group-hover:bg-[#C65D45] group-hover:border-[#C65D45]'
+                          ? 'bg-[#C65D45] shadow-[0_0_24px_rgba(198,93,69,0.55)]'
+                          : 'bg-[#FFF9F2] border border-[#2B170F]/10'
                         }`}
                     >
-                      {/* Render icon, forcing white when active */}
-                      <span className={isActive ? '[&_svg]:text-white' : ''}>
+                      <span className={isActive ? 'text-white [&_svg]:text-white' : 'text-[#C65D45] [&_svg]:text-[#C65D45]'}>
                         {getIcon(service.icon_name)}
                       </span>
                     </div>
-                    <span
-                      className={`text-xl sm:text-2xl font-mono font-bold transition-colors duration-300
-                        ${isActive ? 'text-white/30' : 'text-[#2B170F]/20'}`}
-                    >
+
+                    <span className={`text-xl sm:text-2xl font-mono font-bold ${isActive ? 'text-white/25' : 'text-[#2B170F]/20'}`}>
                       #{cardNum}
                     </span>
                   </div>
 
-                  <h3
-                    className={`font-pogonia text-2xl sm:text-3xl font-bold mb-3 leading-snug transition-colors duration-300
-                      ${isActive ? 'text-[#FFF9F2]' : 'text-[#2B170F]'}`}
-                  >
+                  {/* Title */}
+                  <h3 className={`font-pogonia text-2xl sm:text-3xl font-bold mb-3 leading-snug ${isActive ? 'text-[#FFF9F2]' : 'text-[#2B170F]'}`}>
                     {service.title}
                   </h3>
 
-                  <p
-                    className={`text-xs sm:text-sm font-montserrat font-medium leading-relaxed transition-colors duration-300
-                      ${isActive ? 'text-[#FFF9F2]/75' : 'text-[#756A62]'}`}
-                  >
+                  {/* Description */}
+                  <p className={`text-xs sm:text-sm font-montserrat font-medium leading-relaxed ${isActive ? 'text-[#FFF9F2]/72' : 'text-[#756A62]'}`}>
                     {service.short_description}
                   </p>
 
-                  {/* CTA hint on active */}
+                  {/* CTA — only on active */}
                   {isActive && (
-                    <div className="mt-auto pt-6">
+                    <div className="mt-auto pt-5">
                       <span className="inline-flex items-center gap-1.5 text-xs font-montserrat font-bold text-[#C65D45] uppercase tracking-wider">
-                        Get in touch
-                        <ChevronRight className="w-3.5 h-3.5" />
+                        Get in touch <ChevronRight className="w-3.5 h-3.5" />
                       </span>
                     </div>
                   )}
@@ -351,23 +348,20 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ services, onSe
         })}
       </div>
 
-      {/* ── Dot Indicators ── */}
-      <div className="mt-8 sm:mt-10 flex flex-col items-center justify-center gap-2">
+      {/* ── Dot indicators ── */}
+      <div className="shrink-0 pb-6 sm:pb-8 pt-3 flex flex-col items-center gap-2">
         <div className="flex items-center gap-2">
           {services.map((_, i) => (
             <button
               key={i}
-              onClick={() => setActiveIndex(i)}
+              onClick={() => navigateToSlide(i)}
               aria-label={`Go to service ${i + 1}`}
               className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
-                activeIndex === i ? 'w-7 bg-[#C65D45]' : 'w-2 bg-[#2B170F]/20'
+                activeIndex === i ? 'w-7 bg-[#C65D45]' : 'w-2 bg-[#2B170F]/20 hover:bg-[#2B170F]/40'
               }`}
             />
           ))}
         </div>
-        <p className="text-[11px] font-sans font-medium text-[#756A62]">
-          Click a card or use arrows to explore · Click center card to inquire
-        </p>
       </div>
     </section>
   );
