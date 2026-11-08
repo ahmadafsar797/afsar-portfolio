@@ -61,8 +61,9 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ services, onSe
     const vw = window.innerWidth;
     const xStep =
       vw < 480  ? 72 :
-      vw < 768  ? 90 :
-      vw < 1280 ? 115 : 140;
+      vw < 768  ? 95 :
+      vw < 1280 ? 160 :
+      vw < 1600 ? 210 : 260;
 
     cards.forEach((card, i) => {
       const offset    = i - centerIdx;
@@ -279,7 +280,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ services, onSe
               key={service.id || service.title}
               className="cf-card absolute"
               style={{
-                width: 'clamp(240px, 28vw, 400px)',
+                width: 'clamp(240px, 32vw, 520px)',
                 transformStyle: 'preserve-3d',
                 willChange: 'transform, opacity, filter',
                 cursor: isActive ? 'pointer' : 'default',
@@ -288,12 +289,12 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ services, onSe
             >
               {/* Card face */}
               <div
-                className={`relative w-full p-6 sm:p-8 rounded-3xl flex flex-col overflow-hidden transition-shadow duration-500
+                className={`relative w-full p-6 sm:p-8 xl:p-11 rounded-3xl flex flex-col overflow-hidden transition-shadow duration-500
                   ${isActive
                     ? 'bg-[#2B170F] border border-[#C65D45]/40 shadow-[0_30px_80px_rgba(43,23,15,0.5)] ring-1 ring-[#C65D45]/30'
                     : 'bg-[#F8F1E7] border border-[#2B170F]/10 shadow-md'
                   }`}
-                style={{ minHeight: 'clamp(280px, 36vh, 400px)' }}
+                style={{ minHeight: 'clamp(300px, 48vh, 540px)' }}
               >
                 {/* warm glow behind active card */}
                 {isActive && (
@@ -305,39 +306,39 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ services, onSe
 
                 <div className="relative z-10 flex flex-col h-full">
                   {/* Icon + number */}
-                  <div className="flex items-center justify-between mb-5 sm:mb-6">
+                  <div className="flex items-center justify-between mb-5 sm:mb-6 xl:mb-8">
                     <div
-                      className={`w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center transition-all duration-300 shadow-sm
+                      className={`w-12 h-12 sm:w-14 sm:h-14 xl:w-16 xl:h-16 rounded-2xl flex items-center justify-center transition-all duration-300 shadow-sm
                         ${isActive
                           ? 'bg-[#C65D45] shadow-[0_0_24px_rgba(198,93,69,0.55)]'
                           : 'bg-[#FFF9F2] border border-[#2B170F]/10'
                         }`}
                     >
-                      <span className={isActive ? 'text-white [&_svg]:text-white' : 'text-[#C65D45] [&_svg]:text-[#C65D45]'}>
+                      <span className={`[&_svg]:w-7 [&_svg]:h-7 ${isActive ? 'text-white [&_svg]:text-white' : 'text-[#C65D45] [&_svg]:text-[#C65D45]'}`}>
                         {getIcon(service.icon_name)}
                       </span>
                     </div>
 
-                    <span className={`text-xl sm:text-2xl font-mono font-bold ${isActive ? 'text-white/25' : 'text-[#2B170F]/20'}`}>
+                    <span className={`text-xl sm:text-2xl xl:text-3xl font-mono font-bold ${isActive ? 'text-white/25' : 'text-[#2B170F]/20'}`}>
                       #{cardNum}
                     </span>
                   </div>
 
                   {/* Title */}
-                  <h3 className={`font-pogonia text-2xl sm:text-3xl font-bold mb-3 leading-snug ${isActive ? 'text-[#FFF9F2]' : 'text-[#2B170F]'}`}>
+                  <h3 className={`font-pogonia text-2xl sm:text-3xl xl:text-4xl font-bold mb-3 xl:mb-4 leading-snug ${isActive ? 'text-[#FFF9F2]' : 'text-[#2B170F]'}`}>
                     {service.title}
                   </h3>
 
                   {/* Description */}
-                  <p className={`text-xs sm:text-sm font-montserrat font-medium leading-relaxed ${isActive ? 'text-[#FFF9F2]/72' : 'text-[#756A62]'}`}>
+                  <p className={`text-xs sm:text-sm xl:text-base font-montserrat font-medium leading-relaxed ${isActive ? 'text-[#FFF9F2]/72' : 'text-[#756A62]'}`}>
                     {service.short_description}
                   </p>
 
                   {/* CTA — only on active */}
                   {isActive && (
-                    <div className="mt-auto pt-5">
-                      <span className="inline-flex items-center gap-1.5 text-xs font-montserrat font-bold text-[#C65D45] uppercase tracking-wider">
-                        Get in touch <ChevronRight className="w-3.5 h-3.5" />
+                    <div className="mt-auto pt-5 xl:pt-8">
+                      <span className="inline-flex items-center gap-1.5 text-xs xl:text-sm font-montserrat font-bold text-[#C65D45] uppercase tracking-wider">
+                        Get in touch <ChevronRight className="w-3.5 h-3.5 xl:w-4 xl:h-4" />
                       </span>
                     </div>
                   )}
