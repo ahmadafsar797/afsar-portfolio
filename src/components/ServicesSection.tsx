@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
 import {
   Smartphone,
   MonitorPlay,
@@ -25,182 +25,171 @@ interface ServicesSectionProps {
 
 export const ServicesSection: React.FC<ServicesSectionProps> = ({ services, onSelectService }) => {
   const sectionRef = useRef<HTMLElement>(null);
-  const sliderViewportRef = useRef<HTMLDivElement>(null);
-  const sliderTrackRef = useRef<HTMLDivElement>(null);
+  const headerRef = useRef<HTMLDivElement>(null);
+  const carouselRef = useRef<HTMLDivElement>(null);
 
   const [activeIndex, setActiveIndex] = useState(0);
-  const [scrollProgress, setScrollProgress] = useState(0);
-  const [isDragging, setIsDragging] = useState(false);
 
-  // Mouse / Touch Drag Refs
-  const isDraggingRef = useRef(false);
+  // Touch / drag refs
   const dragStartXRef = useRef(0);
-  const dragScrollYRef = useRef(0);
+  const isDraggingRef = useRef(false);
 
   const totalSlides = services.length;
-  const reversedServices = [...services].reverse();
 
   const getIcon = (iconName?: string) => {
     const iconClass =
       'service-icon w-6 h-6 text-[#C65D45] group-hover:text-white group-active:text-white transition-colors duration-300';
     switch (iconName?.toLowerCase()) {
-      case 'smartphone':
-        return <Smartphone className={iconClass} />;
-      case 'youtube':
-        return <MonitorPlay className={iconClass} />;
-      case 'flame':
-        return <Flame className={iconClass} />;
-      case 'film':
-        return <Film className={iconClass} />;
-      case 'package':
-        return <Package className={iconClass} />;
-      case 'sparkles':
-        return <Sparkles className={iconClass} />;
-      case 'palette':
-        return <Palette className={iconClass} />;
-      case 'volume2':
-        return <Volume2 className={iconClass} />;
-      case 'briefcase':
-        return <Briefcase className={iconClass} />;
-      default:
-        return <Film className={iconClass} />;
+      case 'smartphone':  return <Smartphone className={iconClass} />;
+      case 'youtube':     return <MonitorPlay className={iconClass} />;
+      case 'flame':       return <Flame className={iconClass} />;
+      case 'film':        return <Film className={iconClass} />;
+      case 'package':     return <Package className={iconClass} />;
+      case 'sparkles':    return <Sparkles className={iconClass} />;
+      case 'palette':     return <Palette className={iconClass} />;
+      case 'volume2':     return <Volume2 className={iconClass} />;
+      case 'briefcase':   return <Briefcase className={iconClass} />;
+      default:            return <Film className={iconClass} />;
     }
   };
 
-  /* ── Master Horizontal Pinned Scroll Engine (Rightward Motion) ── */
+  /* ── Animate each card based on distance from active center ── */
+  const positionCards = useCallback(
+    (idx: number, animate = true) => {
+      const cards = carouselRef.current?.querySelectorAll<HTMLElement>('.coverflow-card');
+      if (!cards) return;
+
+      cards.forEach((card, i) => {
+        const offset = i - idx; // -ve = left, 0 = center, +ve = right
+        const absOffset = Math.abs(offset);
+
+        // How much each step shifts, scales, and tilts
+        const xStep        = window.innerWidth < 640 ? 68  : window.innerWidth < 1024 ? 90  : 110; // px per step
+        const scaleFactor  = Math.max(0.68, 1 - absOffset * 0.11);
+        const rotateY      = offset * 22; // degrees
+        const zDepth       = absOffset === 0 ? 0 : -absOffset * 80;
+        const opacity      = absOffset > 3 ? 0 : Math.max(0.25, 1 - absOffset * 0.22);
+        const brightness   = absOffset === 0 ? 1 : Math.max(0.55, 1 - absOffset * 0.18);
+
+        const duration = animate ? 0.55 : 0;
+        const ease     = 'power3.out';
+
+        gsap.to(card, {
+          x: offset * xStep,
+          scale: scaleFactor,
+          rotateY,
+          z: zDepth,
+          opacity,
+          filter: `brightness(${brightness})`,
+          duration,
+          ease,
+          overwrite: 'auto',
+          zIndex: 100 - absOffset,
+        });
+      });
+    },
+    []
+  );
+
+  /* ── Reposition whenever activeIndex changes ── */
   useEffect(() => {
-    const section = sectionRef.current;
-    const track = sliderTrackRef.current;
-    const viewport = sliderViewportRef.current;
-    if (!section || !track || !viewport || totalSlides === 0) return;
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    positionCards(activeIndex);
+  }, [activeIndex, positionCards, services]);
 
+  /* ── Header scroll-in animation ── */
+  useEffect(() => {
+    if (!headerRef.current) return;
     const ctx = gsap.context(() => {
-      const getShiftDistance = () => {
-        const isMobile = window.innerWidth < 768;
-        return Math.max(track.scrollWidth - viewport.clientWidth + (isMobile ? 32 : 120), 200);
-      };
-
-      const isMobile = window.innerWidth < 768;
-
-      // Animate from negative shift to 0 -> cards glide to the RIGHT (->)
       gsap.fromTo(
-        track,
+        headerRef.current!.children,
+        { y: 40, opacity: 0 },
         {
-          x: () => -getShiftDistance(),
-        },
-        {
-          x: 0,
-          ease: 'none',
+          y: 0,
+          opacity: 1,
+          duration: 0.75,
+          stagger: 0.12,
+          ease: 'power3.out',
           scrollTrigger: {
-            id: 'services-pin-slider',
-            trigger: section,
-            pin: true,
-            start: 'top top',
-            end: () => `+=${Math.max(getShiftDistance() * (isMobile ? 1.3 : 1.3), isMobile ? 1000 : 850)}`,
-            scrub: isMobile ? 0.8 : 1.1,
-            anticipatePin: 1,
-            invalidateOnRefresh: true,
-            onUpdate: (self) => {
-              const p = self.progress;
-              setScrollProgress(p);
-              const idx = Math.min(Math.floor(p * totalSlides), totalSlides - 1);
-              setActiveIndex(idx);
-            },
+            trigger: headerRef.current,
+            start: 'top 85%',
+            toggleActions: 'play none none none',
           },
         }
       );
     }, sectionRef);
+    return () => ctx.revert();
+  }, []);
 
-    const refreshTimer = setTimeout(() => {
-      ScrollTrigger.refresh();
-    }, 200);
+  /* ── Initial card fan-in on first scroll into view ── */
+  useEffect(() => {
+    if (!carouselRef.current || totalSlides === 0) return;
 
-    return () => {
-      clearTimeout(refreshTimer);
-      ctx.revert();
-    };
+    const cards = carouselRef.current.querySelectorAll<HTMLElement>('.coverflow-card');
+
+    // Set initial hidden state
+    gsap.set(cards, { opacity: 0, scale: 0.6, y: 60, rotateY: 0 });
+
+    const ctx = gsap.context(() => {
+      ScrollTrigger.create({
+        trigger: carouselRef.current,
+        start: 'top 80%',
+        once: true,
+        onEnter: () => {
+          gsap.to(cards, {
+            opacity: (i) => {
+              const absOffset = Math.abs(i - activeIndex);
+              return absOffset > 3 ? 0 : Math.max(0.25, 1 - absOffset * 0.22);
+            },
+            scale: (i) => Math.max(0.68, 1 - Math.abs(i - activeIndex) * 0.11),
+            y: 0,
+            duration: 0.6,
+            stagger: 0.07,
+            ease: 'back.out(1.3)',
+            onComplete: () => positionCards(activeIndex, false),
+          });
+        },
+      });
+    }, sectionRef);
+
+    return () => ctx.revert();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [services, totalSlides]);
 
-  /* ── Programmatic Next / Prev Navigation ── */
-  const handlePrev = () => {
-    const prevIdx = Math.max(0, activeIndex - 1);
-    navigateToSlide(prevIdx);
-  };
+  /* ── Navigation helpers ── */
+  const handlePrev = () => setActiveIndex((i) => Math.max(0, i - 1));
+  const handleNext = () => setActiveIndex((i) => Math.min(totalSlides - 1, i + 1));
 
-  const handleNext = () => {
-    const nextIdx = Math.min(totalSlides - 1, activeIndex + 1);
-    navigateToSlide(nextIdx);
-  };
-
-  const navigateToSlide = (targetIdx: number) => {
-    const st = ScrollTrigger.getById('services-pin-slider');
-    if (st) {
-      const targetProgress = totalSlides > 1 ? targetIdx / (totalSlides - 1) : 0;
-      const targetScroll = st.start + (st.end - st.start) * targetProgress;
-      window.scrollTo({
-        top: targetScroll,
-        behavior: 'smooth',
-      });
+  const handleCardClick = (service: Service, idx: number) => {
+    if (idx !== activeIndex) {
+      setActiveIndex(idx);
+      return;
     }
-  };
-
-  /* ── Mouse Drag Navigation ── */
-  const handleMouseDown = (e: React.MouseEvent) => {
-    isDraggingRef.current = true;
-    setIsDragging(true);
-    dragStartXRef.current = e.clientX;
-    dragScrollYRef.current = window.scrollY;
-  };
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDraggingRef.current) return;
-    const deltaX = e.clientX - dragStartXRef.current;
-    const st = ScrollTrigger.getById('services-pin-slider');
-    if (st && window.scrollY >= st.start && window.scrollY <= st.end) {
-      const scrollDelta = deltaX * 1.5;
-      window.scrollTo({
-        top: Math.max(st.start, Math.min(st.end, dragScrollYRef.current + scrollDelta)),
-      });
-    }
-  };
-
-  const handleMouseUp = () => {
-    isDraggingRef.current = false;
-    setIsDragging(false);
-  };
-
-  /* ── Mobile Touch Drag ── */
-  const handleTouchStart = (e: React.TouchEvent) => {
-    if (!e.touches[0]) return;
-    isDraggingRef.current = true;
-    dragStartXRef.current = e.touches[0].clientX;
-    dragScrollYRef.current = window.scrollY;
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (!isDraggingRef.current || !e.touches[0]) return;
-    const deltaX = e.touches[0].clientX - dragStartXRef.current;
-    const st = ScrollTrigger.getById('services-pin-slider');
-    if (st && window.scrollY >= st.start && window.scrollY <= st.end) {
-      const scrollDelta = deltaX * 1.5;
-      window.scrollTo({
-        top: Math.max(st.start, Math.min(st.end, dragScrollYRef.current + scrollDelta)),
-      });
-    }
-  };
-
-  const handleTouchEnd = () => {
-    isDraggingRef.current = false;
-  };
-
-  const handleCardClick = (title: string) => {
-    if (onSelectService) {
-      onSelectService(title);
-    }
+    if (onSelectService) onSelectService(service.title);
     const contactEl = document.getElementById('contact');
-    if (contactEl) {
-      contactEl.scrollIntoView({ behavior: 'smooth' });
+    if (contactEl) contactEl.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  /* ── Keyboard navigation ── */
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft')  setActiveIndex((i) => Math.max(0, i - 1));
+      if (e.key === 'ArrowRight') setActiveIndex((i) => Math.min(totalSlides - 1, i + 1));
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [totalSlides]);
+
+  /* ── Touch / mouse drag ── */
+  const handleDragStart = (clientX: number) => {
+    isDraggingRef.current = true;
+    dragStartXRef.current = clientX;
+  };
+  const handleDragEnd = (clientX: number) => {
+    if (!isDraggingRef.current) return;
+    isDraggingRef.current = false;
+    const delta = dragStartXRef.current - clientX;
+    if (Math.abs(delta) > 40) {
+      delta > 0 ? handleNext() : handlePrev();
     }
   };
 
@@ -208,15 +197,15 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ services, onSe
     <section
       ref={sectionRef}
       id="services"
-      className="h-[100dvh] min-h-[580px] max-h-[1080px] md:min-h-[620px] md:max-h-[960px] bg-[#FFF9F2] relative overflow-hidden border-t border-[#2B170F]/10 font-sans flex flex-col justify-center py-4 md:py-0 select-none"
+      className="min-h-[100dvh] bg-[#FFF9F2] relative overflow-hidden border-t border-[#2B170F]/10 font-sans flex flex-col justify-center py-12 md:py-16 select-none"
     >
-      <div className="max-w-[1720px] 2xl:max-w-[1880px] w-full mx-auto px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 mb-4 sm:mb-6 md:mb-8">
-        {/* Header with Navigation Controls */}
+      {/* ── Header ── */}
+      <div ref={headerRef} className="max-w-[1720px] w-full mx-auto px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 mb-10 md:mb-14">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
+            {/* pill badge */}
             <div className="relative inline-flex items-center px-4 py-1.5 rounded-full bg-white/75 backdrop-blur-md border border-white/85 shadow-[0_2px_10px_rgba(43,23,15,0.06),inset_0_1px_1px_rgba(255,255,255,0.95)] overflow-hidden mb-2 sm:mb-3">
               <div className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/80 via-white/20 to-transparent pointer-events-none" />
-              <div className="absolute -top-3 -left-4 w-12 h-16 bg-gradient-to-r from-transparent via-white/60 to-transparent rotate-25 pointer-events-none" />
               <span className="relative z-10 text-xs font-montserrat font-bold uppercase text-[#C65D45] tracking-normal">
                 Full-Stack Post-Production Capabilities
               </span>
@@ -232,7 +221,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ services, onSe
               From viral vertical reels engineered for the algorithm to broadcast-grade commercial color mastering and immersive audio soundscapes.
             </p>
 
-            {/* Slide Counter & Prev/Next Arrows */}
+            {/* Counter + Arrows */}
             <div className="flex items-center gap-2 sm:gap-3 shrink-0">
               <span className="text-xs sm:text-sm font-mono font-bold text-[#756A62] px-2.5 py-1 rounded-full bg-[#2B170F]/5 border border-[#2B170F]/10">
                 {String(activeIndex + 1).padStart(2, '0')} / {String(totalSlides).padStart(2, '0')}
@@ -268,72 +257,107 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ services, onSe
         </div>
       </div>
 
-      {/* Horizontal Viewport Container */}
+      {/* ── Coverflow Carousel Stage ── */}
       <div
-        ref={sliderViewportRef}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-        onTouchCancel={handleTouchEnd}
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
-        className={`w-full overflow-hidden select-none py-2 cursor-grab active:cursor-grabbing ${
-          isDragging ? 'cursor-grabbing' : 'cursor-grab'
-        }`}
+        ref={carouselRef}
+        className="relative w-full flex items-center justify-center"
+        style={{ perspective: '1200px', perspectiveOrigin: '50% 50%', height: '420px' }}
+        onMouseDown={(e) => handleDragStart(e.clientX)}
+        onMouseUp={(e) => handleDragEnd(e.clientX)}
+        onMouseLeave={() => { isDraggingRef.current = false; }}
+        onTouchStart={(e) => handleDragStart(e.touches[0].clientX)}
+        onTouchEnd={(e) => handleDragEnd(e.changedTouches[0].clientX)}
         data-cursor="drag"
       >
-        <div
-          ref={sliderTrackRef}
-          className="flex items-stretch gap-4 sm:gap-6 md:gap-8 px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 w-max will-change-transform"
-        >
-          {reversedServices.map((service) => {
-            const originalIndex = services.findIndex((s) => (s.id ? s.id === service.id : s.title === service.title));
-            const cardNum = String(originalIndex >= 0 ? originalIndex + 1 : 1).padStart(2, '0');
+        {services.map((service, i) => {
+          const cardNum = String(i + 1).padStart(2, '0');
+          const isActive = i === activeIndex;
 
-            return (
+          return (
+            <div
+              key={service.id || service.title}
+              className="coverflow-card absolute"
+              style={{
+                width: 'clamp(260px, 30vw, 390px)',
+                transformStyle: 'preserve-3d',
+                willChange: 'transform, opacity',
+                cursor: isActive ? 'pointer' : 'default',
+              }}
+              onClick={() => handleCardClick(service, i)}
+            >
               <div
-                key={service.id || service.title}
-                onClick={() => handleCardClick(service.title)}
-                className="service-card group relative flex-shrink-0 w-[84vw] max-w-[340px] sm:w-[350px] md:w-[380px] lg:w-[410px] xl:w-[430px] p-7 sm:p-9 rounded-3xl bg-[#F8F1E7] border border-[#2B170F]/10 hover:border-[#C65D45] transition-all duration-500 shadow-md hover:shadow-2xl hover:shadow-[#2B170F]/25 flex flex-col justify-start overflow-hidden cursor-pointer select-none will-change-transform active:scale-[0.98]"
+                className={`group relative w-full p-7 sm:p-9 rounded-3xl flex flex-col justify-start overflow-hidden transition-all duration-500 shadow-md
+                  ${isActive
+                    ? 'bg-[#2B170F] border border-[#C65D45]/40 shadow-2xl shadow-[#2B170F]/40 ring-1 ring-[#C65D45]/30'
+                    : 'bg-[#F8F1E7] border border-[#2B170F]/10'
+                  }`}
+                style={{ minHeight: '340px' }}
               >
-                {/* Background Glow & Hover Dark Layer */}
-                <div className="absolute inset-0 rounded-3xl bg-gradient-to-b from-[#2B170F] via-[#24130C] to-[#180D07] opacity-0 group-hover:opacity-100 group-active:opacity-100 transition-opacity duration-500 pointer-events-none" />
-                <div className="absolute -top-12 -right-12 w-40 h-40 bg-[#C65D45]/20 rounded-full blur-2xl opacity-0 group-hover:opacity-100 group-active:opacity-100 transition-opacity duration-500 pointer-events-none" />
+                {/* Glow on active */}
+                {isActive && (
+                  <div className="absolute -top-12 -right-12 w-40 h-40 bg-[#C65D45]/25 rounded-full blur-2xl pointer-events-none" />
+                )}
 
                 <div className="relative z-10 flex flex-col justify-start h-full">
-                  {/* Icon & Service Number Header */}
+                  {/* Icon + Number row */}
                   <div className="flex items-center justify-between mb-6 sm:mb-7">
-                    <div className="service-icon-box w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-[#FFF9F2] border border-[#2B170F]/10 flex items-center justify-center group-hover:scale-110 group-hover:bg-[#C65D45] group-hover:border-[#C65D45] group-active:bg-[#C65D45] transition-all duration-300 shadow-sm group-hover:shadow-[0_0_20px_rgba(198,93,69,0.5)]">
-                      {getIcon(service.icon_name)}
+                    <div
+                      className={`w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center transition-all duration-300 shadow-sm
+                        ${isActive
+                          ? 'bg-[#C65D45] border border-[#C65D45] shadow-[0_0_20px_rgba(198,93,69,0.5)]'
+                          : 'bg-[#FFF9F2] border border-[#2B170F]/10 group-hover:bg-[#C65D45] group-hover:border-[#C65D45]'
+                        }`}
+                    >
+                      {/* Render icon, forcing white when active */}
+                      <span className={isActive ? '[&_svg]:text-white' : ''}>
+                        {getIcon(service.icon_name)}
+                      </span>
                     </div>
-                    <span className="text-xl sm:text-2xl font-mono font-bold text-[#2B170F]/20 group-hover:text-white/30 transition-colors duration-300">
+                    <span
+                      className={`text-xl sm:text-2xl font-mono font-bold transition-colors duration-300
+                        ${isActive ? 'text-white/30' : 'text-[#2B170F]/20'}`}
+                    >
                       #{cardNum}
                     </span>
                   </div>
 
-                  <h3 className="font-pogonia text-2xl sm:text-3xl font-bold text-[#2B170F] group-hover:text-[#FFF9F2] group-active:text-[#FFF9F2] transition-colors duration-300 mb-3 leading-snug">
+                  <h3
+                    className={`font-pogonia text-2xl sm:text-3xl font-bold mb-3 leading-snug transition-colors duration-300
+                      ${isActive ? 'text-[#FFF9F2]' : 'text-[#2B170F]'}`}
+                  >
                     {service.title}
                   </h3>
 
-                  <p className="text-xs sm:text-sm font-montserrat font-medium text-[#756A62] group-hover:text-[#FFF9F2]/80 group-active:text-[#FFF9F2]/80 transition-colors duration-300 leading-relaxed">
+                  <p
+                    className={`text-xs sm:text-sm font-montserrat font-medium leading-relaxed transition-colors duration-300
+                      ${isActive ? 'text-[#FFF9F2]/75' : 'text-[#756A62]'}`}
+                  >
                     {service.short_description}
                   </p>
+
+                  {/* CTA hint on active */}
+                  {isActive && (
+                    <div className="mt-auto pt-6">
+                      <span className="inline-flex items-center gap-1.5 text-xs font-montserrat font-bold text-[#C65D45] uppercase tracking-wider">
+                        Get in touch
+                        <ChevronRight className="w-3.5 h-3.5" />
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
-            );
-          })}
-        </div>
+            </div>
+          );
+        })}
       </div>
 
-      {/* Mobile Pagination Indicator */}
-      <div className="mt-3 sm:mt-5 flex flex-col items-center justify-center gap-1.5 md:hidden">
+      {/* ── Dot Indicators ── */}
+      <div className="mt-8 sm:mt-10 flex flex-col items-center justify-center gap-2">
         <div className="flex items-center gap-2">
-          {Array.from({ length: totalSlides }).map((_, i) => (
+          {services.map((_, i) => (
             <button
               key={i}
-              onClick={() => navigateToSlide(i)}
+              onClick={() => setActiveIndex(i)}
               aria-label={`Go to service ${i + 1}`}
               className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
                 activeIndex === i ? 'w-7 bg-[#C65D45]' : 'w-2 bg-[#2B170F]/20'
@@ -342,10 +366,9 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ services, onSe
           ))}
         </div>
         <p className="text-[11px] font-sans font-medium text-[#756A62]">
-          Scroll down or swipe to explore services
+          Click a card or use arrows to explore · Click center card to inquire
         </p>
       </div>
     </section>
   );
 };
-
