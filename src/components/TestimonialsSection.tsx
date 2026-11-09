@@ -189,24 +189,14 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({ testim
             </h2>
           </div>
 
-          {/* Slider Controls & Counter */}
+          {/* Slider Controls */}
           <div className="flex items-center gap-4 sm:gap-6">
             {/* Progress line */}
-            <div className="hidden lg:flex flex-col gap-1 w-28">
-              <div className="flex justify-between text-[11px] font-sans font-bold text-[#756A62]">
-                <span className="text-[#C65D45]">0{activeIndex + 1}</span>
-                <span>0{totalSlides}</span>
-              </div>
-              <div className="h-1.5 w-full bg-[#2B170F]/10 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-[#C65D45] transition-all duration-300 rounded-full"
-                  style={{ width: `${Math.max(25, ((activeIndex + 1) / totalSlides) * 100)}%` }}
-                />
-              </div>
-            </div>
-
-            <div className="text-xs font-sans font-medium text-[#756A62] hidden sm:block">
-              <span className="text-[#C65D45] font-bold">0{activeIndex + 1}</span> / 0{totalSlides}
+            <div className="hidden lg:block w-28 h-1.5 bg-[#2B170F]/10 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-[#C65D45] transition-all duration-300 rounded-full"
+                style={{ width: `${Math.max(25, ((activeIndex + 1) / totalSlides) * 100)}%` }}
+              />
             </div>
 
             {/* Arrows */}

@@ -243,8 +243,9 @@ export const Hero: React.FC<HeroProps> = ({ settings, onWatchShowreel }) => {
               </span>
               <br />
               {heroRole}
-              <br />
-              {heroLocation}
+              <span className="block text-2xl sm:text-4xl md:text-5xl lg:text-5xl xl:text-6xl 2xl:text-[68px] font-medium opacity-90 mt-1">
+                {heroLocation}
+              </span>
             </h1>
 
             {/* Subtitle */}

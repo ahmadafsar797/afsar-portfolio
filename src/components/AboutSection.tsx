@@ -113,7 +113,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ about, onOpenShowree
               <div className="absolute bottom-6 left-6 right-6 p-4 rounded-2xl bg-[#FFF9F2]/95 backdrop-blur-xl border border-[#2B170F]/10 shadow-lg flex items-center justify-between">
                 <div>
                   <span className="text-[10px] font-bold uppercase tracking-wider text-[#756A62] block">Experience</span>
-                  <span className="font-pogonia text-2xl font-bold text-[#2B170F]">{about?.years_experience || '2+'} Years in Post-Production</span>
+                  <span className="font-pogonia text-2xl font-bold text-[#2B170F]">{about?.years_experience || '2+'} Years in Video Editing & Graphic Design</span>
                 </div>
                 <div className="w-10 h-10 rounded-full bg-[#C65D45]/20 flex items-center justify-center text-[#2B170F]">
                   <Award className="w-5 h-5 text-[#C65D45]" />
@@ -129,7 +129,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ about, onOpenShowree
               <div className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/80 via-white/20 to-transparent pointer-events-none" />
               <div className="absolute -top-3 -left-4 w-12 h-16 bg-gradient-to-r from-transparent via-white/60 to-transparent rotate-25 pointer-events-none" />
               <span className="relative z-10 text-xs font-sans font-bold uppercase text-[#C65D45] tracking-normal">
-                The Creative Philosophy
+                MY CREATIVE APPROACH
               </span>
             </div>
 
