@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   Smartphone,
   MonitorPlay,
@@ -9,17 +9,13 @@ import {
   Palette,
   Volume2,
   Briefcase,
-  ChevronLeft,
-  ChevronRight,
+  Play,
+  Pause,
   ArrowRight,
   Sparkle,
   Zap,
 } from 'lucide-react';
 import { Service } from '../types';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-gsap.registerPlugin(ScrollTrigger);
 
 interface ServicesSectionProps {
   services: Service[];
@@ -31,12 +27,27 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ services, onSe
   const row1Ref = useRef<HTMLDivElement>(null);
   const row2Ref = useRef<HTMLDivElement>(null);
 
+  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
   const [isHovered, setIsHovered] = useState(false);
 
   // Split services into 2 balanced rows
   const midPoint = Math.ceil(services.length / 2);
   const row1Services = services.slice(0, midPoint);
   const row2Services = services.slice(midPoint);
+
+  // 4x repetition ensures exact 50% split for infinite seamless looping
+  const row1Repeated = [
+    ...row1Services,
+    ...row1Services,
+    ...row1Services,
+    ...row1Services,
+  ];
+  const row2Repeated = [
+    ...row2Services,
+    ...row2Services,
+    ...row2Services,
+    ...row2Services,
+  ];
 
   /* ──────────────────────────────────────────────────
      Icon resolver
@@ -58,128 +69,6 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ services, onSe
   };
 
   /* ──────────────────────────────────────────────────
-     Subtle Parallax Drift on Page Scroll (Desktop Only, No Pinning!)
-  ────────────────────────────────────────────────── */
-  useEffect(() => {
-    const section = sectionRef.current;
-    const r1 = row1Ref.current;
-    const r2 = row2Ref.current;
-    if (!section || !r1 || !r2) return;
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-
-    const mm = gsap.matchMedia();
-
-    // Desktop/Tablet only: subtle parallax drift. On mobile, keep rows at natural 0 offset to avoid clipping.
-    mm.add('(min-width: 768px)', () => {
-      gsap.to(r1, {
-        x: '-=100',
-        ease: 'none',
-        scrollTrigger: {
-          trigger: section,
-          start: 'top bottom',
-          end: 'bottom top',
-          scrub: 1.2,
-        },
-      });
-
-      gsap.fromTo(
-        r2,
-        { x: -60 },
-        {
-          x: 40,
-          ease: 'none',
-          scrollTrigger: {
-            trigger: section,
-            start: 'top bottom',
-            end: 'bottom top',
-            scrub: 1.2,
-          },
-        }
-      );
-    });
-
-    return () => mm.revert();
-  }, [services]);
-
-  /* ──────────────────────────────────────────────────
-     Row Dragging Logic (Smooth Mouse & Touch Grab)
-  ────────────────────────────────────────────────── */
-  const setupDrag = (container: HTMLDivElement | null) => {
-    if (!container) return;
-    let isDown = false;
-    let startX = 0;
-    let scrollLeft = 0;
-
-    const onMouseDown = (e: MouseEvent) => {
-      isDown = true;
-      container.classList.add('cursor-grabbing');
-      startX = e.pageX - container.offsetLeft;
-      scrollLeft = container.scrollLeft;
-    };
-
-    const onMouseLeave = () => {
-      isDown = false;
-      container.classList.remove('cursor-grabbing');
-    };
-
-    const onMouseUp = () => {
-      isDown = false;
-      container.classList.remove('cursor-grabbing');
-    };
-
-    const onMouseMove = (e: MouseEvent) => {
-      if (!isDown) return;
-      e.preventDefault();
-      const x = e.pageX - container.offsetLeft;
-      const walk = (x - startX) * 1.5;
-      container.scrollLeft = scrollLeft - walk;
-    };
-
-    container.addEventListener('mousedown', onMouseDown);
-    container.addEventListener('mouseleave', onMouseLeave);
-    container.addEventListener('mouseup', onMouseUp);
-    container.addEventListener('mousemove', onMouseMove);
-
-    return () => {
-      container.removeEventListener('mousedown', onMouseDown);
-      container.removeEventListener('mouseleave', onMouseLeave);
-      container.removeEventListener('mouseup', onMouseUp);
-      container.removeEventListener('mousemove', onMouseMove);
-    };
-  };
-
-  useEffect(() => {
-    const clean1 = setupDrag(row1Ref.current);
-    const clean2 = setupDrag(row2Ref.current);
-    return () => {
-      if (clean1) clean1();
-      if (clean2) clean2();
-    };
-  }, []);
-
-  /* ──────────────────────────────────────────────────
-     Header Button Controls (Slide Both Rows)
-  ────────────────────────────────────────────────── */
-  const scrollRows = (direction: 'left' | 'right') => {
-    const distance = 420;
-    const r1 = row1Ref.current;
-    const r2 = row2Ref.current;
-
-    if (r1) {
-      r1.scrollBy({
-        left: direction === 'right' ? distance : -distance,
-        behavior: 'smooth',
-      });
-    }
-    if (r2) {
-      r2.scrollBy({
-        left: direction === 'right' ? -distance : distance,
-        behavior: 'smooth',
-      });
-    }
-  };
-
-  /* ──────────────────────────────────────────────────
      Card Click: Inquire Service
   ────────────────────────────────────────────────── */
   const handleCardClick = (serviceTitle: string) => {
@@ -195,10 +84,10 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ services, onSe
   /* ──────────────────────────────────────────────────
      Single Service Card Component
   ────────────────────────────────────────────────── */
-  const renderCard = (service: Service) => {
+  const renderCard = (service: Service, uniqueKey: string) => {
     return (
       <div
-        key={service.id || service.title}
+        key={uniqueKey}
         onClick={() => handleCardClick(service.title)}
         className="service-reel-card group relative flex-shrink-0 w-[220px] sm:w-[280px] md:w-[340px] lg:w-[400px] p-4 sm:p-6 md:p-7 rounded-2xl sm:rounded-3xl bg-[#F8F1E7] border border-[#2B170F]/10 hover:border-[#C65D45] transition-all duration-500 shadow-sm hover:shadow-2xl hover:shadow-[#2B170F]/25 flex flex-col justify-between overflow-hidden cursor-pointer select-none active:scale-[0.98] will-change-transform"
       >
@@ -244,13 +133,13 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ services, onSe
     );
   };
 
+  const isPaused = !isAutoPlaying || isHovered;
+
   return (
     <section
       ref={sectionRef}
       id="services"
-      className="w-full bg-[#FFF9F2] text-[#2B170F] py-16 sm:py-20 lg:py-24 border-t border-[#2B170F]/10 font-sans relative overflow-hidden select-none"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      className="w-full bg-[#FFF9F2] text-[#2B170F] py-12 sm:py-16 md:py-20 lg:py-24 border-t border-[#2B170F]/10 font-sans relative overflow-hidden select-none"
     >
       {/* Ambient background blur blobs */}
       <div className="absolute top-1/4 -right-40 w-[500px] h-[500px] rounded-full bg-[#C65D45]/10 blur-[140px] pointer-events-none" />
@@ -272,51 +161,69 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ services, onSe
             </h2>
           </div>
 
-          <div className="flex items-center justify-between md:justify-end gap-6">
+          <div className="flex items-center justify-between md:justify-end gap-4 sm:gap-6">
             <p className="text-xs sm:text-sm font-montserrat font-medium text-[#756A62] max-w-md hidden lg:block">
-              All 9 specialized editing, color mastering, and sound disciplines at a glance. Drag or swipe horizontally to explore.
+              All 9 specialized editing, color mastering, and sound disciplines. Continuous auto-slide — hover over any card to explore.
             </p>
 
-            {/* Slider Navigation Arrows */}
+            {/* Auto-Slide Toggle Button */}
             <div className="flex items-center gap-2 shrink-0">
               <button
-                onClick={() => scrollRows('left')}
-                aria-label="Slide left"
-                className="w-10 h-10 sm:w-11 sm:h-11 rounded-full border border-[#2B170F]/15 bg-white/80 text-[#2B170F] hover:bg-[#C65D45] hover:text-white hover:border-[#C65D45] active:scale-95 transition-all duration-300 flex items-center justify-center cursor-pointer shadow-sm"
+                onClick={() => setIsAutoPlaying(!isAutoPlaying)}
+                aria-label={isAutoPlaying ? 'Pause auto-slide' : 'Resume auto-slide'}
+                className="px-3 sm:px-4 py-2 rounded-full border border-[#2B170F]/15 bg-white/80 text-[#2B170F] hover:bg-[#C65D45] hover:text-white hover:border-[#C65D45] active:scale-95 transition-all duration-300 flex items-center gap-2 cursor-pointer shadow-sm text-xs font-montserrat font-semibold"
               >
-                <ChevronLeft className="w-5 h-5" />
-              </button>
-
-              <button
-                onClick={() => scrollRows('right')}
-                aria-label="Slide right"
-                className="w-10 h-10 sm:w-11 sm:h-11 rounded-full border border-[#2B170F]/15 bg-white/80 text-[#2B170F] hover:bg-[#C65D45] hover:text-white hover:border-[#C65D45] active:scale-95 transition-all duration-300 flex items-center justify-center cursor-pointer shadow-sm"
-              >
-                <ChevronRight className="w-5 h-5" />
+                {isAutoPlaying ? (
+                  <>
+                    <Pause className="w-3.5 h-3.5 fill-current text-[#C65D45]" />
+                    <span>Auto-Playing</span>
+                  </>
+                ) : (
+                  <>
+                    <Play className="w-3.5 h-3.5 fill-current text-[#C65D45]" />
+                    <span>Paused</span>
+                  </>
+                )}
               </button>
             </div>
           </div>
         </div>
       </div>
 
-      {/* ── 2-Row Interactive Horizontal Reel ── */}
-      <div className="space-y-3 sm:space-y-6">
-        {/* Row 1: Top Services */}
+      {/* ── 2-Row Infinite Auto-Sliding Reel ── */}
+      <div
+        className="space-y-3 sm:space-y-6 overflow-hidden py-1"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        onTouchStart={() => setIsHovered(true)}
+        onTouchEnd={() => setIsHovered(false)}
+      >
+        {/* Row 1: Glides continuously leftwards */}
         <div
           ref={row1Ref}
-          className="flex items-stretch gap-3 sm:gap-6 px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 overflow-x-auto scrollbar-none cursor-grab active:cursor-grabbing will-change-transform"
-          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          className="animate-marquee flex items-stretch gap-3 sm:gap-6 will-change-transform"
+          style={{
+            animationPlayState: isPaused ? 'paused' : 'running',
+            animationDuration: '36s',
+          }}
         >
-          {row1Services.map((service) => renderCard(service))}
+          {row1Repeated.map((service, idx) =>
+            renderCard(service, `r1-${service.id || service.title}-${idx}`)
+          )}
         </div>
 
-        {/* Row 2: Bottom Services */}
+        {/* Row 2: Glides continuously rightwards */}
         <div
           ref={row2Ref}
-          className="flex items-stretch gap-3 sm:gap-6 px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 overflow-x-auto scrollbar-none cursor-grab active:cursor-grabbing will-change-transform"
-          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          className="animate-marquee-reverse flex items-stretch gap-3 sm:gap-6 will-change-transform"
+          style={{
+            animationPlayState: isPaused ? 'paused' : 'running',
+            animationDuration: '34s',
+          }}
         >
-          {row2Services.map((service) => renderCard(service))}
+          {row2Repeated.map((service, idx) =>
+            renderCard(service, `r2-${service.id || service.title}-${idx}`)
+          )}
         </div>
       </div>
 
@@ -324,7 +231,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ services, onSe
       <div className="mt-8 text-center">
         <p className="inline-flex items-center gap-2 text-xs font-montserrat font-medium text-[#756A62]">
           <Zap className="w-3.5 h-3.5 text-[#C65D45]" />
-          Drag horizontally or click any capability to start a project
+          Slides automatically • Hover over any card to pause • Click to start a project
         </p>
       </div>
     </section>
