@@ -2,8 +2,11 @@ import React, { useRef, useState, useEffect } from 'react';
 import { Play, Pause, Volume2, VolumeX, Maximize2, Sparkles, Layers, Sliders, Disc } from 'lucide-react';
 import { SettingsData } from '../types';
 import { gsap } from 'gsap';
-import { useRevealOnScroll, useFadeUpOnScroll } from '../hooks/useAnimations';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useFadeUpOnScroll } from '../hooks/useAnimations';
 import { isYouTubeUrl, getYouTubeThumbnail } from '../utils/videoUtils';
+
+gsap.registerPlugin(ScrollTrigger);
 
 interface ShowreelProps {
   settings?: SettingsData;
@@ -21,7 +24,7 @@ export const Showreel: React.FC<ShowreelProps> = ({ settings, onOpenLightbox }) 
   const [autoThumbnail, setAutoThumbnail] = useState<string | null>(null);
 
   const headerRef = useFadeUpOnScroll<HTMLDivElement>(0);
-  const playerRef = useRevealOnScroll<HTMLDivElement>('up', 0.1);
+  const playerRef = useRef<HTMLDivElement>(null);
   const statsRef = useFadeUpOnScroll<HTMLDivElement>(0.15);
   const playBtnRef = useRef<HTMLButtonElement>(null);
 
@@ -130,6 +133,69 @@ export const Showreel: React.FC<ShowreelProps> = ({ settings, onOpenLightbox }) 
     videoRef.current.currentTime = newTime;
   };
 
+  // Center Masking Reveal Animation (Expands outward from the center)
+  useEffect(() => {
+    const el = playerRef.current;
+    if (!el) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    const ctx = gsap.context(() => {
+      const mediaEl = el.querySelector('.showreel-media');
+      const btnEl = playBtnRef.current;
+
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: el,
+          start: 'top 82%',
+          once: true,
+        },
+      });
+
+      // 1. Center Mask reveal (aperture/curtain opens from center)
+      tl.fromTo(
+        el,
+        {
+          clipPath: 'inset(48% 48% 48% 48% round 32px)',
+          scale: 0.92,
+          opacity: 0,
+        },
+        {
+          clipPath: 'inset(0% 0% 0% 0% round 24px)',
+          scale: 1,
+          opacity: 1,
+          duration: 1.35,
+          ease: 'power3.inOut',
+          onComplete: () => {
+            gsap.set(el, { clearProps: 'clipPath' });
+          },
+        },
+        0
+      );
+
+      // 2. Parallax zoom out of the video/poster inside the expanding mask
+      if (mediaEl) {
+        tl.fromTo(
+          mediaEl,
+          { scale: 1.2 },
+          { scale: 1, duration: 1.45, ease: 'power3.out' },
+          0
+        );
+      }
+
+      // 3. Central Play Button blooms outward from center
+      if (btnEl) {
+        tl.fromTo(
+          btnEl,
+          { scale: 0.35, opacity: 0 },
+          { scale: 1, opacity: 1, duration: 0.75, ease: 'back.out(1.6)' },
+          0.38
+        );
+      }
+    }, el);
+
+    return () => ctx.revert();
+  }, []);
+
   // Magnetic play button
   const handlePlayMagnetic = (e: React.MouseEvent<HTMLButtonElement>) => {
     const btn = playBtnRef.current;
@@ -177,7 +243,7 @@ export const Showreel: React.FC<ShowreelProps> = ({ settings, onOpenLightbox }) 
             <img
               src={effectivePoster || ''}
               alt="Featured Master Showreel"
-              className="w-full h-full object-cover cursor-pointer group-hover:scale-105 transition-transform duration-700 ease-out"
+              className="showreel-media w-full h-full object-cover cursor-pointer group-hover:scale-105 transition-transform duration-700 ease-out will-change-transform"
               onClick={() => onOpenLightbox(videoUrl, 'Featured Master Showreel', 'Afsar Ahmad Films')}
             />
           ) : (
@@ -190,7 +256,7 @@ export const Showreel: React.FC<ShowreelProps> = ({ settings, onOpenLightbox }) 
               loop
               onTimeUpdate={handleTimeUpdate}
               onLoadedMetadata={handleLoadedMetadata}
-              className="w-full h-full object-cover cursor-pointer"
+              className="showreel-media w-full h-full object-cover cursor-pointer will-change-transform"
               onClick={() => onOpenLightbox(videoUrl, 'Featured Master Showreel', 'Afsar Ahmad Films')}
             />
           )}
