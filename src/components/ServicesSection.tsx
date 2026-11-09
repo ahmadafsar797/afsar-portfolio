@@ -12,7 +12,6 @@ import {
   ChevronLeft,
   ChevronRight,
   ArrowRight,
-  Clock,
   Sparkle,
   Zap,
 } from 'lucide-react';
@@ -195,9 +194,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ services, onSe
   /* ──────────────────────────────────────────────────
      Single Service Card Component
   ────────────────────────────────────────────────── */
-  const renderCard = (service: Service, globalIdx: number) => {
-    const cardNum = String(globalIdx + 1).padStart(2, '0');
-
+  const renderCard = (service: Service) => {
     return (
       <div
         key={service.id || service.title}
@@ -213,22 +210,9 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ services, onSe
         <div className="relative z-10 flex flex-col justify-between h-full">
           {/* Top Row: Icon + Number + Turnaround */}
           <div>
-            <div className="flex items-center justify-between mb-4">
+            <div className="mb-4">
               <div className="service-card-icon w-12 h-12 rounded-2xl bg-[#FFF9F2] border border-[#2B170F]/10 flex items-center justify-center text-[#C65D45] transition-all duration-300 shadow-sm">
                 {getIcon(service.icon_name)}
-              </div>
-
-              <div className="flex items-center gap-2">
-                {service.turnaround && (
-                  <span className="service-card-badge hidden sm:inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-white/70 border border-[#2B170F]/10 text-[10px] font-mono text-[#756A62] transition-colors">
-                    <Clock className="w-3 h-3 text-[#C65D45]" />
-                    {service.turnaround}
-                  </span>
-                )}
-
-                <span className="service-card-number font-mono text-xl sm:text-2xl font-bold text-[#2B170F]/20 transition-colors duration-300">
-                  #{cardNum}
-                </span>
               </div>
             </div>
 
@@ -323,7 +307,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ services, onSe
           className="flex items-stretch gap-4 sm:gap-6 px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 overflow-x-auto scrollbar-none cursor-grab active:cursor-grabbing will-change-transform"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
-          {row1Services.map((service, idx) => renderCard(service, idx))}
+          {row1Services.map((service) => renderCard(service))}
         </div>
 
         {/* Row 2: Bottom Services */}
@@ -332,7 +316,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ services, onSe
           className="flex items-stretch gap-4 sm:gap-6 px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 overflow-x-auto scrollbar-none cursor-grab active:cursor-grabbing will-change-transform"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
-          {row2Services.map((service, idx) => renderCard(service, midPoint + idx))}
+          {row2Services.map((service) => renderCard(service))}
         </div>
       </div>
 
