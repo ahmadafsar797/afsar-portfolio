@@ -58,7 +58,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ services, onSe
   };
 
   /* ──────────────────────────────────────────────────
-     Subtle Parallax Drift on Page Scroll (No Pinning!)
+     Subtle Parallax Drift on Page Scroll (Desktop Only, No Pinning!)
   ────────────────────────────────────────────────── */
   useEffect(() => {
     const section = sectionRef.current;
@@ -67,10 +67,12 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ services, onSe
     if (!section || !r1 || !r2) return;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-    const ctx = gsap.context(() => {
-      // Row 1 drifts smoothly leftwards as you scroll naturally down
+    const mm = gsap.matchMedia();
+
+    // Desktop/Tablet only: subtle parallax drift. On mobile, keep rows at natural 0 offset to avoid clipping.
+    mm.add('(min-width: 768px)', () => {
       gsap.to(r1, {
-        x: '-=120',
+        x: '-=100',
         ease: 'none',
         scrollTrigger: {
           trigger: section,
@@ -80,10 +82,9 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ services, onSe
         },
       });
 
-      // Row 2 drifts smoothly rightwards as you scroll naturally down
       gsap.fromTo(
         r2,
-        { x: -100 },
+        { x: -60 },
         {
           x: 40,
           ease: 'none',
@@ -95,9 +96,9 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ services, onSe
           },
         }
       );
-    }, sectionRef);
+    });
 
-    return () => ctx.revert();
+    return () => mm.revert();
   }, [services]);
 
   /* ──────────────────────────────────────────────────
@@ -199,44 +200,43 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ services, onSe
       <div
         key={service.id || service.title}
         onClick={() => handleCardClick(service.title)}
-        className="service-reel-card group relative flex-shrink-0 w-[300px] sm:w-[360px] md:w-[410px] lg:w-[440px] p-6 sm:p-7 rounded-3xl bg-[#F8F1E7] border border-[#2B170F]/10 hover:border-[#C65D45] transition-all duration-500 shadow-sm hover:shadow-2xl hover:shadow-[#2B170F]/25 flex flex-col justify-between overflow-hidden cursor-pointer select-none active:scale-[0.98] will-change-transform"
+        className="service-reel-card group relative flex-shrink-0 w-[220px] sm:w-[280px] md:w-[340px] lg:w-[400px] p-4 sm:p-6 md:p-7 rounded-2xl sm:rounded-3xl bg-[#F8F1E7] border border-[#2B170F]/10 hover:border-[#C65D45] transition-all duration-500 shadow-sm hover:shadow-2xl hover:shadow-[#2B170F]/25 flex flex-col justify-between overflow-hidden cursor-pointer select-none active:scale-[0.98] will-change-transform"
       >
         {/* Dark Obsidian Gradient on Hover */}
-        <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-[#24130C] via-[#1A0D07] to-[#120804] opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+        <div className="absolute inset-0 rounded-2xl sm:rounded-3xl bg-gradient-to-br from-[#24130C] via-[#1A0D07] to-[#120804] opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
         {/* Ambient Terracotta Glow on Hover */}
         <div className="absolute -top-12 -right-12 w-40 h-40 bg-[#C65D45]/30 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
         <div className="relative z-10 flex flex-col justify-between h-full">
-          {/* Top Row: Icon + Number + Turnaround */}
           <div>
-            <div className="mb-4">
-              <div className="service-card-icon w-12 h-12 rounded-2xl bg-[#FFF9F2] border border-[#2B170F]/10 flex items-center justify-center text-[#C65D45] transition-all duration-300 shadow-sm">
+            <div className="mb-3 sm:mb-4">
+              <div className="service-card-icon w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-[#FFF9F2] border border-[#2B170F]/10 flex items-center justify-center text-[#C65D45] transition-all duration-300 shadow-sm [&_svg]:w-5 [&_svg]:h-5 sm:[&_svg]:w-6 sm:[&_svg]:h-6">
                 {getIcon(service.icon_name)}
               </div>
             </div>
 
             {/* Title */}
-            <h3 className="service-card-title font-pogonia text-xl sm:text-2xl font-bold text-[#2B170F] transition-colors duration-300 mb-2 leading-snug">
+            <h3 className="service-card-title font-pogonia text-sm sm:text-lg md:text-2xl font-bold text-[#2B170F] transition-colors duration-300 mb-1.5 sm:mb-2 leading-snug">
               {service.title}
             </h3>
 
             {/* Short Description */}
-            <p className="service-card-desc font-montserrat text-xs sm:text-sm text-[#756A62] transition-colors duration-300 line-clamp-2 leading-relaxed">
+            <p className="service-card-desc font-montserrat text-[11px] sm:text-xs md:text-sm text-[#756A62] transition-colors duration-300 line-clamp-2 leading-relaxed">
               {service.short_description}
             </p>
           </div>
 
           {/* Bottom Row: Micro Deliverable Tag & Inquire Link */}
-          <div className="pt-4 mt-4 border-t border-[#2B170F]/10 group-hover:border-white/10 flex items-center justify-between transition-colors">
-            <span className="service-card-tag inline-flex items-center gap-1.5 text-[11px] font-montserrat font-semibold text-[#2B170F]/60 transition-colors">
-              <Sparkle className="w-3 h-3 text-[#C65D45]" />
+          <div className="pt-3 sm:pt-4 mt-3 sm:mt-4 border-t border-[#2B170F]/10 group-hover:border-white/10 flex items-center justify-between transition-colors">
+            <span className="service-card-tag inline-flex items-center gap-1 sm:gap-1.5 text-[10px] sm:text-[11px] font-montserrat font-semibold text-[#2B170F]/60 transition-colors">
+              <Sparkle className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-[#C65D45]" />
               Commercial Quality
             </span>
 
-            <span className="service-card-inquire inline-flex items-center gap-1 text-xs font-montserrat font-bold text-[#C65D45] uppercase tracking-wider transition-colors">
+            <span className="service-card-inquire inline-flex items-center gap-1 text-[10.5px] sm:text-xs font-montserrat font-bold text-[#C65D45] uppercase tracking-wider transition-colors">
               Inquire
-              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+              <ArrowRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 group-hover:translate-x-1 transition-transform" />
             </span>
           </div>
         </div>
@@ -300,11 +300,11 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ services, onSe
       </div>
 
       {/* ── 2-Row Interactive Horizontal Reel ── */}
-      <div className="space-y-4 sm:space-y-6">
+      <div className="space-y-3 sm:space-y-6">
         {/* Row 1: Top Services */}
         <div
           ref={row1Ref}
-          className="flex items-stretch gap-4 sm:gap-6 px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 overflow-x-auto scrollbar-none cursor-grab active:cursor-grabbing will-change-transform"
+          className="flex items-stretch gap-3 sm:gap-6 px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 overflow-x-auto scrollbar-none cursor-grab active:cursor-grabbing will-change-transform"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
           {row1Services.map((service) => renderCard(service))}
@@ -313,7 +313,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ services, onSe
         {/* Row 2: Bottom Services */}
         <div
           ref={row2Ref}
-          className="flex items-stretch gap-4 sm:gap-6 px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 overflow-x-auto scrollbar-none cursor-grab active:cursor-grabbing will-change-transform"
+          className="flex items-stretch gap-3 sm:gap-6 px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 overflow-x-auto scrollbar-none cursor-grab active:cursor-grabbing will-change-transform"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
           {row2Services.map((service) => renderCard(service))}

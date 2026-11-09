@@ -263,7 +263,7 @@ export const Showreel: React.FC<ShowreelProps> = ({ settings, onOpenLightbox }) 
 
           {/* Central Play/Pause */}
           <div
-            className={`absolute inset-0 flex items-center justify-center pointer-events-none transition-opacity duration-300 ${
+            className={`absolute inset-0 flex items-center justify-center pb-5 sm:pb-0 pointer-events-none transition-opacity duration-300 ${
               isPlaying && !isYt ? 'opacity-0 group-hover:opacity-100' : 'opacity-100 bg-black/40'
             }`}
           >
@@ -276,10 +276,10 @@ export const Showreel: React.FC<ShowreelProps> = ({ settings, onOpenLightbox }) 
               onMouseMove={handlePlayMagnetic}
               onMouseLeave={handlePlayLeave}
               data-cursor="play"
-              className="pointer-events-auto w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-white/20 backdrop-blur-xl border border-white/30 flex items-center justify-center text-[#FFF9F2] hover:scale-110 hover:bg-[#C65D45] hover:text-[#2B170F] hover:border-[#C65D45] transition-all duration-300 shadow-2xl cursor-pointer"
+              className="pointer-events-auto w-12 h-12 sm:w-18 sm:h-18 md:w-20 md:h-20 lg:w-24 lg:h-24 rounded-full bg-white/20 backdrop-blur-xl border border-white/30 flex items-center justify-center text-[#FFF9F2] hover:scale-110 hover:bg-[#C65D45] hover:text-[#2B170F] hover:border-[#C65D45] transition-all duration-300 shadow-2xl cursor-pointer"
               aria-label="Play Fullscreen"
             >
-              <Play className="w-8 h-8 fill-current ml-1" />
+              <Play className="w-5 h-5 sm:w-7 sm:h-7 md:w-8 md:h-8 fill-current ml-0.5 sm:ml-1" />
             </button>
           </div>
 

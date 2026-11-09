@@ -242,7 +242,7 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({ testim
       >
         <div
           ref={sliderTrackRef}
-          className="flex items-stretch gap-4 sm:gap-6 md:gap-8 px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 w-max will-change-transform"
+          className="flex items-stretch gap-2.5 sm:gap-6 md:gap-8 px-3 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 w-max will-change-transform"
         >
           {/* ONLY the original Client Video Testimonial Cards */}
           {testimonials.map((item, idx) => (
@@ -311,7 +311,7 @@ const HorizontalTestimonialCard: React.FC<HorizontalTestimonialCardProps> = ({
       ref={cardRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className="testimonial-slide-card flex-shrink-0 w-[82vw] max-w-[320px] sm:w-[310px] md:w-[340px] lg:w-[360px] xl:w-[390px] 2xl:w-[410px] rounded-3xl bg-[#FFF9F2] border border-[#2B170F]/10 hover:border-[#C65D45]/50 transition-all duration-400 overflow-hidden shadow-md hover:shadow-2xl flex flex-col justify-between group will-change-transform"
+      className="testimonial-slide-card flex-shrink-0 w-[45vw] min-w-[155px] max-w-[215px] sm:w-[310px] md:w-[340px] lg:w-[360px] xl:w-[390px] 2xl:w-[410px] rounded-2xl sm:rounded-3xl bg-[#FFF9F2] border border-[#2B170F]/10 hover:border-[#C65D45]/50 transition-all duration-400 overflow-hidden shadow-md hover:shadow-2xl flex flex-col justify-between group will-change-transform"
     >
       {/* 9:16 Video Container (Proportionally sized to fit inside screen height without clipping) */}
       <div
@@ -319,7 +319,7 @@ const HorizontalTestimonialCard: React.FC<HorizontalTestimonialCardProps> = ({
           onOpenLightbox(item.video_url, `${item.client_name} - ${item.company}`, 'Video Testimonial')
         }
         data-cursor="play"
-        className="relative w-full h-[240px] sm:h-[285px] md:h-[315px] lg:h-[330px] xl:h-[350px] overflow-hidden bg-black cursor-pointer group/video rounded-t-3xl"
+        className="relative w-full h-[175px] sm:h-[285px] md:h-[315px] lg:h-[330px] xl:h-[350px] overflow-hidden bg-black cursor-pointer group/video rounded-t-2xl sm:rounded-t-3xl"
       >
         <VideoAutoThumbnail
           videoUrl={item.video_url}
@@ -330,14 +330,14 @@ const HorizontalTestimonialCard: React.FC<HorizontalTestimonialCardProps> = ({
         <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/30 to-black/50 transition-opacity duration-300 group-hover/video:opacity-90" />
 
         {/* Top Badge & Rating */}
-        <div className="absolute top-3 left-3 right-3 flex items-center justify-between z-10 pointer-events-none">
-          <span className="px-2.5 py-1 rounded-full bg-black/75 backdrop-blur-md border border-white/10 text-[10px] font-sans uppercase font-bold tracking-wider text-[#C65D45] flex items-center gap-1.5 shadow-sm">
+        <div className="absolute top-2 sm:top-3 left-2 sm:left-3 right-2 sm:right-3 flex items-center justify-between z-10 pointer-events-none">
+          <span className="px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full bg-black/75 backdrop-blur-md border border-white/10 text-[8.5px] sm:text-[10px] font-sans uppercase font-bold tracking-wider text-[#C65D45] flex items-center gap-1 shadow-sm">
             <span className="w-1.5 h-1.5 rounded-full bg-[#C65D45] animate-ping" />
-            <span>Video Testimonial</span>
+            <span>Testimonial</span>
           </span>
-          <div className="flex items-center gap-0.5 bg-black/75 px-2 py-1 rounded-full backdrop-blur-md border border-white/10 shadow-sm">
+          <div className="flex items-center gap-0.5 bg-black/75 px-1.5 py-0.5 sm:px-2 sm:py-1 rounded-full backdrop-blur-md border border-white/10 shadow-sm">
             {[...Array(item.rating || 5)].map((_, i) => (
-              <Star key={i} className="w-3 h-3 text-[#C65D45] fill-current" />
+              <Star key={i} className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-[#C65D45] fill-current" />
             ))}
           </div>
         </div>
@@ -346,26 +346,26 @@ const HorizontalTestimonialCard: React.FC<HorizontalTestimonialCardProps> = ({
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <div
             ref={playBtnRef}
-            className="w-14 h-14 rounded-full bg-white/20 backdrop-blur-xl border border-white/30 flex items-center justify-center text-[#FFF9F2] group-hover/video:scale-110 group-hover/video:bg-[#C65D45] group-hover/video:text-[#2B170F] group-hover/video:border-[#C65D45] transition-all duration-300 shadow-2xl"
+            className="w-9 h-9 sm:w-14 sm:h-14 rounded-full bg-white/20 backdrop-blur-xl border border-white/30 flex items-center justify-center text-[#FFF9F2] group-hover/video:scale-110 group-hover/video:bg-[#C65D45] group-hover/video:text-[#2B170F] group-hover/video:border-[#C65D45] transition-all duration-300 shadow-2xl"
           >
-            <Play className="w-5 h-5 fill-current ml-1" />
+            <Play className="w-3.5 h-3.5 sm:w-5 sm:h-5 fill-current ml-0.5 sm:ml-1" />
           </div>
         </div>
 
         {/* Bottom Overlay with Client Details */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 z-10 bg-gradient-to-t from-black/95 via-black/60 to-transparent">
-          <div className="text-[11px] text-[#C65D45] font-sans font-bold tracking-wider uppercase mb-0.5">
+        <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-4 z-10 bg-gradient-to-t from-black/95 via-black/60 to-transparent">
+          <div className="text-[8.5px] sm:text-[11px] text-[#C65D45] font-sans font-bold tracking-wider uppercase mb-0.5 truncate">
             {item.client_title || 'Client'} • {item.company}
           </div>
-          <h3 className="font-pogonia text-xl sm:text-2xl font-bold text-white leading-tight">
+          <h3 className="font-pogonia text-xs sm:text-xl md:text-2xl font-bold text-white leading-tight truncate">
             {item.client_name}
           </h3>
         </div>
       </div>
 
       {/* Written Quote & CTA Button */}
-      <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between">
-        <blockquote className="text-xs sm:text-sm font-sans font-medium text-[#756A62] italic leading-relaxed line-clamp-3 mb-4">
+      <div className="p-2.5 sm:p-5 flex-1 flex flex-col justify-between">
+        <blockquote className="text-[10px] sm:text-xs md:text-sm font-sans font-medium text-[#756A62] italic leading-snug line-clamp-2 sm:line-clamp-3 mb-2 sm:mb-4">
           "{item.quote || 'Afsar completely transformed our video retention and overall brand perception.'}"
         </blockquote>
 
@@ -374,13 +374,13 @@ const HorizontalTestimonialCard: React.FC<HorizontalTestimonialCardProps> = ({
             onOpenLightbox(item.video_url, `${item.client_name} - ${item.company}`, 'Video Testimonial')
           }
           data-cursor="play"
-          className="group/story relative w-full py-3 rounded-full text-xs font-sans uppercase font-black tracking-wide text-[#FFF9F2] bg-gradient-to-r from-[#C65D45] via-[#D8684F] to-[#E2725B] shadow-[0_4px_18px_rgba(198,93,69,0.45),inset_0_1px_1px_rgba(255,255,255,0.35)] hover:shadow-[0_6px_28px_rgba(198,93,69,0.65)] hover:scale-[1.02] active:scale-95 transition-all duration-300 flex items-center justify-center gap-2 border border-[#E2725B]/40 cursor-pointer"
+          className="group/story relative w-full py-2 sm:py-3 rounded-full text-[10px] sm:text-xs font-sans uppercase font-black tracking-wide text-[#FFF9F2] bg-gradient-to-r from-[#C65D45] via-[#D8684F] to-[#E2725B] shadow-[0_4px_18px_rgba(198,93,69,0.45),inset_0_1px_1px_rgba(255,255,255,0.35)] hover:shadow-[0_6px_28px_rgba(198,93,69,0.65)] hover:scale-[1.02] active:scale-95 transition-all duration-300 flex items-center justify-center gap-1.5 sm:gap-2 border border-[#E2725B]/40 cursor-pointer"
         >
           <span className="absolute inset-0 rounded-full overflow-hidden pointer-events-none">
             <span className="absolute inset-0 -translate-x-full group-hover/story:translate-x-full group-active/story:translate-x-full transition-transform duration-500 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
           </span>
-          <Play className="relative w-3.5 h-3.5 fill-current" />
-          <span className="relative">Watch Client Story</span>
+          <Play className="relative w-3 h-3 sm:w-3.5 sm:h-3.5 fill-current" />
+          <span className="relative">Watch Story</span>
         </button>
       </div>
     </div>
