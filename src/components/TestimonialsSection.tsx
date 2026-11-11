@@ -311,7 +311,7 @@ const HorizontalTestimonialCard: React.FC<HorizontalTestimonialCardProps> = ({
       ref={cardRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className="testimonial-slide-card flex-shrink-0 w-[45vw] min-w-[155px] max-w-[215px] sm:w-[310px] md:w-[340px] lg:w-[360px] xl:w-[390px] 2xl:w-[410px] rounded-2xl sm:rounded-3xl bg-[#FFF9F2] border border-[#2B170F]/10 hover:border-[#C65D45]/50 transition-all duration-400 overflow-hidden shadow-md hover:shadow-2xl flex flex-col justify-between group will-change-transform"
+      className="testimonial-slide-card flex-shrink-0 w-[45vw] min-w-[155px] max-w-[215px] sm:min-w-0 sm:max-w-none sm:w-[310px] md:w-[340px] lg:w-[360px] xl:w-[390px] 2xl:w-[410px] rounded-2xl sm:rounded-3xl bg-[#FFF9F2] border border-[#2B170F]/10 hover:border-[#C65D45]/50 transition-all duration-400 overflow-hidden shadow-md hover:shadow-2xl flex flex-col justify-between group will-change-transform"
     >
       {/* 9:16 Video Container (Proportionally sized to fit inside screen height without clipping) */}
       <div
@@ -333,7 +333,7 @@ const HorizontalTestimonialCard: React.FC<HorizontalTestimonialCardProps> = ({
         <div className="absolute top-2 sm:top-3 left-2 sm:left-3 right-2 sm:right-3 flex items-center justify-between z-10 pointer-events-none">
           <span className="px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full bg-black/75 backdrop-blur-md border border-white/10 text-[8.5px] sm:text-[10px] font-sans uppercase font-bold tracking-wider text-[#C65D45] flex items-center gap-1 shadow-sm">
             <span className="w-1.5 h-1.5 rounded-full bg-[#C65D45] animate-ping" />
-            <span>Testimonial</span>
+            <span><span className="hidden sm:inline">Video </span>Testimonial</span>
           </span>
           <div className="flex items-center gap-0.5 bg-black/75 px-1.5 py-0.5 sm:px-2 sm:py-1 rounded-full backdrop-blur-md border border-white/10 shadow-sm">
             {[...Array(item.rating || 5)].map((_, i) => (
@@ -365,7 +365,7 @@ const HorizontalTestimonialCard: React.FC<HorizontalTestimonialCardProps> = ({
 
       {/* Written Quote & CTA Button */}
       <div className="p-2.5 sm:p-5 flex-1 flex flex-col justify-between">
-        <blockquote className="text-[10px] sm:text-xs md:text-sm font-sans font-medium text-[#756A62] italic leading-snug line-clamp-2 sm:line-clamp-3 mb-2 sm:mb-4">
+        <blockquote className="text-[10px] sm:text-xs md:text-sm font-sans font-medium text-[#756A62] italic leading-snug sm:leading-relaxed line-clamp-2 sm:line-clamp-3 mb-2 sm:mb-4">
           "{item.quote || 'Afsar completely transformed our video retention and overall brand perception.'}"
         </blockquote>
 
@@ -380,7 +380,7 @@ const HorizontalTestimonialCard: React.FC<HorizontalTestimonialCardProps> = ({
             <span className="absolute inset-0 -translate-x-full group-hover/story:translate-x-full group-active/story:translate-x-full transition-transform duration-500 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
           </span>
           <Play className="relative w-3 h-3 sm:w-3.5 sm:h-3.5 fill-current" />
-          <span className="relative">Watch Story</span>
+          <span className="relative"><span className="hidden sm:inline">Watch Client Story</span><span className="sm:hidden">Watch Story</span></span>
         </button>
       </div>
     </div>
